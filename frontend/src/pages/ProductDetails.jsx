@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Heart, Star, ChevronLeft, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
 import Specifications from '../components/home/Specifications';
+import { useCart } from '../../context/CartContext';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
@@ -18,6 +19,8 @@ const fallbackProduct = {
 const ProductDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
+  
   // Using passed product from location state, or fallback if accessed directly
   const product = location.state || fallbackProduct;
 
@@ -122,11 +125,19 @@ const ProductDetails = () => {
 
           {/* Actions */}
           <div className="flex gap-4 mb-12">
-            <button className="cursor-pointer flex-1 bg-black text-white px-8 py-4 flex items-center justify-center gap-3 font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors">
+            <button 
+              onClick={() => addToCart(product, size)}
+              className="cursor-pointer flex-1 bg-black text-white px-8 py-4 flex items-center justify-center gap-3 font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors"
+            >
               <ShoppingBag size={18} />
               Add to Cart
             </button>
-            <button className="cursor-pointer flex-1 border-2 border-black text-black px-8 py-4 flex items-center justify-center gap-3 font-medium uppercase tracking-wider hover:bg-gray-50 transition-colors">
+            <button 
+              onClick={() => {
+                addToCart(product, size);
+              }}
+              className="cursor-pointer flex-1 border-2 border-black text-black px-8 py-4 flex items-center justify-center gap-3 font-medium uppercase tracking-wider hover:bg-gray-50 transition-colors"
+            >
               Buy Now
             </button>
             <button 
