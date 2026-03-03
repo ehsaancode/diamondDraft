@@ -22,20 +22,20 @@ const EditorialSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-gray-300">
           
           {/* Left - Parallax Brand Hero */}
-          <div className="bg-[#E5E5E5] relative min-h-[600px] flex flex-col justify-between p-12 overflow-hidden">
+          <div className="bg-[#E5E5E5] relative min-h-[400px] md:min-h-[600px] flex flex-col justify-between p-6 md:p-12 overflow-hidden">
             <motion.h2 
               style={{ y: textY }}
-              className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15vw] font-bold text-black opacity-100 leading-none select-none pointer-events-none whitespace-nowrap z-0"
+              className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-[35vw] md:text-[15vw] font-bold text-black opacity-100 leading-none select-none pointer-events-none whitespace-nowrap z-0"
             >
               Gwel
             </motion.h2>
             
-            <div className="relative z-10 flex-1 flex items-start justify-center h-[450px] overflow-hidden pt-12">
+            <div className="relative z-10 flex-1 flex items-start justify-center h-[350px] md:h-[450px] overflow-hidden pt-6 md:pt-12">
               <motion.img 
                 style={{ y: imageY }}
                 src={heroModel}
                 alt="Brand Ambassador"
-                className="w-full max-w-2xl h-auto object-contain mix-blend-multiply scale-125"
+                className="w-full max-w-2xl h-auto object-contain mix-blend-multiply scale-[1.4] md:scale-125"
               />
             </div>
 
