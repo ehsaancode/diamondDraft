@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Heart, Star, ChevronLeft, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
 import Specifications from '../components/home/Specifications';
-import { useCart } from '../../context/CartContext';
+import { useCart } from '../context/CartContext';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 
