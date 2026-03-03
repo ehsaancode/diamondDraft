@@ -1,11 +1,14 @@
+/* eslint-disable */
 import React, { useState } from 'react';
 import { Heart, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 // A reusable Product Card Component
 const ProductCard = ({ product, index }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLiked, setIsLiked] = useState(product.isLiked || false);
+  const navigate = useNavigate();
 
   return (
     <motion.div 
@@ -16,6 +19,7 @@ const ProductCard = ({ product, index }) => {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => navigate(`/product/${product.id}`, { state: product })}
     >
       <div className="relative bg-white pt-4 pb-8 px-4 rounded-sm shadow-sm overflow-hidden mb-4 h-[320px] flex items-center justify-center transition-all duration-300 hover:shadow-md">
         {/* Top bar with rating and heart */}

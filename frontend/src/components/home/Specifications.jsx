@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AccordionItem from '../ui/AccordionItem';
 
-const Specifications = () => {
+const Specifications = ({ product }) => {
   const [openIndex, setOpenIndex] = useState(1); // 1 is default open based on mock
 
   const toggleAccordion = (index) => {
@@ -34,10 +34,10 @@ const Specifications = () => {
             <div className="flex-1 text-sm">
               <div className="grid grid-cols-[120px_1fr] gap-y-4 gap-x-4">
                 <div className="font-semibold text-gray-800">Metal Type:</div>
-                <div className="text-gray-600">18k Rose Gold</div>
+                <div className="text-gray-600">{product?.metalType || '18k Rose Gold'}</div>
 
                 <div className="font-semibold text-gray-800">Gemstones</div>
-                <div className="text-gray-600">Diamonds, 0.5 carats</div>
+                <div className="text-gray-600">{product?.gemstones || 'Diamonds, 0.5 carats'}</div>
 
                 <div className="font-semibold text-gray-800">Ring Size</div>
                 <div className="text-gray-600">Adjustable <span className="text-gray-400 italic">(Available any sizes)</span></div>

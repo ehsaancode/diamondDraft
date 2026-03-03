@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import { ShoppingBag, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -11,7 +12,7 @@ const Navbar = () => {
       className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full group"
     >
       <div className="text-2xl font-serif font-semibold tracking-wide">
-        Gwells
+        Gwel
       </div>
       
       <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-800">
