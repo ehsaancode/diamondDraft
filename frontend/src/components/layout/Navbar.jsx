@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShoppingBag, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 
 const Navbar = () => {
@@ -13,15 +14,15 @@ const Navbar = () => {
       className="sticky top-0 z-50 w-full bg-[#fafafa]/80 backdrop-blur-md transition-all"
     >
       <nav className="flex items-center justify-between px-8 py-4 max-w-7xl mx-auto w-full group">
-      <div className="text-2xl font-serif font-semibold tracking-wide">
+      <Link to="/" className="text-2xl font-serif font-semibold tracking-wide cursor-pointer hover:opacity-80 transition-opacity">
         Gwel
-      </div>
+      </Link>
       
       <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-800">
-        <a href="#" className="hover:text-black transition-colors">Home</a>
-        <a href="#" className="hover:text-black transition-colors">Shop</a>
-        <a href="#" className="hover:text-black transition-colors">About</a>
-        <a href="#" className="hover:text-black transition-colors">Contact</a>
+        <Link to="/" className="hover:text-black transition-colors">Home</Link>
+        <Link to="/shop" className="hover:text-black transition-colors">Shop</Link>
+        <Link to="/about" className="hover:text-black transition-colors">About</Link>
+        <Link to="/contact" className="hover:text-black transition-colors">Contact</Link>
       </div>
 
       <div className="flex items-center gap-4">
