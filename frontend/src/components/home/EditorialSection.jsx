@@ -35,7 +35,7 @@ const EditorialSection = () => {
                 style={{ y: imageY }}
                 src={heroModel}
                 alt="Brand Ambassador"
-                className="w-full max-w-2xl h-auto object-contain mix-blend-multiply"
+                className="w-full max-w-2xl h-auto object-contain mix-blend-multiply scale-125"
               />
             </div>
 
@@ -48,30 +48,30 @@ const EditorialSection = () => {
           </div>
 
           {/* Right - Featured Product Card */}
-          <div className="bg-[#E5E5E5] p-12 md:p-16 flex flex-col justify-center min-h-[600px] relative">
-            <div className="max-w-sm ml-auto">
-              <h2 className="text-4xl font-bold mb-2 text-black leading-tight">
+          <div className="bg-[#E5E5E5] p-8 md:p-16 flex flex-col justify-center min-h-[500px] md:min-h-[600px] relative">
+            <div className="max-w-sm mx-auto lg:ml-auto lg:mr-0">
+              <h2 className="text-3xl md:text-4xl font-bold mb-2 text-black leading-tight">
                 {featureProduct.name.split(' ').slice(0, 3).join(' ')} ring
               </h2>
-              <p className="text-sm text-gray-500 mb-12 uppercase tracking-widest font-semibold">18K yellow gold</p>
+              <p className="text-xs md:text-sm text-gray-500 mb-8 md:mb-12 uppercase tracking-widest font-semibold">18K yellow gold</p>
               
-              <div className="w-full aspect-square flex items-center justify-center mb-12">
+              <div className="w-full aspect-square flex items-center justify-center mb-8 md:mb-12">
                 <motion.img 
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.5 }}
                   src={featureProduct.image} 
                   alt={featureProduct.name} 
-                  className="max-h-[300px] w-auto object-contain mix-blend-multiply drop-shadow-xl" 
+                  className="max-h-[250px] md:max-h-[300px] w-auto object-contain mix-blend-multiply drop-shadow-xl" 
                 />
               </div>
 
               <div className="flex justify-between items-end">
                 <div>
-                  <p className="text-xs text-gray-400 mb-1 uppercase tracking-tighter">From</p>
-                  <p className="text-3xl font-bold text-black">${featureProduct.price.toLocaleString()}</p>
+                  <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-tighter">From</p>
+                  <p className="text-2xl md:text-3xl font-bold text-black">${featureProduct.price.toLocaleString()}</p>
                 </div>
-                <button className="bg-black text-white p-6 hover:bg-gray-800 transition-colors cursor-pointer group">
-                  <ArrowUpRight size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                <button className="bg-black text-white p-5 md:p-6 hover:bg-gray-800 transition-colors cursor-pointer group">
+                  <ArrowUpRight size={20} className="md:w-6 md:h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                 </button>
               </div>
             </div>
