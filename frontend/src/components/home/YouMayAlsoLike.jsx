@@ -1,53 +1,8 @@
 import React from 'react';
-
-const suggestedProducts = [
-  {
-    id: 11,
-    name: 'Exquisite Vintage Lab Grown Diamond Flower Ring',
-    price: 272.36,
-    originalPrice: 280.45,
-    rating: 5.0,
-    reviews: 248,
-    image: '/images/ring_1_1772534075731.png', 
-    colors: ['#D6A848', '#E6E6E6', '#B76E79'],
-    tag: 'Best Selling'
-  },
-  {
-    id: 12,
-    name: 'Gleaming Diamond Cluster Dangle Drop Earrings',
-    price: 582.20,
-    originalPrice: 600.00,
-    rating: 5.0,
-    reviews: 248,
-    image: '/images/ring_1_1772534075731.png',
-    colors: ['#D6A848', '#E6E6E6', '#B76E79'],
-    tag: 'New Arrival'
-  },
-  {
-    id: 13,
-    name: 'Designer Nesting Diamond Cluster Pendant',
-    price: 1035.00,
-    originalPrice: 1100.00,
-    rating: 5.0,
-    reviews: 248,
-    image: '/images/ring_1_1772534075731.png',
-    colors: ['#D6A848', '#E6E6E6', '#B76E79'],
-    tag: 'Best Selling'
-  },
-  {
-    id: 14,
-    name: 'Antique Pear Shaped Double Row Diamond Bracelet',
-    price: 16721.19,
-    originalPrice: 17000.00,
-    rating: 4.8,
-    reviews: 146,
-    image: '/images/ring_1_1772534075731.png',
-    colors: ['#D6A848', '#E6E6E6', '#B76E79'],
-    tag: 'Best Selling'
-  }
-];
+import { products } from '../../data/products';
 
 const YouMayAlsoLike = () => {
+  const suggestedProducts = products.slice(-4);
   return (
     <section className="px-8 py-20 bg-[#FAFAFA] w-full mt-12">
       <div className="max-w-7xl mx-auto">

@@ -1,0 +1,120 @@
+export const products = [
+  {
+    id: 1,
+    name: 'Eternal Embrace Ring',
+    brand: 'Lustro & Co.',
+    price: 330.00,
+    rating: 4.9,
+    reviews: 2365,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'Best Selling'
+  },
+  {
+    id: 2,
+    name: 'Harmonic Serenity Ring',
+    brand: 'Aurora Jewels',
+    price: 325.00,
+    rating: 4.9,
+    reviews: 2365,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: true,
+    tag: 'Best Selling'
+  },
+  {
+    id: 3,
+    name: 'Starlit Voyage Ring',
+    brand: 'Gilded Grace',
+    price: 300.00,
+    rating: 4.9,
+    reviews: 2365,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'New Arrival'
+  },
+  {
+    id: 4,
+    name: 'Ember Glow Ring',
+    brand: 'Soleil Gems',
+    price: 350.00,
+    rating: 4.9,
+    reviews: 2365,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'Best Selling'
+  },
+  {
+    id: 5,
+    name: 'Moonlit Serenade Ring',
+    brand: 'Velvet Atelier',
+    price: 380.00,
+    rating: 4.9,
+    reviews: 2365,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'Best Selling'
+  },
+  {
+    id: 6,
+    name: 'Radiant Reverie Ring',
+    brand: 'Opal & Ivy',
+    price: 450.00,
+    rating: 4.9,
+    reviews: 2365,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'Best Selling'
+  },
+  {
+    id: 11,
+    name: 'Exquisite Vintage Lab Grown Diamond Flower Ring',
+    brand: 'Lustro & Co.',
+    price: 272.36,
+    originalPrice: 280.45,
+    rating: 5.0,
+    reviews: 248,
+    image: '/images/ring_1_1772534075731.png', 
+    colors: ['#D6A848', '#E6E6E6', '#B76E79'],
+    isLiked: false,
+    tag: 'Best Selling'
+  },
+  {
+    id: 12,
+    name: 'Gleaming Diamond Cluster Dangle Drop Earrings',
+    brand: 'Lustro & Co.',
+    price: 582.20,
+    originalPrice: 600.00,
+    rating: 5.0,
+    reviews: 248,
+    image: '/images/ring_1_1772534075731.png',
+    colors: ['#D6A848', '#E6E6E6', '#B76E79'],
+    isLiked: false,
+    tag: 'New Arrival'
+  },
+  {
+    id: 13,
+    name: 'Designer Nesting Diamond Cluster Pendant',
+    brand: 'Lustro & Co.',
+    price: 1035.00,
+    originalPrice: 1100.00,
+    rating: 5.0,
+    reviews: 248,
+    image: '/images/ring_1_1772534075731.png',
+    colors: ['#D6A848', '#E6E6E6', '#B76E79'],
+    isLiked: false,
+    tag: 'Best Selling'
+  },
+  {
+    id: 14,
+    name: 'Antique Pear Shaped Double Row Diamond Bracelet',
+    brand: 'Lustro & Co.',
+    price: 16721.19,
+    originalPrice: 17000.00,
+    rating: 4.8,
+    reviews: 146,
+    image: '/images/ring_1_1772534075731.png',
+    colors: ['#D6A848', '#E6E6E6', '#B76E79'],
+    isLiked: false,
+    tag: 'Best Selling'
+  }
+];
