@@ -150,15 +150,15 @@ const ProductDetails = () => {
 
           {/* Features */}
           <div className="space-y-4 pt-6 md:pt-8 border-t border-gray-200">
-            <div className="flex items-center gap-4 text-gray-600">
+            <div className="flex items-center justify-center md:justify-start gap-4 text-gray-600">
               <Truck size={18} className="text-gray-400" />
               <span className="text-xs md:text-sm font-medium uppercase tracking-tight">Free worldwide shipping over $500</span>
             </div>
-            <div className="flex items-center gap-4 text-gray-600">
+            <div className="flex items-center justify-center md:justify-start gap-4 text-gray-600">
               <ShieldCheck size={18} className="text-gray-400" />
               <span className="text-xs md:text-sm font-medium uppercase tracking-tight">Lifetime warranty on all diamonds</span>
             </div>
-            <div className="flex items-center gap-4 text-gray-600">
+            <div className="flex items-center justify-center md:justify-start gap-4 text-gray-600">
               <RotateCcw size={18} className="text-gray-400" />
               <span className="text-xs md:text-sm font-medium uppercase tracking-tight">30-day free returns</span>
             </div>

@@ -35,7 +35,7 @@ const EditorialSection = () => {
                 style={{ y: imageY }}
                 src={heroModel}
                 alt="Brand Ambassador"
-                className="w-full max-w-2xl h-auto object-contain mix-blend-multiply scale-[1.4] md:scale-125"
+                className="w-full max-w-2xl h-auto object-contain mix-blend-multiply scale-[1.1] md:scale-125"
               />
             </div>
 
