@@ -13,7 +13,7 @@ const BestSelling = () => {
         </a>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-8 gap-y-10 md:gap-y-12">
         {sellingProducts.map((product, index) => (
           <ProductCard key={product.id} product={product} index={index} />
         ))}

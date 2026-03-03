@@ -10,11 +10,11 @@ const YouMayAlsoLike = () => {
           You May Also Like It
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {suggestedProducts.map((product) => (
-            <div key={product.id} className="bg-white p-6 rounded-sm shadow-sm flex flex-col items-center group cursor-pointer transition-shadow hover:shadow-md">
+            <div key={product.id} className="bg-white p-4 md:p-6 rounded-sm shadow-sm flex flex-col items-center group cursor-pointer transition-shadow hover:shadow-md">
               <div className="w-full flex justify-between items-center mb-6 text-xs text-gray-500">
-                <span className="font-medium text-black">{product.tag}</span>
+                <span className="font-bold text-black text-[10px] uppercase truncate">{product.tag}</span>
                 <div className="flex items-center gap-1">
                   <span className="text-yellow-500">★</span>
                   <span>{product.rating.toFixed(1)} ({product.reviews})</span>
@@ -34,9 +34,9 @@ const YouMayAlsoLike = () => {
                   {product.name}
                 </h3>
                 <div className="flex items-center justify-center gap-2 mb-4 text-xs font-semibold">
-                  <span className="text-black">${product.price.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</span>
+                  <span className="text-black">${product.price.toLocaleString('en-US', { minimumFractionDigits: 0 })}</span>
                   {product.originalPrice && (
-                    <span className="text-gray-400 line-through">${product.originalPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</span>
+                    <span className="text-gray-400 line-through">${product.originalPrice.toLocaleString('en-US', { minimumFractionDigits: 0 })}</span>
                   )}
                 </div>
                 

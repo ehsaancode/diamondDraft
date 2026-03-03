@@ -21,22 +21,22 @@ const ProductCard = ({ product, index }) => {
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => navigate(`/product/${product.id}`, { state: product })}
     >
-      <div className="relative bg-white pt-4 pb-8 px-4 rounded-sm shadow-sm overflow-hidden mb-4 h-[320px] flex items-center justify-center transition-all duration-300 hover:shadow-md">
+      <div className="relative bg-white pt-4 pb-8 px-4 rounded-sm shadow-sm overflow-hidden mb-4 h-[220px] md:h-[320px] flex items-center justify-center transition-all duration-300 hover:shadow-md">
         {/* Top bar with rating and heart */}
         <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
-          <div className="flex items-center gap-1 text-xs text-gray-500 font-medium">
-            <Star size={12} className="text-gray-400" fill="currentColor" />
+          <div className="flex items-center gap-1 text-[10px] md:text-xs text-gray-500 font-medium">
+            <Star size={10} className="text-gray-400 md:w-3 md:h-3" fill="currentColor" />
             <span>{product.rating}</span>
-            <span className="text-gray-400">({product.reviews})</span>
+            <span className="text-gray-400 hidden sm:inline">({product.reviews})</span>
           </div>
           <button 
             onClick={(e) => { e.stopPropagation(); setIsLiked(!isLiked); }} 
-            className="p-1.5 bg-white/50 hover:bg-white rounded-full transition-colors"
+            className="p-1 md:p-1.5 bg-white/50 hover:bg-white rounded-full transition-colors"
           >
-            <Heart size={16} className={isLiked ? "text-red-500" : "text-gray-400"} fill={isLiked ? "currentColor" : "none"} />
+            <Heart size={14} className={isLiked ? "text-red-500 md:w-4 md:h-4" : "text-gray-400 md:w-4 md:h-4"} fill={isLiked ? "currentColor" : "none"} />
           </button>
         </div>
-
+ 
         {/* Product Image */}
         <motion.img 
           initial={false}
@@ -44,7 +44,7 @@ const ProductCard = ({ product, index }) => {
           transition={{ duration: 0.4 }}
           src={product.image} 
           alt={product.name} 
-          className="max-h-[200px] object-contain drop-shadow-lg" 
+          className="max-h-[140px] md:max-h-[200px] object-contain drop-shadow-lg" 
         />
       </div>
 
