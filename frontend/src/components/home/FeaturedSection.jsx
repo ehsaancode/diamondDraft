@@ -2,6 +2,7 @@
 import React from 'react';
 import { ArrowRight, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const FeaturedSection = () => {
   return (
@@ -21,9 +22,9 @@ const FeaturedSection = () => {
             Explore our new arrival jewelry collection: elegant necklaces, classic hoops, vibrant gemstone rings, pearl drop earrings, and chic charm bracelets. Perfect for everyday elegance!
           </p>
 
-          <a href="#" className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase mb-16 hover:gap-4 transition-all w-max hover:text-gray-600">
+          <Link to="/shop" className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase mb-16 hover:gap-4 transition-all w-max hover:text-gray-600">
             Shop All <ArrowRight size={16} />
-          </a>
+          </Link>
 
           {/* Featured Product Card */}
           <div className="bg-white p-6 rounded-sm shadow-sm max-w-[280px] group cursor-pointer hover:shadow-md transition-shadow relative">

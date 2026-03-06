@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ProductCard from '../ui/ProductCard';
 import { products } from '../../data/products';
 
@@ -8,9 +9,9 @@ const BestSelling = () => {
     <section className="px-8 py-16 max-w-7xl mx-auto w-full">
       <div className="flex justify-between items-end mb-10">
         <h2 className="text-4xl font-serif text-black">Best Selling</h2>
-        <a href="#" className="text-sm font-medium text-gray-500 hover:text-black transition-colors uppercase tracking-wider mb-1">
+        <Link to="/shop" className="text-sm font-medium text-gray-500 hover:text-black transition-colors uppercase tracking-wider mb-1">
           Shop all
-        </a>
+        </Link>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-8 gap-y-10 md:gap-y-12">
