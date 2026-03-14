@@ -10,7 +10,7 @@ const FeaturedSection = () => {
         
         {/* Left Content Box */}
         <motion.div 
-          className="w-full lg:w-1/2 p-12 md:p-24 flex flex-col justify-center relative z-10"
+          className="w-full lg:w-1/2 p-6 md:p-12 lg:p-24 flex flex-col justify-center relative z-10"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -21,8 +21,8 @@ const FeaturedSection = () => {
             <span className="text-xs font-bold tracking-[0.2em] uppercase text-gray-400">Featured Innovation</span>
           </div>
           
-          <h2 className="text-5xl md:text-6xl font-serif mb-8 leading-tight">Masterpiece<br/>in the Matrix</h2>
-          <p className="text-base text-gray-400 leading-relaxed mb-12 max-w-md">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif mb-6 md:mb-8 leading-tight">Masterpiece<br/>in the Matrix</h2>
+          <p className="text-sm md:text-base text-gray-400 leading-relaxed mb-8 md:mb-12 max-w-md">
             Dive into our premium selection of highly advanced parameteric designs. 
             Experience the flawless transition from digital wireframes to absolute reality 
             with our newest precision diamond setting CAD models. Perfect topologies, ready for print.
@@ -58,7 +58,7 @@ const FeaturedSection = () => {
 
         {/* Right Large Image Box */}
         <motion.div 
-          className="w-full lg:w-1/2 h-[500px] lg:h-[800px] relative lg:-ml-12"
+          className="w-full lg:w-1/2 h-[400px] md:h-[500px] lg:h-[800px] relative lg:-ml-12"
           initial={{ opacity: 0, x: 50 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}

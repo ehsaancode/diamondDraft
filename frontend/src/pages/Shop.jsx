@@ -75,7 +75,7 @@ const Shop = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="mb-12"
+        className="mb-8 md:mb-12"
       >
         <h1 className="text-4xl md:text-5xl font-serif text-black mb-4">CAD Design Library</h1>
         <p className="text-gray-500 max-w-2xl">
@@ -83,14 +83,25 @@ const Shop = () => {
         </p>
       </motion.div>
 
+      {/* Mobile Sticky Search - Detached from grid to span full width */}
+      <div className="md:hidden sticky top-[58px] bg-[#fafafa] z-[40] py-3 -mx-8 px-8 border-b border-gray-100 shadow-sm mb-6">
+        <input 
+          ref={searchInputRef}
+          type="text" 
+          placeholder="Search models..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full text-sm border border-gray-300 rounded-sm px-4 py-3 focus:outline-none focus:border-black transition-colors bg-white shadow-inner relative z-50"
+        />
+      </div>
+
       <div className="flex flex-col md:flex-row gap-8 items-start">
         {/* Sidebar Filters */}
-        <aside className="w-full md:w-64 flex flex-col gap-8 shrink-0 sticky top-24">
-          {/* Search */}
-          <div>
+        <aside className="w-full md:w-64 flex flex-col gap-6 md:gap-8 shrink-0 md:sticky md:top-24">
+          {/* Desktop Search */}
+          <div className="hidden md:block">
             <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Search</h3>
             <input 
-              ref={searchInputRef}
               type="text" 
               placeholder="Search models..." 
               value={searchQuery}
@@ -101,8 +112,8 @@ const Shop = () => {
 
           {/* Brand Filter */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Brands</h3>
-            <ul className="flex flex-col gap-2">
+            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3 md:mb-4 border-b pb-2">Brands</h3>
+            <ul className="flex flex-row flex-wrap md:flex-col gap-x-4 gap-y-2 md:gap-y-2">
               {brands.map(brand => (
                 <li key={brand}>
                   <button 
@@ -119,8 +130,8 @@ const Shop = () => {
           {/* Collection/Tag Filter */}
           {tags.length > 1 && (
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Collections</h3>
-              <ul className="flex flex-col gap-2">
+              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3 md:mb-4 border-b pb-2">Collections</h3>
+              <ul className="flex flex-row flex-wrap md:flex-col gap-x-4 gap-y-2 md:gap-y-2">
                 {tags.map(tag => (
                   <li key={tag}>
                     <button 
@@ -137,7 +148,7 @@ const Shop = () => {
 
           {/* Sorting */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Sort By</h3>
+            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3 md:mb-4 border-b pb-2">Sort By</h3>
             <select 
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}

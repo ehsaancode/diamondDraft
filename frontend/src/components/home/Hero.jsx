@@ -24,11 +24,11 @@ const Hero = () => {
       </motion.div>
 
       {/* Right side images collage */}
-      <div className="w-full lg:w-2/3 h-[500px] relative flex justify-end items-center gap-4">
+      <div className="w-full lg:w-2/3 h-auto md:h-[500px] relative flex justify-center lg:justify-end items-center gap-2 md:gap-4 mt-8 lg:mt-0">
         
         {/* Left small image */}
         <motion.div 
-          className="w-[200px] h-[250px] overflow-hidden self-end mb-12"
+          className="hidden md:block w-[150px] lg:w-[200px] h-[200px] lg:h-[250px] overflow-hidden self-end mb-12"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
@@ -38,7 +38,7 @@ const Hero = () => {
 
         {/* Center large image */}
         <motion.div 
-          className="w-[300px] h-[400px] overflow-hidden z-20"
+          className="w-full max-w-[300px] h-[350px] lg:h-[400px] overflow-hidden z-20"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
@@ -48,7 +48,7 @@ const Hero = () => {
 
         {/* Right small image */}
         <motion.div 
-          className="w-[120px] h-[300px] overflow-hidden self-start mt-8"
+          className="hidden md:block w-[100px] lg:w-[120px] h-[250px] lg:h-[300px] overflow-hidden self-start mt-8"
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
