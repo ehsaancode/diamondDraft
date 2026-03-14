@@ -1,11 +1,17 @@
 import React from 'react';
 import { ShoppingBag, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 
 const Navbar = () => {
   const { cartCount, setIsCartOpen } = useCart();
+  const navigate = useNavigate();
+
+  const handleSearchClick = () => {
+    navigate('/shop', { state: { focusSearch: true } });
+  };
+
   return (
     <motion.header 
       initial={{ y: -50, opacity: 0 }}
@@ -37,7 +43,10 @@ const Navbar = () => {
             </span>
           )}
         </button>
-        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
+        <button 
+          onClick={handleSearchClick}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+        >
           <Search size={20} className="text-gray-800" strokeWidth={1.5} />
         </button>
       </div>

@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ProductCard from '../components/ui/ProductCard';
 import { products } from '../data/products';
@@ -7,6 +8,30 @@ const Shop = () => {
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [selectedTag, setSelectedTag] = useState('All');
   const [sortOrder, setSortOrder] = useState('default');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  
+  const location = useLocation();
+  const searchInputRef = useRef(null);
+
+  // Focus search input if coming from Navbar Search icon
+  useEffect(() => {
+    if (location.state?.focusSearch && searchInputRef.current) {
+      // Small timeout to ensure rendering is complete
+      setTimeout(() => {
+        searchInputRef.current.focus();
+      }, 100);
+    }
+  }, [location.state]);
+
+  // Debounce effect for search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const brands = ['All', ...new Set(products.map(p => p.brand))];
   const tags = ['All', ...new Set(products.map(p => p.tag).filter(Boolean))];
@@ -24,6 +49,16 @@ const Shop = () => {
       result = result.filter(p => p.tag === selectedTag);
     }
 
+    // Filter by Search Query
+    if (debouncedSearchQuery.trim() !== '') {
+      const lowerQuery = debouncedSearchQuery.toLowerCase();
+      result = result.filter(p => 
+        p.name.toLowerCase().includes(lowerQuery) || 
+        p.brand.toLowerCase().includes(lowerQuery) ||
+        (p.tag && p.tag.toLowerCase().includes(lowerQuery))
+      );
+    }
+
     // Sort
     if (sortOrder === 'price-asc') {
       result.sort((a, b) => a.price - b.price);
@@ -32,7 +67,7 @@ const Shop = () => {
     } // 'default' keeps original order
 
     return result;
-  }, [selectedBrand, selectedTag, sortOrder]);
+  }, [selectedBrand, selectedTag, sortOrder, debouncedSearchQuery]);
 
   return (
     <div className="px-8 py-12 max-w-7xl mx-auto w-full">
@@ -51,6 +86,19 @@ const Shop = () => {
       <div className="flex flex-col md:flex-row gap-8 items-start">
         {/* Sidebar Filters */}
         <aside className="w-full md:w-64 flex flex-col gap-8 shrink-0 sticky top-24">
+          {/* Search */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Search</h3>
+            <input 
+              ref={searchInputRef}
+              type="text" 
+              placeholder="Search models..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full text-sm border border-gray-300 rounded-sm px-3 py-2 focus:outline-none focus:border-black transition-colors bg-white"
+            />
+          </div>
+
           {/* Brand Filter */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">Brands</h3>
@@ -116,11 +164,12 @@ const Shop = () => {
             </div>
           ) : (
             <div className="py-20 text-center">
-              <p className="text-gray-500 mb-4">No products found matching your filters.</p>
+              <p className="text-gray-500 mb-4">No products found matching your search or filters.</p>
               <button 
                 onClick={() => {
                   setSelectedBrand('All');
                   setSelectedTag('All');
+                  setSearchQuery('');
                 }}
                 className="text-sm font-medium underline hover:text-gray-700"
               >
