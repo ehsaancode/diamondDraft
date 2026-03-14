@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShoppingBag, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 
 const Navbar = () => {
@@ -18,11 +18,11 @@ const Navbar = () => {
         Gwel
       </Link>
       
-      <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-800">
-        <Link to="/" className="hover:text-black transition-colors">Home</Link>
-        <Link to="/shop" className="hover:text-black transition-colors">CAD Library</Link>
-        <Link to="/about" className="hover:text-black transition-colors">About</Link>
-        <Link to="/contact" className="hover:text-black transition-colors">Contact</Link>
+      <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
+        <NavLink to="/" className={({ isActive }) => `transition-colors pb-1 border-b-2 ${isActive ? 'text-black border-black' : 'text-gray-500 border-transparent hover:text-black'}`}>Home</NavLink>
+        <NavLink to="/shop" className={({ isActive }) => `transition-colors pb-1 border-b-2 ${isActive ? 'text-black border-black' : 'text-gray-500 border-transparent hover:text-black'}`}>CAD Library</NavLink>
+        <NavLink to="/about" className={({ isActive }) => `transition-colors pb-1 border-b-2 ${isActive ? 'text-black border-black' : 'text-gray-500 border-transparent hover:text-black'}`}>About</NavLink>
+        <NavLink to="/contact" className={({ isActive }) => `transition-colors pb-1 border-b-2 ${isActive ? 'text-black border-black' : 'text-gray-500 border-transparent hover:text-black'}`}>Contact</NavLink>
       </div>
 
       <div className="flex items-center gap-4">
