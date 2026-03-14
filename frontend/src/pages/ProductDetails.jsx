@@ -26,7 +26,7 @@ const ProductDetails = () => {
 
   const [mainImage, setMainImage] = useState(product.image);
   const [isLiked, setIsLiked] = useState(product.isLiked || false);
-  const [size, setSize] = useState('7');
+  const [format, setFormat] = useState('STL');
   
   // Generating mock gallery if none exists
   const gallery = [
@@ -35,7 +35,7 @@ const ProductDetails = () => {
     'https://images.unsplash.com/photo-1599643477874-dc3b91490214?w=800&auto=format&fit=crop&q=60'
   ];
 
-  const sizes = ['5', '6', '7', '8', '9'];
+  const formats = ['STL', '3DM', 'OBJ', 'STEP'];
 
   return (
     <motion.div 
@@ -100,24 +100,24 @@ const ProductDetails = () => {
           </div>
 
           <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-8 md:mb-10">
-            {product.description || "A breathtaking piece crafted with meticulous attention to detail. This elegant design perfectly balances classic beauty with modern sophistication, making it a timeless addition to any collection."}
+            {product.description || "Request a custom CAD design based on this breathtaking piece. Our expert designers will craft a production-ready 3D model according to your specific requirements, ready for 3D printing and casting."}
           </p>
 
-          {/* Sizing */}
+          {/* Formats */}
           <div className="mb-8 md:mb-10">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Select Size</span>
-              <button className="text-xs md:text-sm text-gray-500 underline hover:text-black cursor-pointer">Size Guide</button>
+              <span className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Select CAD Format</span>
+              <button className="text-xs md:text-sm text-gray-500 underline hover:text-black cursor-pointer">Format Guide</button>
             </div>
             <div className="flex flex-wrap gap-3 md:gap-4">
-              {sizes.map((s) => (
+              {formats.map((f) => (
                 <button
-                  key={s}
-                  onClick={() => setSize(s)}
-                  className={`cursor-pointer w-10 md:w-12 h-10 md:h-12 rounded-full border flex items-center justify-center text-xs md:text-sm font-medium transition-colors
-                    ${size === s ? 'border-black bg-black text-white' : 'border-gray-300 text-gray-700 hover:border-black'}`}
+                  key={f}
+                  onClick={() => setFormat(f)}
+                  className={`cursor-pointer w-16 md:w-20 h-10 md:h-12 rounded-full border flex items-center justify-center text-xs md:text-sm font-medium transition-colors
+                    ${format === f ? 'border-black bg-black text-white' : 'border-gray-300 text-gray-700 hover:border-black'}`}
                 >
-                  {s}
+                  {f}
                 </button>
               ))}
             </div>
@@ -126,18 +126,18 @@ const ProductDetails = () => {
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-10 md:mb-12">
             <button 
-              onClick={() => addToCart(product, size)}
+              onClick={() => addToCart(product, format)}
               className="cursor-pointer flex-1 bg-black text-white px-6 md:px-8 py-3.5 md:py-4 flex items-center justify-center gap-3 text-sm md:text-base font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors"
             >
               <ShoppingBag size={18} />
-              Add to Cart
+              Add to Requests
             </button>
             <div className="flex gap-3 flex-1">
               <button 
-                onClick={() => addToCart(product, size)}
+                onClick={() => addToCart(product, format)}
                 className="cursor-pointer flex-1 border-2 border-black text-black px-4 md:px-8 py-3.5 md:py-4 flex items-center justify-center gap-3 text-sm md:text-base font-medium uppercase tracking-wider hover:bg-gray-50 transition-colors"
               >
-                Buy Now
+                Request Now
               </button>
               <button 
                 onClick={() => setIsLiked(!isLiked)}
@@ -152,15 +152,15 @@ const ProductDetails = () => {
           <div className="space-y-4 pt-6 md:pt-8 border-t border-gray-200">
             <div className="flex items-center justify-center md:justify-start gap-4 text-gray-600">
               <Truck size={18} className="text-gray-400" />
-              <span className="text-xs md:text-sm font-medium uppercase tracking-tight">Free worldwide shipping over $500</span>
+              <span className="text-xs md:text-sm font-medium uppercase tracking-tight">Delivery within 2-3 business days</span>
             </div>
             <div className="flex items-center justify-center md:justify-start gap-4 text-gray-600">
               <ShieldCheck size={18} className="text-gray-400" />
-              <span className="text-xs md:text-sm font-medium uppercase tracking-tight">Lifetime warranty on all diamonds</span>
+              <span className="text-xs md:text-sm font-medium uppercase tracking-tight">Production-ready precision</span>
             </div>
             <div className="flex items-center justify-center md:justify-start gap-4 text-gray-600">
               <RotateCcw size={18} className="text-gray-400" />
-              <span className="text-xs md:text-sm font-medium uppercase tracking-tight">30-day free returns</span>
+              <span className="text-xs md:text-sm font-medium uppercase tracking-tight">Includes 3 free design revisions</span>
             </div>
           </div>
         </div>

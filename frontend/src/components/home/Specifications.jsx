@@ -15,86 +15,76 @@ const Specifications = ({ product }) => {
       <div className="w-full max-w-3xl">
         <AccordionItem 
           number="01" 
-          title="Certifications" 
+          title="CAD Deliverables" 
           isOpen={openIndex === 0} 
           onClick={() => toggleAccordion(0)}
         >
           <p className="text-sm text-gray-600 leading-relaxed mb-4">
-            Our jewelry items come with authentic certifications validating their quality and origin. Focus on conflict-free sourcing.
+            Upon completion, you will receive production-ready 3D models in your requested formats (STL, 3DM, OBJ). Files are optimized for 3D printing and casting.
           </p>
         </AccordionItem>
 
         <AccordionItem 
           number="02" 
-          title="Product Description" 
+          title="Design Parameters" 
           isOpen={openIndex === 1} 
           onClick={() => toggleAccordion(1)}
         >
           <div className="flex flex-col md:flex-row gap-8">
             <div className="flex-1 text-sm">
               <div className="grid grid-cols-[120px_1fr] gap-y-4 gap-x-4">
-                <div className="font-semibold text-gray-800">Metal Type:</div>
-                <div className="text-gray-600">{product?.metalType || '18k Rose Gold'}</div>
+                <div className="font-semibold text-gray-800">Target Metal:</div>
+                <div className="text-gray-600">{product?.metalType || 'Configurable (e.g., 18k Gold, Platinum)'}</div>
 
-                <div className="font-semibold text-gray-800">Gemstones</div>
-                <div className="text-gray-600">{product?.gemstones || 'Diamonds, 0.5 carats'}</div>
+                <div className="font-semibold text-gray-800">Stone Map:</div>
+                <div className="text-gray-600">{product?.gemstones || 'Included in design files'}</div>
 
-                <div className="font-semibold text-gray-800">Ring Size</div>
-                <div className="text-gray-600">Adjustable <span className="text-gray-400 italic">(Available any sizes)</span></div>
+                <div className="font-semibold text-gray-800">Ring Size:</div>
+                <div className="text-gray-600">Customizable <span className="text-gray-400 italic">(Default US 7)</span></div>
 
-                <div className="font-semibold text-gray-800">Design</div>
-                <div className="text-gray-600 leading-relaxed">Intricate floral pattern with pave-set stones</div>
+                <div className="font-semibold text-gray-800">Geometry:</div>
+                <div className="text-gray-600 leading-relaxed">Watertight mesh, zero non-manifold edges</div>
 
-                <div className="font-semibold text-gray-800">Finish</div>
-                <div className="text-gray-600">High-polish with textured details</div>
+                <div className="font-semibold text-gray-800">Shrinkage:</div>
+                <div className="text-gray-600">Calculated for standard lost-wax casting</div>
               </div>
             </div>
             
-            {/* Small image on right in description */}
             <div className="w-48 flex-shrink-0 flex items-center justify-center">
-              <img src="/images/ring_1_1772534075731.png" alt="Ring details" className="w-full object-contain" />
+              <img src="/images/ring_1_1772534075731.png" alt="CAD details" className="w-full object-contain grayscale" />
             </div>
           </div>
         </AccordionItem>
 
         <AccordionItem 
           number="03" 
-          title="Features" 
+          title="Revisions" 
           isOpen={openIndex === 2} 
           onClick={() => toggleAccordion(2)}
         >
           <p className="text-sm text-gray-600 leading-relaxed mb-4">
-            Hypoallergenic and crafted for every day comfort without compromising elegance.
+            Standard requests include 3 rounds of minor revisions to ensure the final design meets your exact production requirements.
           </p>
         </AccordionItem>
 
         <AccordionItem 
           number="04" 
-          title="Accessories" 
+          title="Photo-Realistic Renders" 
           isOpen={openIndex === 3} 
           onClick={() => toggleAccordion(3)}
         >
           <p className="text-sm text-gray-600 leading-relaxed mb-4">
-            Comes with a luxurious velvet storage pouch and a cleaning cloth.
+            Includes 3 high-resolution rendered images from different angles to present to your clients before final production.
           </p>
         </AccordionItem>
         
         <AccordionItem 
           number="05" 
-          title="Bowl" 
+          title="Support" 
           isOpen={openIndex === 4} 
           onClick={() => toggleAccordion(4)}
         >
-          <p className="text-sm text-gray-600 leading-relaxed mb-4">N/A</p>
-        </AccordionItem>
-
-        <AccordionItem 
-          number="06" 
-          title="Dimensions" 
-          isOpen={openIndex === 5} 
-          onClick={() => toggleAccordion(5)}
-        >
-          <p className="text-sm text-gray-600 leading-relaxed mb-4">Band width: 3mm, Setting height: 5mm.</p>
+          <p className="text-sm text-gray-600 leading-relaxed mb-4">Dedicated technical support for issues relating to slicing and 3D printing the provide models.</p>
         </AccordionItem>
       </div>
     </section>

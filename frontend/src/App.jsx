@@ -7,6 +7,8 @@ import Shop from './pages/Shop';
 import ProductDetails from './pages/ProductDetails';
 import CartDrawer from './components/cart/CartDrawer';
 
+import About from './pages/About';
+
 function App() {
   return (
     <BrowserRouter>
@@ -17,6 +19,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
+            <Route path="/about" element={<About />} />
             <Route path="/product/:id" element={<ProductDetails />} />
           </Routes>
         </div>

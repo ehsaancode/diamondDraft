@@ -13,13 +13,13 @@ const Hero = () => {
         transition={{ duration: 0.8, delay: 0.2 }}
       >
         <h1 className="text-5xl lg:text-7xl font-serif leading-tight text-black mb-8">
-          Elevate The<br />
-          Everyday<br />
-          With Timeless<br />
-          Jewels
+          Precision<br />
+          Crafted<br />
+          Jewelry<br />
+          CAD Design
         </h1>
         <button className="bg-black text-white px-8 py-4 text-xs font-semibold tracking-wider uppercase hover:bg-gray-900 transition-colors">
-          Shop Now
+          Browse CAD Models
         </button>
       </motion.div>
 

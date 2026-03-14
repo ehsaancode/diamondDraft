@@ -7,7 +7,7 @@ const YouMayAlsoLike = () => {
     <section className="px-8 py-20 bg-[#FAFAFA] w-full mt-12">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-serif text-center text-gray-900 mb-12">
-          You May Also Like It
+          Related Base Designs
         </h2>
         
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">

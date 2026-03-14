@@ -20,7 +20,7 @@ const Navbar = () => {
       
       <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-800">
         <Link to="/" className="hover:text-black transition-colors">Home</Link>
-        <Link to="/shop" className="hover:text-black transition-colors">Shop</Link>
+        <Link to="/shop" className="hover:text-black transition-colors">CAD Library</Link>
         <Link to="/about" className="hover:text-black transition-colors">About</Link>
         <Link to="/contact" className="hover:text-black transition-colors">Contact</Link>
       </div>

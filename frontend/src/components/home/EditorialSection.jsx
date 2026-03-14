@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { products } from '../../data/products';
 import { ArrowUpRight } from 'lucide-react';
 
@@ -40,9 +41,14 @@ const EditorialSection = () => {
             </div>
 
             <div className="relative z-20 flex justify-between items-end gap-8 pt-8 border-t border-gray-300">
-              <span className="text-xl font-serif text-black italic">[ Since 2017 ]</span>
+              <div className="flex flex-col gap-2">
+                <span className="text-xl font-serif text-black italic">[ Since 2017 ]</span>
+                <Link to="/about" className="text-[10px] uppercase tracking-widest font-bold text-black border-b border-black w-fit hover:opacity-60 transition-opacity">
+                  Read Our Story
+                </Link>
+              </div>
               <p className="max-w-[260px] text-[10px] leading-relaxed text-gray-600 text-right font-medium">
-                Each design reflects the dialogue between craftsmanship and feeling, exploring what it means to express oneself with elegance.
+                Each design reflects the dialogue between client vision and digital craftsmanship, ensuring perfectly manufacturable 3D models.
               </p>
             </div>
           </div>
@@ -51,9 +57,9 @@ const EditorialSection = () => {
           <div className="bg-[#E5E5E5] p-8 md:p-16 flex flex-col justify-center min-h-[500px] md:min-h-[600px] relative">
             <div className="max-w-sm mx-auto lg:ml-auto lg:mr-0">
               <h2 className="text-3xl md:text-4xl font-bold mb-2 text-black leading-tight">
-                {featureProduct.name.split(' ').slice(0, 3).join(' ')} ring
+                {featureProduct.name.split(' ').slice(0, 3).join(' ')} CAD
               </h2>
-              <p className="text-xs md:text-sm text-gray-500 mb-8 md:mb-12 uppercase tracking-widest font-semibold">18K yellow gold</p>
+              <p className="text-xs md:text-sm text-gray-500 mb-8 md:mb-12 uppercase tracking-widest font-semibold">Production Ready</p>
               
               <div className="w-full aspect-square flex items-center justify-center mb-8 md:mb-12">
                 <motion.img 

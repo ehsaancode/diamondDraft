@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowUpRight, Instagram, Facebook } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
@@ -23,7 +24,7 @@ const Footer = () => {
             </div>
             <div className="p-8 py-12 flex-1 hidden md:block">
               <h2 className="text-4xl lg:text-5xl font-serif leading-[1.2] text-white/90">
-                Unveil Your<br/>New<br/>Everyday<br/>Jewelry<br/>Collection
+                Crafting Your<br/>Vision Into<br/>Precision<br/>CAD Models
               </h2>
             </div>
           </div>
@@ -32,9 +33,9 @@ const Footer = () => {
           <div className="hidden md:flex border-r border-white/10 flex-col">
             <div className="p-8 py-12 border-b border-white/10 flex-1">
               <nav className="flex flex-col gap-5 text-[11px] font-bold tracking-widest uppercase">
-                <a href="#" className="hover:text-gray-300 transition-colors">Home</a>
-                <a href="#" className="hover:text-gray-300 transition-colors">Shop</a>
-                <a href="#" className="hover:text-gray-300 transition-colors">About Us</a>
+                <Link to="/" className="hover:text-gray-300 transition-colors">Home</Link>
+                <Link to="/shop" className="hover:text-gray-300 transition-colors">CAD Library</Link>
+                <Link to="/about" className="hover:text-gray-300 transition-colors">About Us</Link>
                 <a href="#" className="hover:text-gray-300 transition-colors">News</a>
                 <a href="#" className="hover:text-gray-300 transition-colors">Contact</a>
               </nav>

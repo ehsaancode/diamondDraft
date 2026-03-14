@@ -42,9 +42,9 @@ const Shop = () => {
         transition={{ duration: 0.6 }}
         className="mb-12"
       >
-        <h1 className="text-4xl md:text-5xl font-serif text-black mb-4">Shop Collection</h1>
+        <h1 className="text-4xl md:text-5xl font-serif text-black mb-4">CAD Design Library</h1>
         <p className="text-gray-500 max-w-2xl">
-          Discover our exquisite collection of fine jewelry, carefully crafted to bring elegance and brilliance to your everyday moments.
+          Discover our exquisite collection of 3D jewelry models. Request custom modifications to any of these base designs to create your perfect piece.
         </p>
       </motion.div>
 

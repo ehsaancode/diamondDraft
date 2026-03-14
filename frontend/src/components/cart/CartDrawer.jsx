@@ -31,7 +31,7 @@ const CartDrawer = () => {
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div className="flex items-center gap-2">
                 <ShoppingBag size={20} className="text-gray-900" />
-                <h2 className="text-lg font-serif font-semibold text-gray-900">Your Cart ({cartCount})</h2>
+                <h2 className="text-lg font-serif font-semibold text-gray-900">Design Requests ({cartCount})</h2>
               </div>
               <button
                 onClick={() => setIsCartOpen(false)}
@@ -46,12 +46,12 @@ const CartDrawer = () => {
               {cartItems.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-500">
                   <ShoppingBag size={48} className="mb-4 opacity-20" />
-                  <p>Your cart is empty.</p>
+                  <p>No design requests yet.</p>
                   <button 
                     onClick={() => setIsCartOpen(false)}
                     className="mt-6 text-sm underline hover:text-black cursor-pointer"
                   >
-                    Continue Shopping
+                    Browse Portfolio
                   </button>
                 </div>
               ) : (
@@ -73,7 +73,7 @@ const CartDrawer = () => {
                             <Trash2 size={16} />
                           </button>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">Size: {item.size}</p>
+                        <p className="text-xs text-gray-500 mt-1">Format: {item.size}</p>
                       </div>
                       
                       <div className="flex items-center justify-between mt-2">
@@ -105,12 +105,12 @@ const CartDrawer = () => {
             {cartItems.length > 0 && (
               <div className="p-6 border-t border-gray-100 bg-gray-50">
                 <div className="flex justify-between mb-4">
-                  <span className="text-gray-600">Subtotal</span>
+                  <span className="text-gray-600">Base Estimate</span>
                   <span className="font-semibold text-gray-900">${cartTotal.toFixed(2)}</span>
                 </div>
-                <p className="text-xs text-gray-500 mb-6">Shipping and taxes calculated at checkout.</p>
+                <p className="text-xs text-gray-500 mb-6">Final cost tailored to your specific CAD requirements.</p>
                 <button className="w-full bg-black text-white py-4 font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors cursor-pointer">
-                  Checkout
+                  Submit Request
                 </button>
               </div>
             )}
