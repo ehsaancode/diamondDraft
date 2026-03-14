@@ -1,62 +1,54 @@
 /* eslint-disable */
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const Hero = () => {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.5; // Plays video at half speed
+    }
+  }, []);
+
   return (
-    <section className="px-8 pb-16 pt-8 max-w-7xl mx-auto w-full flex flex-col lg:flex-row items-center justify-between gap-12">
-      {/* Left side text */}
+    <section className="relative w-full h-[85vh] md:h-[90vh] flex items-center justify-center overflow-hidden bg-[#fafafa]">
+      
+      {/* Video Background Layer */}
+      <div className="absolute inset-0 z-0">
+        <video 
+          ref={videoRef}
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          className="w-full h-full object-cover mix-blend-multiply opacity-90"
+        >
+          <source src="/images/Video_Generation_Request_Fulfilled.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      {/* Gradual Blend from Bottom */}
+      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#fafafa] via-[#fafafa]/80 to-transparent z-10 pointer-events-none" />
+
+      {/* Centered Top-Level Content */}
       <motion.div 
-        className="w-full lg:w-1/3 flex flex-col items-start z-10"
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
+        className="relative z-20 flex flex-col items-center text-center px-6 max-w-4xl mx-auto -mt-10"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
-        <h1 className="text-5xl lg:text-7xl font-serif leading-tight text-black mb-8">
-          Precision<br />
-          Crafted<br />
-          Jewelry<br />
-          CAD Design
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif leading-[1.1] text-black mb-6 md:mb-8 tracking-tight">
+          Precision Crafted <br className="hidden md:block" /> Jewelry CAD Design
         </h1>
-        <button className="bg-black text-white px-8 py-4 text-xs font-semibold tracking-wider uppercase hover:bg-gray-900 transition-colors">
+        <p className="text-gray-700 text-sm md:text-lg mb-8 md:mb-10 max-w-xl font-medium px-4">
+          Discover exquisite 3D models ready for seamless printing and precision casting.
+        </p>
+        <button className="bg-black text-white px-8 md:px-10 py-4 text-xs md:text-sm font-semibold tracking-wider uppercase hover:bg-gray-800 transition-all shadow-2xl tracking-[0.2em]">
           Browse CAD Models
         </button>
       </motion.div>
-
-      {/* Right side images collage */}
-      <div className="w-full lg:w-2/3 h-auto md:h-[500px] relative flex justify-center lg:justify-end items-center gap-2 md:gap-4 mt-8 lg:mt-0">
-        
-        {/* Left small image */}
-        <motion.div 
-          className="hidden md:block w-[150px] lg:w-[200px] h-[200px] lg:h-[250px] overflow-hidden self-end mb-12"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          <img src="/images/necklaces_1772534131738.png" alt="Necklace detail" className="w-full h-full object-cover" />
-        </motion.div>
-
-        {/* Center large image */}
-        <motion.div 
-          className="w-full max-w-[300px] h-[350px] lg:h-[400px] overflow-hidden z-20"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-        >
-          <img src="/images/hero_hands_1772534059346.png" alt="Statement ring on hands" className="w-full h-full object-cover" />
-        </motion.div>
-
-        {/* Right small image */}
-        <motion.div 
-          className="hidden md:block w-[100px] lg:w-[120px] h-[250px] lg:h-[300px] overflow-hidden self-start mt-8"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-        >
-          <img src="/images/bracelets_1772534147312.png" alt="Bracelets detail" className="w-full h-full object-cover" />
-        </motion.div>
-        
-      </div>
     </section>
   );
 };
