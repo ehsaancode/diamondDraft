@@ -1,10 +1,13 @@
 import React from 'react';
 import { ArrowUpRight, Instagram, Facebook } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Footer = () => {
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+
   return (
-    <footer className="bg-[#030b1a] text-white py-16 px-8 flex justify-center w-full">
+    <footer className={`bg-[#030b1a] text-white py-16 px-8 justify-center w-full ${isHome ? 'flex' : 'hidden md:flex'}`}>
       <div className="w-full max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1.5fr] border border-white/10 overflow-hidden">
           

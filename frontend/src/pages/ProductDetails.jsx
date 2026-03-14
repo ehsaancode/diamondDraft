@@ -130,7 +130,7 @@ const ProductDetails = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-10 md:mb-12">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
             <button 
               onClick={() => addToCart(product, format)}
               className="cursor-pointer flex-1 bg-black text-white px-6 md:px-8 py-3.5 md:py-4 flex items-center justify-center gap-3 text-sm md:text-base font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors"
@@ -154,8 +154,15 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Features */}
-          <div className="space-y-4 pt-6 md:pt-8 border-t border-gray-200">
+        </div>
+      </div>
+
+      {/* Specifications & Features Section */}
+      <div className="mt-8 md:mt-10 border-t border-gray-200 pt-8 border-b">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
+          <Specifications product={product} />
+          
+          <div className="flex flex-col justify-center space-y-6 pt-8 md:pt-0 border-t border-gray-200 md:border-t-0">
             <div className="flex items-center justify-center md:justify-start gap-4 text-gray-600">
               <Truck size={18} className="text-gray-400" />
               <span className="text-xs md:text-sm font-medium uppercase tracking-tight">Delivery within 2-3 business days</span>
@@ -170,11 +177,6 @@ const ProductDetails = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Specifications Section */}
-      <div className="mt-12 md:mt-16 border-t border-gray-200 pt-8">
-        <Specifications product={product} />
       </div>
 
       {/* Format Guide Modal */}
