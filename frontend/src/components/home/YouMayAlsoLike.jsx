@@ -2,7 +2,7 @@ import React from 'react';
 import { products } from '../../data/products';
 
 const YouMayAlsoLike = () => {
-  const suggestedProducts = products.slice(-4);
+  const suggestedProducts = products.slice(-8);
   return (
     <section className="px-8 py-20 bg-[#FAFAFA] w-full mt-12">
       <div className="max-w-7xl mx-auto">

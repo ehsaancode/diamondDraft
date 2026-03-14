@@ -66,6 +66,50 @@ export const products = [
     tag: 'Top Requested'
   },
   {
+    id: 7,
+    name: 'Solitaire Engagement Ring CAD',
+    brand: 'Precision Models',
+    price: 5500.00,
+    rating: 4.9,
+    reviews: 412,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'Classic'
+  },
+  {
+    id: 8,
+    name: 'Halo Diamond Setting 3D',
+    brand: 'Precision Models',
+    price: 8200.00,
+    rating: 4.8,
+    reviews: 320,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: true,
+    tag: 'Classic'
+  },
+  {
+    id: 9,
+    name: 'Micro Pave Eternity Band',
+    brand: 'Lumiere Digital',
+    price: 6400.00,
+    rating: 4.7,
+    reviews: 185,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'Wedding'
+  },
+  {
+    id: 10,
+    name: 'Three Stone Anniversary Ring',
+    brand: 'Lumiere Digital',
+    price: 7500.00,
+    rating: 4.9,
+    reviews: 240,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'Wedding'
+  },
+  {
     id: 11,
     name: 'Vintage Diamond Flower Ring CAD',
     brand: 'Gwel Designs',
@@ -116,5 +160,71 @@ export const products = [
     colors: ['#D6A848', '#E6E6E6', '#B76E79'],
     isLiked: false,
     tag: 'Top Requested'
+  },
+  {
+    id: 15,
+    name: 'Cuban Link Chain Generator CAD',
+    brand: 'TechJewel',
+    price: 15000.00,
+    rating: 4.9,
+    reviews: 512,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'Parametric'
+  },
+  {
+    id: 16,
+    name: 'Tennis Bracelet Link Assortment',
+    brand: 'TechJewel',
+    price: 18500.00,
+    rating: 4.8,
+    reviews: 325,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: true,
+    tag: 'New Design'
+  },
+  {
+    id: 17,
+    name: 'Signet Ring Blank Collection',
+    brand: 'Precision Models',
+    price: 4500.00,
+    rating: 4.7,
+    reviews: 190,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'Classic'
+  },
+  {
+    id: 18,
+    name: 'Milgrain Bezel Solitaire 3D',
+    brand: 'Lumiere Digital',
+    price: 6800.00,
+    rating: 4.9,
+    reviews: 215,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'Vintage Style'
+  },
+  {
+    id: 19,
+    name: 'Invisible Set Princess Cut Matrix',
+    brand: 'Gwel Designs',
+    price: 22000.00,
+    rating: 5.0,
+    reviews: 88,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'Advanced'
+  },
+  {
+    id: 20,
+    name: 'Art Deco Geometric Pendant CAD',
+    brand: 'Vintage Vector',
+    price: 8500.00,
+    rating: 4.6,
+    reviews: 134,
+    image: '/images/ring_1_1772534075731.png',
+    isLiked: false,
+    tag: 'Vintage Style'
   }
 ];

@@ -4,7 +4,7 @@ import ProductCard from '../ui/ProductCard';
 import { products } from '../../data/products';
 
 const BestSelling = () => {
-  const sellingProducts = products.slice(0, 6);
+  const sellingProducts = products.slice(0, 8);
   return (
     <section className="px-8 py-16 max-w-7xl mx-auto w-full">
       <div className="flex justify-between items-end mb-10">
@@ -14,7 +14,7 @@ const BestSelling = () => {
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-8 gap-y-10 md:gap-y-12">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-8 gap-y-10 md:gap-y-12">
         {sellingProducts.map((product, index) => (
           <ProductCard key={product.id} product={product} index={index} />
         ))}
