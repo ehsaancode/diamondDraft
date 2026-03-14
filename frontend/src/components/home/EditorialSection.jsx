@@ -74,7 +74,7 @@ const EditorialSection = () => {
               <div className="flex justify-between items-end">
                 <div>
                   <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-tighter">From</p>
-                  <p className="text-2xl md:text-3xl font-bold text-black">${featureProduct.price.toLocaleString()}</p>
+                  <p className="text-2xl md:text-3xl font-bold text-black">₹{featureProduct.price.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
                 </div>
                 <button className="bg-black text-white p-5 md:p-6 hover:bg-gray-800 transition-colors cursor-pointer group">
                   <ArrowUpRight size={20} className="md:w-6 md:h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />

@@ -34,9 +34,9 @@ const YouMayAlsoLike = () => {
                   {product.name}
                 </h3>
                 <div className="flex items-center justify-center gap-2 mb-4 text-xs font-semibold">
-                  <span className="text-black">${product.price.toLocaleString('en-US', { minimumFractionDigits: 0 })}</span>
+                  <span className="text-black">₹{product.price.toLocaleString('en-IN', { minimumFractionDigits: 0 })}</span>
                   {product.originalPrice && (
-                    <span className="text-gray-400 line-through">${product.originalPrice.toLocaleString('en-US', { minimumFractionDigits: 0 })}</span>
+                    <span className="text-gray-400 line-through">₹{product.originalPrice.toLocaleString('en-IN', { minimumFractionDigits: 0 })}</span>
                   )}
                 </div>
                 

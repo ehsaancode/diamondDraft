@@ -93,7 +93,7 @@ const CartDrawer = () => {
                             <Plus size={14} />
                           </button>
                         </div>
-                        <p className="font-semibold text-gray-900">${(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="font-semibold text-gray-900">₹{(item.price * item.quantity).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
                       </div>
                     </div>
                   </div>
@@ -106,7 +106,7 @@ const CartDrawer = () => {
               <div className="p-6 border-t border-gray-100 bg-gray-50">
                 <div className="flex justify-between mb-4">
                   <span className="text-gray-600">Base Estimate</span>
-                  <span className="font-semibold text-gray-900">${cartTotal.toFixed(2)}</span>
+                  <span className="font-semibold text-gray-900">₹{cartTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                 </div>
                 <p className="text-xs text-gray-500 mb-6">Final cost tailored to your specific CAD requirements.</p>
                 <button className="w-full bg-black text-white py-4 font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors cursor-pointer">

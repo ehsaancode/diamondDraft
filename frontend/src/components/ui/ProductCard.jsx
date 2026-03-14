@@ -51,7 +51,7 @@ const ProductCard = ({ product, index }) => {
       <div className="flex flex-col gap-1">
         <h3 className="text-sm font-semibold text-gray-900">{product.name}</h3>
         <p className="text-xs text-gray-500 italic">by {product.brand}</p>
-        <p className="text-sm font-semibold mt-1">${product.price.toFixed(2)}</p>
+        <p className="text-sm font-semibold mt-1">₹{product.price.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
       </div>
     </motion.div>
   );

@@ -96,7 +96,7 @@ const ProductDetails = () => {
           </div>
 
           <div className="text-2xl md:text-3xl font-semibold text-gray-900 mb-6 md:mb-8">
-            ${product.price?.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            ₹{product.price?.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
           </div>
 
           <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-8 md:mb-10">

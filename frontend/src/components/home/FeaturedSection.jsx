@@ -17,13 +17,13 @@ const FeaturedSection = () => {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-4xl text-gray-900 font-serif mb-6">Necklace</h2>
+          <h2 className="text-4xl text-gray-900 font-serif mb-6">New CAD Models</h2>
           <p className="text-sm text-gray-500 leading-relaxed mb-12 max-w-sm">
-            Explore our new arrival jewelry collection: elegant necklaces, classic hoops, vibrant gemstone rings, pearl drop earrings, and chic charm bracelets. Perfect for everyday elegance!
+            Explore our new arrival digital designs: elegant necklaces, classic hoops, and vibrant gemstone rings optimized for 3D printing. Perfect foundations for custom jewelry!
           </p>
 
           <Link to="/shop" className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase mb-16 hover:gap-4 transition-all w-max hover:text-gray-600">
-            Shop All <ArrowRight size={16} />
+            Browse All <ArrowRight size={16} />
           </Link>
 
           {/* Featured Product Card */}
@@ -38,9 +38,9 @@ const FeaturedSection = () => {
                 className="max-h-full object-contain group-hover:scale-105 transition-transform duration-500"
               />
             </div>
-            <h3 className="text-sm font-semibold text-gray-900">Twilight Serenity Ring</h3>
-            <p className="text-xs text-gray-500 italic mb-2">by Lumière Jewelry</p>
-            <p className="text-sm font-bold">$299.99</p>
+            <h3 className="text-sm font-semibold text-gray-900">Twilight Serenity Ring CAD</h3>
+            <p className="text-xs text-gray-500 italic mb-2">by Gwel Designs</p>
+            <p className="text-sm font-bold">₹8,000</p>
           </div>
         </motion.div>
 
