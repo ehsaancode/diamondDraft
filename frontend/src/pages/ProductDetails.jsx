@@ -3,8 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Heart, Star, ChevronLeft, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
 import Specifications from '../components/home/Specifications';
 import { useCart } from '../context/CartContext';
-// eslint-disable-next-line no-unused-vars
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Info } from 'lucide-react';
 
 const fallbackProduct = {
   id: 'mock',
@@ -27,6 +27,7 @@ const ProductDetails = () => {
   const [mainImage, setMainImage] = useState(product.image);
   const [isLiked, setIsLiked] = useState(product.isLiked || false);
   const [format, setFormat] = useState('STL');
+  const [isFormatGuideOpen, setIsFormatGuideOpen] = useState(false);
   
   // Generating mock gallery if none exists
   const gallery = [
@@ -107,7 +108,12 @@ const ProductDetails = () => {
           <div className="mb-8 md:mb-10">
             <div className="flex justify-between items-center mb-4">
               <span className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Select CAD Format</span>
-              <button className="text-xs md:text-sm text-gray-500 underline hover:text-black cursor-pointer">Format Guide</button>
+              <button 
+                onClick={() => setIsFormatGuideOpen(true)}
+                className="text-xs md:text-sm text-gray-500 underline hover:text-black cursor-pointer flex items-center gap-1"
+              >
+                <Info size={14} /> Format Guide
+              </button>
             </div>
             <div className="flex flex-wrap gap-3 md:gap-4">
               {formats.map((f) => (
@@ -170,6 +176,75 @@ const ProductDetails = () => {
       <div className="mt-12 md:mt-16 border-t border-gray-200 pt-8">
         <Specifications product={product} />
       </div>
+
+      {/* Format Guide Modal */}
+      <AnimatePresence>
+        {isFormatGuideOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsFormatGuideOpen(false)}
+              className="fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-lg bg-white z-[110] shadow-2xl rounded-sm overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50 sticky top-0">
+                <span className="text-xl font-serif font-bold text-gray-900 flex items-center gap-2">
+                  <Info size={20} className="text-black" /> File Formats Guide
+                </span>
+                <button 
+                  onClick={() => setIsFormatGuideOpen(false)} 
+                  className="p-2 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
+                >
+                  <X size={20} className="text-gray-900" />
+                </button>
+              </div>
+              
+              <div className="p-6 md:p-8 overflow-y-auto space-y-6">
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-1">STL (Stereolithography)</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">
+                    The industry standard for 3D printing. It represents the surface of the model using a mesh of triangles. Best for sending directly to your 3D printer or casting house. <span className="text-black font-semibold">Cannot be easily edited.</span>
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-1">3DM (Rhinoceros 3D)</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">
+                    The native file format for Rhino and Matrix/MatrixGold. This contains the full NURBS geometry and is the absolute best choice if your jeweler intends to <span className="text-black font-semibold">manipulate or edit the design</span> before printing.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-1">OBJ (Wavefront)</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">
+                    A universally accepted format that supports polygonal geometry, commonly used in rendering software (like Blender or KeyShot) or animation pipelines. Good for visual representation but rarely used for precise manufacturing.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-1">STEP (Standard for the Exchange of Product model data)</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">
+                    A highly accurate, cross-platform solid modeling format widely used in precision engineering. Retains mathematical accuracy of curves and surfaces, making it great for CNC milling or importing into parametric CAD software like SolidWorks.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-6 bg-gray-50 border-t border-gray-100 text-center sticky bottom-0">
+                <p className="text-xs text-gray-500 italic">
+                  Not sure what you need? Select <span className="font-bold text-black">STL</span> for direct printing, or <span className="font-bold text-black">3DM</span> if your local jeweler needs to edit the design.
+                </p>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
