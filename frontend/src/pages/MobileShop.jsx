@@ -4,6 +4,7 @@ import { ChevronLeft, Search, Plus, Heart, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
+import { useFavorites } from '../context/FavoriteContext';
 
 const filters = [
   { name: 'Price', icon: <ChevronDown size={14} className="ml-1 opacity-60" /> },
@@ -14,6 +15,7 @@ const filters = [
 const MobileShop = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   return (
     <div className="bg-[#f8f9fa] min-h-screen pb-32 font-sans">
@@ -63,10 +65,13 @@ const MobileShop = () => {
                   className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700"
                 />
                 <button 
-                  onClick={(e) => e.stopPropagation()}
-                  className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center text-red-500 hover:bg-white active:scale-90 transition-all z-10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(product);
+                  }}
+                  className={`absolute top-4 right-4 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center hover:bg-white active:scale-90 transition-all z-10 ${isFavorite(product.id) ? 'text-red-500' : 'text-gray-400'}`}
                 >
-                  <Heart size={18} fill={product.isLiked ? "currentColor" : "none"} strokeWidth={2} />
+                  <Heart size={18} fill={isFavorite(product.id) ? "currentColor" : "none"} strokeWidth={2} />
                 </button>
                 {product.id % 4 === 0 && (
                   <div className="absolute top-4 left-0 bg-red-500 text-white text-[10px] px-3 py-1 rounded-r-full font-bold shadow-sm">
@@ -83,13 +88,14 @@ const MobileShop = () => {
                 
                 <div className="flex items-center justify-between mt-auto">
                   <div className="flex items-center gap-2">
-                    <span className="text-base font-black text-gray-900">${product.price}</span>
-                    <span className="text-xs text-red-400 line-through font-medium opacity-60">${product.price + product.price*0.2}</span>
+                    <span className="text-base font-black text-gray-900">₹{product.price.toLocaleString('en-IN')}</span>
+                    <span className="text-xs text-red-400 line-through font-medium opacity-60">₹{(product.price * 1.2).toLocaleString('en-IN')}</span>
                   </div>
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
                       addToCart(product, 'CAD');
+                      navigate('/cart');
                     }}
                     className="w-9 h-9 rounded-full bg-[#1b4332] flex items-center justify-center text-white shadow-lg active:scale-90 transition-all hover:bg-[#2d6a4f]"
                   >

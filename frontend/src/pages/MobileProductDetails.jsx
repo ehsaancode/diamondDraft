@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Share2, Heart, Star, ShoppingBag, Plus, Minus, Info, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
+import { ChevronLeft, Share2, Heart, Star, ShoppingBag, Plus, Minus, Info, ShieldCheck, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useCart } from '../context/CartContext';
+import { useFavorites } from '../context/FavoriteContext';
 
 const MobileProductDetails = ({ product }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [selectedFormat, setSelectedFormat] = useState('STL');
   const formats = ['STL', '3DM', 'OBJ', 'STEP'];
 
@@ -35,8 +37,11 @@ const MobileProductDetails = ({ product }) => {
             alt={product.name} 
             className="max-h-full max-w-full object-contain mix-blend-multiply drop-shadow-2xl"
           />
-          <button className="absolute top-6 right-6 w-11 h-11 rounded-full bg-white shadow-md flex items-center justify-center text-red-500 active:scale-90 transition-transform">
-             <Heart size={20} fill={product.isLiked ? "currentColor" : "none"} />
+          <button 
+            onClick={() => toggleFavorite(product)}
+            className={`absolute top-6 right-6 w-11 h-11 rounded-full bg-white shadow-md flex items-center justify-center active:scale-90 transition-transform ${isFavorite(product.id) ? 'text-red-500' : 'text-gray-400'}`}
+          >
+             <Heart size={20} fill={isFavorite(product.id) ? "currentColor" : "none"} />
           </button>
         </motion.div>
 
@@ -51,8 +56,8 @@ const MobileProductDetails = ({ product }) => {
           </div>
           <h2 className="text-2xl font-black text-gray-900 leading-tight">{product.name}</h2>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-3xl font-black text-black">${product.price}</span>
-            <span className="text-sm font-medium text-red-400 line-through opacity-50">${product.price * 1.2}</span>
+            <span className="text-3xl font-black text-black">₹{product.price?.toLocaleString('en-IN')}</span>
+            <span className="text-sm font-medium text-red-400 line-through opacity-50">₹{(product.price * 1.25).toLocaleString('en-IN')}</span>
           </div>
         </div>
 
@@ -121,7 +126,10 @@ const MobileProductDetails = ({ product }) => {
              </button>
           </div>
           <button 
-            onClick={() => addToCart(product, selectedFormat)}
+            onClick={() => {
+              addToCart(product, selectedFormat);
+              navigate('/cart');
+            }}
             className="flex-[2] h-14 bg-black text-white rounded-2xl font-bold flex items-center justify-center gap-3 active:scale-95 transition-transform"
           >
             <ShoppingBag size={20} />

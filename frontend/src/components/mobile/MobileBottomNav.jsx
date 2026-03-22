@@ -15,17 +15,18 @@ const MobileBottomNav = () => {
         {({ isActive }) => <Search size={22} strokeWidth={isActive ? 2.5 : 2} />}
       </NavLink>
       
-      <button 
-        onClick={() => setIsCartOpen(true)}
-        className="p-2 rounded-full transition-all duration-300 text-gray-400 relative"
-      >
-        <ShoppingBag size={22} strokeWidth={2} />
-        {cartCount > 0 && (
-          <span className="absolute top-1 right-1 bg-red-500 text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white shadow-sm">
-            {cartCount}
-          </span>
+      <NavLink to="/cart" className={({ isActive }) => `p-2 rounded-full transition-all duration-300 relative ${isActive ? 'bg-black text-white' : 'text-gray-400'}`}>
+        {({ isActive }) => (
+          <>
+            <ShoppingBag size={22} strokeWidth={isActive ? 2.5 : 2} />
+            {cartCount > 0 && (
+              <span className={`absolute top-1 right-1 text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center border shadow-sm ${isActive ? 'bg-white text-black border-black' : 'bg-red-500 text-white border-white'}`}>
+                {cartCount}
+              </span>
+            )}
+          </>
         )}
-      </button>
+      </NavLink>
 
       <NavLink to="/profile" className={({ isActive }) => `p-2 rounded-full transition-all duration-300 ${isActive ? 'bg-black text-white' : 'text-gray-400'}`}>
         {({ isActive }) => <User size={22} strokeWidth={isActive ? 2.5 : 2} />}

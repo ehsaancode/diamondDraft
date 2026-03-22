@@ -9,23 +9,16 @@ const MobileHeader = () => {
     <div className="flex flex-col gap-4 p-4 pb-0 bg-white sticky top-0 z-30">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="bg-red-50 p-1.5 rounded-full">
-            <MapPin size={18} className="text-red-500" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs text-gray-500">Delivery to</span>
-            <span className="text-sm font-semibold flex items-center">
-              New York City <span className="ml-1 text-[10px] transform rotate-90">›</span>
+           <h1 className="text-2xl font-serif italic font-black text-black tracking-widest">GWEL</h1>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Delivery to</span>
+            <span className="text-xs font-black text-gray-900 flex items-center gap-1">
+              New York City 
+              <MapPin size={12} className="text-red-500" />
             </span>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button 
-            onClick={() => navigate('/favorites')}
-            className="p-2 border border-gray-100 rounded-full bg-white shadow-sm"
-          >
-            <Heart size={20} className="text-gray-600" />
-          </button>
         </div>
       </div>
       

@@ -6,6 +6,7 @@ import { ShoppingCart, Heart, Plus } from 'lucide-react';
 import { products } from '../data/products';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useFavorites } from '../context/FavoriteContext';
 
 const categories = [
   { name: 'Rings', icon: '/images/jewellery_cad_ring.png', color: 'bg-green-100' },
@@ -19,6 +20,7 @@ const MobileHome = () => {
   const navigate = useNavigate();
   const featuredProducts = products.slice(0, 4);
   const { addToCart } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   return (
     <div className="bg-gray-50 min-h-screen pb-32">
@@ -109,11 +111,11 @@ const MobileHome = () => {
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      // handle like if needed
+                      toggleFavorite(product);
                     }}
-                    className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm shadow-sm transition-colors hover:bg-white text-red-500 z-10"
+                    className={`absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm shadow-sm transition-colors hover:bg-white z-10 ${isFavorite(product.id) ? 'text-red-500' : 'text-gray-400'}`}
                   >
-                    <Heart size={14} fill={product.isLiked ? "currentColor" : "none"} />
+                    <Heart size={14} fill={isFavorite(product.id) ? "currentColor" : "none"} />
                   </button>
                 </div>
                 <div>
@@ -124,13 +126,14 @@ const MobileHome = () => {
                 </div>
                 <div className="flex items-center justify-between mt-auto">
                   <div className="flex flex-col">
-                    <span className="text-sm font-extrabold text-black">${product.price}</span>
-                    <span className="text-[10px] text-gray-400 line-through decoration-red-400/50">${product.price * 1.25}</span>
+                    <span className="text-sm font-extrabold text-black">₹{product.price.toLocaleString('en-IN')}</span>
+                    <span className="text-[10px] text-gray-400 line-through decoration-red-400/50">₹{(product.price * 1.25).toLocaleString('en-IN')}</span>
                   </div>
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
                       addToCart(product, 'CAD');
+                      navigate('/cart');
                     }}
                     className="w-8 h-8 rounded-full bg-green-900 flex items-center justify-center text-white shadow-lg shadow-green-900/20 active:scale-95 transition-transform"
                   >
