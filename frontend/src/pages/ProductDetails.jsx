@@ -5,6 +5,8 @@ import Specifications from '../components/home/Specifications';
 import { useCart } from '../context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Info } from 'lucide-react';
+import { useMobile } from '../hooks/useMobile';
+import MobileProductDetails from './MobileProductDetails';
 
 const fallbackProduct = {
   id: 'mock',
@@ -20,10 +22,16 @@ const ProductDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const isMobile = useMobile();
   
   // Using passed product from location state, or fallback if accessed directly
   const product = location.state || fallbackProduct;
 
+  if (isMobile) {
+    return <MobileProductDetails product={product} />;
+  }
+  
+  // Existing desktop code...
   const [mainImage, setMainImage] = useState(product.image);
   const [isLiked, setIsLiked] = useState(product.isLiked || false);
   const [format, setFormat] = useState('STL');

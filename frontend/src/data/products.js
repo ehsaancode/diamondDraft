@@ -6,7 +6,7 @@ export const products = [
     price: 6800.00,
     rating: 4.9,
     reviews: 365,
-    image: '/images/ring_1_1772534075731.png',
+    image: '/images/jewellery_cad_ring.png',
     isLiked: false,
     tag: 'Top Requested'
   },
@@ -17,7 +17,7 @@ export const products = [
     price: 7600.00,
     rating: 4.9,
     reviews: 245,
-    image: '/images/ring_1_1772534075731.png',
+    image: '/images/jewellery_cad_neckless.png',
     isLiked: true,
     tag: 'Top Requested'
   },
@@ -28,7 +28,7 @@ export const products = [
     price: 6000.00,
     rating: 4.9,
     reviews: 180,
-    image: '/images/ring_1_1772534075731.png',
+    image: '/images/jewellery_cad_earring.png',
     isLiked: false,
     tag: 'New Design'
   },
@@ -39,7 +39,7 @@ export const products = [
     price: 8800.00,
     rating: 4.9,
     reviews: 310,
-    image: '/images/ring_1_1772534075731.png',
+    image: '/images/jewellery_cad_bracelet.png',
     isLiked: false,
     tag: 'Top Requested'
   },
