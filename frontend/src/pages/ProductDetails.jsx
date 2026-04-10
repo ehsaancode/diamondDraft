@@ -161,28 +161,40 @@ const ProductDetails = () => {
               </button>
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* Specifications & Features Section */}
-      <div className="mt-8 md:mt-10 border-t border-gray-200 pt-8 border-b">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
-          <Specifications product={product} />
+      {/* Specifications Section */}
+      <div className="mt-16 md:mt-24 border-t border-gray-100 pt-16">
+        <Specifications product={product} />
+      </div>
+
+      {/* Shipping & Support Features - Now at the bottom */}
+      <div className="mt-12 md:mt-20 border-t border-gray-100 py-12 md:py-16 bg-gray-50/50 rounded-3xl">
+        <div className="flex flex-col md:flex-row items-center justify-around gap-8 md:gap-4 px-4 md:px-8">
+          <div className="flex flex-col items-center text-center gap-3">
+            <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-900 border border-gray-100">
+              <Truck size={22} className="text-gray-700" />
+            </div>
+            <span className="text-xs md:text-sm font-semibold uppercase tracking-widest text-gray-900">Delivery within 2-3 business days</span>
+          </div>
           
-          <div className="flex flex-col justify-center space-y-6 pt-8 md:pt-0 border-t border-gray-200 md:border-t-0">
-            <div className="flex items-center justify-center md:justify-start gap-4 text-gray-600">
-              <Truck size={18} className="text-gray-400" />
-              <span className="text-xs md:text-sm font-medium uppercase tracking-tight">Delivery within 2-3 business days</span>
+          <div className="hidden md:block h-12 w-px bg-gray-200"></div>
+
+          <div className="flex flex-col items-center text-center gap-3">
+            <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-900 border border-gray-100">
+              <ShieldCheck size={22} className="text-gray-700" />
             </div>
-            <div className="flex items-center justify-center md:justify-start gap-4 text-gray-600">
-              <ShieldCheck size={18} className="text-gray-400" />
-              <span className="text-xs md:text-sm font-medium uppercase tracking-tight">Production-ready precision</span>
+            <span className="text-xs md:text-sm font-semibold uppercase tracking-widest text-gray-900">Production-ready precision</span>
+          </div>
+
+          <div className="hidden md:block h-12 w-px bg-gray-200"></div>
+
+          <div className="flex flex-col items-center text-center gap-3">
+            <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-900 border border-gray-100">
+              <RotateCcw size={22} className="text-gray-700" />
             </div>
-            <div className="flex items-center justify-center md:justify-start gap-4 text-gray-600">
-              <RotateCcw size={18} className="text-gray-400" />
-              <span className="text-xs md:text-sm font-medium uppercase tracking-tight">Includes 3 free design revisions</span>
-            </div>
+            <span className="text-xs md:text-sm font-semibold uppercase tracking-widest text-gray-900">Includes 3 free design revisions</span>
           </div>
         </div>
       </div>

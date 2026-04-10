@@ -9,10 +9,10 @@ const Specifications = ({ product }) => {
   };
 
   return (
-    <section className="px-8 py-16 max-w-7xl mx-auto w-full flex flex-col items-center">
-      <h2 className="text-4xl font-serif text-black mb-16 text-center">Specifications</h2>
+    <div className="w-full">
+      <h2 className="text-3xl font-serif text-black mb-12">Specifications</h2>
 
-      <div className="w-full max-w-3xl">
+      <div className="w-full">
         <AccordionItem 
           number="01" 
           title="CAD Deliverables" 
@@ -87,7 +87,7 @@ const Specifications = ({ product }) => {
           <p className="text-sm text-gray-600 leading-relaxed mb-4">Dedicated technical support for issues relating to slicing and 3D printing the provide models.</p>
         </AccordionItem>
       </div>
-    </section>
+    </div>
   );
 };
 
