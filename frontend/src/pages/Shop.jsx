@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, X } from 'lucide-react';
+import { Filter, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '../components/ui/ProductCard';
 import { products } from '../data/products';
 import { useMobile } from '../hooks/useMobile';
@@ -15,6 +15,8 @@ const Shop = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 12;
   
   const location = useLocation();
   const searchInputRef = useRef(null);
@@ -36,6 +38,11 @@ const Shop = () => {
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedBrand, selectedTag, sortOrder, debouncedSearchQuery]);
 
   const brands = ['All', ...new Set(products.map(p => p.brand))];
   const tags = ['All', ...new Set(products.map(p => p.tag).filter(Boolean))];
@@ -72,6 +79,12 @@ const Shop = () => {
   if (isMobile) {
     return <MobileShop />;
   }
+
+  const totalPages = Math.ceil(filteredAndSortedProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = filteredAndSortedProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="px-8 py-12 max-w-7xl mx-auto w-full">
@@ -156,11 +169,59 @@ const Shop = () => {
           </div>
 
           {filteredAndSortedProducts.length > 0 ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-8 gap-y-10 md:gap-y-12">
-              {filteredAndSortedProducts.map((product, index) => (
-                <ProductCard key={product.id} product={product} index={index} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-8 gap-y-10 md:gap-y-12">
+                {paginatedProducts.map((product, index) => (
+                  <ProductCard key={product.id} product={product} index={index} />
+                ))}
+              </div>
+              
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-12 bg-white rounded-full px-6 py-3 w-fit mx-auto border border-gray-100 shadow-sm">
+                  <button 
+                    onClick={() => {
+                      setCurrentPage(prev => Math.max(prev - 1, 1));
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    disabled={currentPage === 1}
+                    className={`p-2 rounded-full transition-colors ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-100'}`}
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  
+                  <div className="flex gap-1 overflow-x-auto max-w-[200px] scrollbar-hide px-2">
+                    {Array.from({ length: totalPages }).map((_, i) => {
+                      // Logic to show a limited number of pages could go here, but for now we show all
+                      // or just standard dots if there are too many. Assuming < 10 pages for now.
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setCurrentPage(i + 1);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className={`min-w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all px-3 shrink-0 ${currentPage === i + 1 ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                        >
+                          {i + 1}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button 
+                    onClick={() => {
+                      setCurrentPage(prev => Math.min(prev + 1, totalPages));
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    disabled={currentPage === totalPages}
+                    className={`p-2 rounded-full transition-colors ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-100'}`}
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="py-20 text-center">
               <p className="text-gray-500 mb-4">No products found matching your search or filters.</p>

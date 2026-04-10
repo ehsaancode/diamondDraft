@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Search, Plus, Heart, ChevronDown, Filter, X, Check } from 'lucide-react';
+import { ChevronLeft, Search, Plus, Heart, ChevronDown, Filter, X, Check, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
@@ -15,6 +15,12 @@ const MobileShop = () => {
   const [selectedTag, setSelectedTag] = useState('All');
   const [sortOrder, setSortOrder] = useState('default');
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 12;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedBrand, selectedTag, sortOrder]);
 
   const brands = ['All', ...new Set(products.map(p => p.brand))];
   const tags = ['All', ...new Set(products.map(p => p.tag).filter(Boolean))];
@@ -40,6 +46,12 @@ const MobileShop = () => {
   }, [selectedBrand, selectedTag, sortOrder]);
 
   const activeFilterCount = (selectedBrand !== 'All' ? 1 : 0) + (selectedTag !== 'All' ? 1 : 0) + (sortOrder !== 'default' ? 1 : 0);
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <div className="bg-[#f8f9fa] min-h-screen pb-32 font-sans overflow-x-hidden">
@@ -102,7 +114,7 @@ const MobileShop = () => {
 
         <div className="grid grid-cols-2 gap-x-4 gap-y-6">
           <AnimatePresence mode='popLayout'>
-            {filteredProducts.map((product) => (
+            {paginatedProducts.map((product) => (
               <motion.div 
                 key={product.id}
                 layout
@@ -157,6 +169,47 @@ const MobileShop = () => {
             ))}
           </AnimatePresence>
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-1.5 mt-8 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2.5 w-fit mx-auto border border-gray-100 shadow-sm">
+            <button 
+              onClick={() => {
+                setCurrentPage(prev => Math.max(prev - 1, 1));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              disabled={currentPage === 1}
+              className={`p-1.5 rounded-full transition-colors ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-100'}`}
+            >
+              <ChevronLeft size={18} />
+            </button>
+            
+            <div className="flex gap-1 overflow-x-auto max-w-[150px] scrollbar-hide px-1">
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setCurrentPage(i + 1);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`min-w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all px-2 shrink-0 ${currentPage === i + 1 ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+
+            <button 
+              onClick={() => {
+                setCurrentPage(prev => Math.min(prev + 1, totalPages));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              disabled={currentPage === totalPages}
+              className={`p-1.5 rounded-full transition-colors ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-100'}`}
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        )}
 
         {filteredProducts.length === 0 && (
           <div className="py-20 text-center flex flex-col items-center gap-4">
