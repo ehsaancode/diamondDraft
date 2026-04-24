@@ -13,7 +13,7 @@ app.use(express.json());
 
 // Basic Route
 app.get('/', (req, res) => {
-  res.send('DiamondDraft API is running...');
+  res.send('Jwel API is running...');
 });
 
 // Database Connection
