@@ -3,12 +3,13 @@ import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '../components/ui/ProductCard';
-import { products } from '../data/products';
+import { useProducts } from '../hooks/useProducts';
 import { useMobile } from '../hooks/useMobile';
 import MobileShop from './MobileShop';
 
 const Shop = () => {
   const isMobile = useMobile();
+  const { products, loading } = useProducts();
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [selectedTag, setSelectedTag] = useState('All');
   const [sortOrder, setSortOrder] = useState('default');

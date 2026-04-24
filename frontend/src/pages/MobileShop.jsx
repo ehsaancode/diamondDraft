@@ -2,12 +2,13 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Search, Plus, Heart, ChevronDown, Filter, X, Check, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { products } from '../data/products';
+import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../context/CartContext';
 import { useFavorites } from '../context/FavoriteContext';
 
 const MobileShop = () => {
   const navigate = useNavigate();
+  const { products, loading } = useProducts();
   const { addToCart } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
   

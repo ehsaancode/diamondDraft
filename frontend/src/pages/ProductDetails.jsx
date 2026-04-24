@@ -38,7 +38,7 @@ const ProductDetails = () => {
   const [isFormatGuideOpen, setIsFormatGuideOpen] = useState(false);
   
   // Generating mock gallery if none exists
-  const gallery = [
+  const gallery = (product.images && product.images.length > 0) ? product.images : [
     product.image,
     'https://images.unsplash.com/photo-1605100804763-247f67b25406?w=800&auto=format&fit=crop&q=60',
     'https://images.unsplash.com/photo-1599643477874-dc3b91490214?w=800&auto=format&fit=crop&q=60'
