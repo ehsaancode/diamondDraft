@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../ui/ProductCard';
-import { products } from '../../data/products';
+import { useProducts } from '../../hooks/useProducts';
 
 const BestSelling = () => {
+  const { products, loading } = useProducts();
   const sellingProducts = products.slice(0, 8);
   return (
     <section className="px-8 py-16 max-w-7xl mx-auto w-full">

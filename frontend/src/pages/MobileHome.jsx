@@ -3,10 +3,10 @@ import MobileHeader from '../components/mobile/MobileHeader';
 import MobileBottomNav from '../components/mobile/MobileBottomNav';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Heart, Plus } from 'lucide-react';
-import { products } from '../data/products';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useFavorites } from '../context/FavoriteContext';
+import { useProducts } from '../hooks/useProducts';
 
 const categories = [
   { name: 'Rings', icon: '/images/jewellery_cad_ring.png', color: 'bg-green-100' },
@@ -18,6 +18,7 @@ const categories = [
 
 const MobileHome = () => {
   const navigate = useNavigate();
+  const { products } = useProducts();
   const featuredProducts = products.slice(0, 4);
   const { addToCart } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();

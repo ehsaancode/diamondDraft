@@ -1,8 +1,9 @@
 import React from 'react';
-import { products } from '../../data/products';
+import { useProducts } from '../../hooks/useProducts';
 
 const YouMayAlsoLike = () => {
-  const suggestedProducts = products.slice(-8);
+  const { products, loading } = useProducts();
+  const suggestedProducts = products.slice(0, 8);
   return (
     <section className="px-8 py-20 bg-[#FAFAFA] w-full mt-12">
       <div className="max-w-7xl mx-auto">
@@ -14,10 +15,10 @@ const YouMayAlsoLike = () => {
           {suggestedProducts.map((product) => (
             <div key={product.id} className="bg-white p-4 md:p-6 rounded-sm shadow-sm flex flex-col items-center group cursor-pointer transition-shadow hover:shadow-md">
               <div className="w-full flex justify-between items-center mb-6 text-xs text-gray-500">
-                <span className="font-bold text-black text-[10px] uppercase truncate">{product.tag}</span>
+                <span className="font-bold text-black text-[10px] uppercase truncate">{product.tag || 'Design'}</span>
                 <div className="flex items-center gap-1">
                   <span className="text-yellow-500">★</span>
-                  <span>{product.rating.toFixed(1)} ({product.reviews})</span>
+                  <span>{parseFloat(product.rating || 5).toFixed(1)} ({product.reviews || 0})</span>
                 </div>
               </div>
               

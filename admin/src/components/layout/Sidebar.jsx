@@ -42,7 +42,7 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
               <div className="w-3 h-3 bg-white rounded-full"></div>
             </div>
             <h1 className="text-xl font-bold font-grotesk tracking-tight">
-              Jwel<span className="text-primary-500">Admin</span>
+              Gwel<span className="text-primary-500">Admin</span>
             </h1>
           </div>
           <button className="lg:hidden text-zinc-400 hover:text-white" onClick={() => setIsOpen(false)}>

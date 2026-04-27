@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { products } from '../../data/products';
 import { ArrowUpRight } from 'lucide-react';
+import { useProducts } from '../../hooks/useProducts';
 
 const EditorialSection = () => {
   const scrollRef = useRef(null);
@@ -15,7 +15,8 @@ const EditorialSection = () => {
   const imageY = useTransform(scrollYProgress, [0, 1], [40, -40]);
 
   const heroModel = "/beautiful_model_gold_necklace_1772562801429.png";
-  const featureProduct = products[6] || products[0];
+  const { products } = useProducts();
+  const featureProduct = products[0] || null;
 
   return (
     <section ref={scrollRef} className="w-full bg-[#E5E5E5] py-20 px-8 overflow-hidden">
@@ -54,6 +55,7 @@ const EditorialSection = () => {
           </div>
 
           {/* Right - Featured Product Card */}
+          {featureProduct && (
           <div className="bg-[#E5E5E5] p-8 md:p-16 flex flex-col justify-center min-h-[500px] md:min-h-[600px] relative">
             <div className="max-w-sm mx-auto lg:ml-auto lg:mr-0">
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 text-black leading-tight">
@@ -82,6 +84,7 @@ const EditorialSection = () => {
               </div>
             </div>
           </div>
+          )}
 
         </div>
       </div>

@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Image as ImageIcon, Video as VideoIcon } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Check } from '../components/icons/Check';
 import axios from 'axios';
 
-export const AddProduct = () => {
+export const EditProduct = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: '', sku: '', description: '', price: '', compareAtPrice: '', quantity: '', category: 'Rings'
@@ -16,6 +20,31 @@ export const AddProduct = () => {
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const res = await axios.get(`${apiUrl}/api/products/${id}`);
+        const data = res.data;
+        setFormData({
+          name: data.name || '',
+          sku: data.sku || '',
+          description: data.description || '',
+          price: data.price || '',
+          compareAtPrice: data.compareAtPrice || '',
+          quantity: data.quantity || '',
+          category: data.category || 'Rings'
+        });
+      } catch (err) {
+        console.error('Failed to load product', err);
+        alert('Failed to load product for editing');
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,27 +58,29 @@ export const AddProduct = () => {
       if (video) data.append('video', video);
 
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      await axios.post(`${apiUrl}/api/products`, data, {
+      await axios.put(`${apiUrl}/api/products/${id}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setSuccess(true);
-      setFormData({ name: '', sku: '', description: '', price: '', compareAtPrice: '', quantity: '', category: 'Rings' });
-      setImages([]);
-      setVideo(null);
+      setTimeout(() => navigate('/products'), 1500);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || 'Error creating product: See console for details.');
+      alert(err.response?.data?.error || 'Error updating product: See console for details.');
     } finally {
       setLoading(false);
     }
   };
 
+  if (initialLoading) {
+    return <div className="p-8 text-center text-zinc-400">Loading product...</div>;
+  }
+
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h2 className="text-3xl font-bold font-grotesk tracking-tight">Add New Product</h2>
-        <p className="text-zinc-400 mt-1">Fill out the form below to list a new piece of jewelry.</p>
-        {success && <p className="text-green-500 mt-2">Product published successfully!</p>}
+        <h2 className="text-3xl font-bold font-grotesk tracking-tight">Edit Product</h2>
+        <p className="text-zinc-400 mt-1">Update your jewelry listing information.</p>
+        {success && <p className="text-green-500 mt-2">Product updated successfully! Redirecting...</p>}
       </div>
 
       <div className="glass-panel p-6 md:p-8">
@@ -138,7 +169,7 @@ export const AddProduct = () => {
 
           <div className="pt-4 flex justify-end gap-4">
             <button type="submit" disabled={loading} className="btn-primary flex items-center gap-2">
-              <Check size={18} /> {loading ? 'Publishing...' : 'Publish Product'}
+              <Check size={18} /> {loading ? 'Updating...' : 'Update Product'}
             </button>
           </div>
         </form>

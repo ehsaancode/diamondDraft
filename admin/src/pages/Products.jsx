@@ -11,7 +11,8 @@ export const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/products');
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const res = await axios.get(`${apiUrl}/api/products`);
         setProducts(res.data);
       } catch (err) {
         console.error('Failed to fetch products', err);
@@ -21,6 +22,19 @@ export const Products = () => {
     };
     fetchProducts();
   }, []);
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        await axios.delete(`${apiUrl}/api/products/${id}`);
+        setProducts(products.filter(p => p._id !== id));
+      } catch (err) {
+        console.error('Failed to delete product', err);
+        alert('Failed to delete product');
+      }
+    }
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
@@ -68,7 +82,7 @@ export const Products = () => {
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-lg bg-surfaceHover overflow-hidden border border-border flex items-center justify-center">
                         {product.images && product.images.length > 0 ? (
-                          <img src={`http://localhost:5000${product.images[0]}`} alt={product.name} className="w-full h-full object-cover" />
+                          <img src={product.images[0].startsWith('http') ? product.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${product.images[0]}`} alt={product.name} className="w-full h-full object-cover" />
                         ) : (
                           <Package size={20} className="text-zinc-500" />
                         )}
@@ -87,8 +101,8 @@ export const Products = () => {
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button className="p-2 text-zinc-400 hover:text-primary-500 transition-colors"><Edit size={16} /></button>
-                      <button className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+                      <Link to={`/edit-product/${product._id}`} className="p-2 text-zinc-400 hover:text-primary-500 transition-colors"><Edit size={16} /></Link>
+                      <button onClick={() => handleDelete(product._id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
                     </div>
                   </td>
                 </tr>

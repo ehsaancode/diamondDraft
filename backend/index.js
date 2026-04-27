@@ -1,5 +1,4 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
@@ -29,21 +28,9 @@ app.get('/', (req, res) => {
   res.send('Jwel API is running...');
 });
 
-// Database Connection
+// Database Connection (Now handled by Firebase in routes)
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  console.warn('WARNING: MONGODB_URI is not defined in .env! Database connection will likely fail.');
-}
-
-mongoose.connect(MONGODB_URI || 'mongodb://127.0.0.1:27017/jweladmin')
-  .then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error('MongoDB connection error:', err);
-  });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
