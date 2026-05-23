@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { admin, bucket, db } from '../config/firebase.js';
+import cloudinary from '../config/cloudinary.js';
 
 const router = express.Router();
 
@@ -17,26 +18,41 @@ if (!fs.existsSync(uploadDir)) {
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-const uploadToFirebase = async (file, folderName) => {
-  if (!bucket) {
-    throw new Error('Firebase Storage is not configured properly.');
+const uploadFile = async (req, file, folderName) => {
+  const fileExt = path.extname(file.originalname);
+
+  // Try Cloudinary upload if credentials are provided
+  if (process.env.CLOUD_NAME && process.env.API_KEY && process.env.CLOUDINARY_API_SECRET) {
+    try {
+      const resultUrl = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: `diamondDraft/${folderName}`,
+            resource_type: 'auto',
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result.secure_url);
+          }
+        );
+        uploadStream.end(file.buffer);
+      });
+      return resultUrl;
+    } catch (err) {
+      console.warn('Cloudinary upload failed, falling back to local upload:', err.message || err);
+    }
   }
 
-  const fileExt = path.extname(file.originalname);
-  const fileName = `${folderName}/${Date.now()}-${Math.random().toString(36).substring(2, 7)}${fileExt}`;
-  const bucketFile = bucket.file(fileName);
-  const uuid = uuidv4();
-  
-  await bucketFile.save(file.buffer, {
-    metadata: {
-      contentType: file.mimetype,
-      metadata: {
-        firebaseStorageDownloadTokens: uuid
-      }
-    }
-  });
+  // Fallback to local upload
+  const localFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}${fileExt}`;
+  const localDir = path.join(uploadDir, folderName);
+  if (!fs.existsSync(localDir)) {
+    fs.mkdirSync(localDir, { recursive: true });
+  }
+  const filePath = path.join(localDir, localFileName);
+  await fs.promises.writeFile(filePath, file.buffer);
 
-  return `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${uuid}`;
+  return `${req.protocol}://${req.get('host')}/uploads/${folderName}/${localFileName}`;
 };
 
 // POST: Create Product with Images/Video
@@ -44,16 +60,16 @@ router.post('/', upload.fields([{ name: 'images', maxCount: 5 }, { name: 'video'
   try {
     const { name, sku, description, price, compareAtPrice, quantity, category, status } = req.body;
     
-    // Upload files to Firebase
+    // Upload files
     let imageUrls = [];
     if (req.files?.images) {
-      const uploadPromises = req.files.images.map(file => uploadToFirebase(file, 'products'));
+      const uploadPromises = req.files.images.map(file => uploadFile(req, file, 'products'));
       imageUrls = await Promise.all(uploadPromises);
     }
     
     let videoUrl = null;
     if (req.files?.video && req.files.video.length > 0) {
-      videoUrl = await uploadToFirebase(req.files.video[0], 'videos');
+      videoUrl = await uploadFile(req, req.files.video[0], 'videos');
     }
 
     const newProduct = {
@@ -100,6 +116,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 // PUT: Update a product
 router.put('/:id', upload.fields([{ name: 'images', maxCount: 5 }, { name: 'video', maxCount: 1 }]), async (req, res) => {
   try {
@@ -109,14 +126,14 @@ router.put('/:id', upload.fields([{ name: 'images', maxCount: 5 }, { name: 'vide
 
     const updateData = { ...req.body, updatedAt: admin.firestore.FieldValue.serverTimestamp() };
     
-    // Upload files to Firebase if new ones are provided
+    // Upload files if new ones are provided
     if (req.files?.images) {
-      const uploadPromises = req.files.images.map(file => uploadToFirebase(file, 'products'));
+      const uploadPromises = req.files.images.map(file => uploadFile(req, file, 'products'));
       updateData.images = await Promise.all(uploadPromises);
     }
     
     if (req.files?.video && req.files.video.length > 0) {
-      updateData.video = await uploadToFirebase(req.files.video[0], 'videos');
+      updateData.video = await uploadFile(req, req.files.video[0], 'videos');
     }
 
     await docRef.update(updateData);
@@ -127,18 +144,52 @@ router.put('/:id', upload.fields([{ name: 'images', maxCount: 5 }, { name: 'vide
   }
 });
 
-// Helper for Firebase deletion
-const deleteFromFirebase = async (fileUrl) => {
-  if (!bucket || !fileUrl.includes('firebasestorage')) return;
-  try {
-    const urlObj = new URL(fileUrl);
-    const pathParts = urlObj.pathname.split('/o/');
-    if (pathParts.length === 2) {
-      const filePath = decodeURIComponent(pathParts[1]);
-      await bucket.file(filePath).delete();
+// Helper for deletion
+const deleteFile = async (fileUrl) => {
+  if (!fileUrl) return;
+  
+  if (fileUrl.includes('cloudinary.com')) {
+    try {
+      const urlParts = fileUrl.split('/upload/');
+      if (urlParts.length === 2) {
+        const pathWithVersion = urlParts[1];
+        const pathParts = pathWithVersion.split('/');
+        if (pathParts[0].startsWith('v') && !isNaN(pathParts[0].substring(1))) {
+          pathParts.shift();
+        }
+        const fileWithExt = pathParts.join('/');
+        const lastDotIndex = fileWithExt.lastIndexOf('.');
+        const publicId = lastDotIndex !== -1 ? fileWithExt.substring(0, lastDotIndex) : fileWithExt;
+
+        const resourceType = fileUrl.includes('/video/') ? 'video' : 'image';
+        await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
+      }
+    } catch (err) {
+      console.error('Error deleting from Cloudinary:', err.message || err);
     }
-  } catch (err) {
-    console.error('Error deleting from firebase:', err.message);
+  } else if (fileUrl.includes('firebasestorage')) {
+    if (!bucket) return;
+    try {
+      const urlObj = new URL(fileUrl);
+      const pathParts = urlObj.pathname.split('/o/');
+      if (pathParts.length === 2) {
+        const filePath = decodeURIComponent(pathParts[1]);
+        await bucket.file(filePath).delete();
+      }
+    } catch (err) {
+      console.error('Error deleting from firebase:', err.message);
+    }
+  } else if (fileUrl.includes('/uploads/')) {
+    try {
+      const urlObj = new URL(fileUrl);
+      const relativePath = urlObj.pathname.replace(/^\/uploads\//, '');
+      const filePath = path.join(uploadDir, relativePath);
+      if (fs.existsSync(filePath)) {
+        await fs.promises.unlink(filePath);
+      }
+    } catch (err) {
+      console.error('Error deleting local file:', err.message || err);
+    }
   }
 };
 
@@ -154,12 +205,12 @@ router.delete('/:id', async (req, res) => {
     // Delete associated images
     if (product.images && product.images.length > 0) {
       for (const imgUrl of product.images) {
-        await deleteFromFirebase(imgUrl);
+        await deleteFile(imgUrl);
       }
     }
     // Delete associated video
     if (product.video) {
-      await deleteFromFirebase(product.video);
+      await deleteFile(product.video);
     }
 
     await docRef.delete();

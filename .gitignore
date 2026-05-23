@@ -130,3 +130,7 @@ Desktop.ini
 backend/uploads/
 admin/dist/
 frontend/dist/
+
+# Firebase Admin SDK credentials
+*firebase-adminsdk*.json
+
