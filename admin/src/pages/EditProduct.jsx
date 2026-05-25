@@ -4,14 +4,14 @@ import { ChevronDown, Image as ImageIcon, Video as VideoIcon, X } from 'lucide-r
 import { useParams, useNavigate } from 'react-router-dom';
 import { Check } from '../components/icons/Check';
 import axios from 'axios';
-import { Toast } from '../components/common/Toast';
+import { Modal } from '../components/common/Modal';
 
 export const EditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const [modal, setModal] = useState({ show: false, title: '', message: '', type: 'success', actionLabel: 'Okay' });
   const [formData, setFormData] = useState({
     name: '', sku: '', description: '', price: '', compareAtPrice: '', quantity: '', category: 'Rings'
   });
@@ -54,7 +54,7 @@ export const EditProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setToast({ ...toast, show: false });
+    setModal(prev => ({ ...prev, show: false }));
     try {
       const data = new FormData();
       Object.keys(formData).forEach(key => data.append(key, formData[key]));
@@ -69,11 +69,23 @@ export const EditProduct = () => {
       await axios.put(`${apiUrl}/api/products/${id}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      setToast({ show: true, message: 'Product updated successfully!', type: 'success' });
+      setModal({
+        show: true,
+        title: 'Success!',
+        message: 'Product listing has been updated and changes saved to the database successfully.',
+        type: 'success',
+        actionLabel: 'Great'
+      });
       setTimeout(() => navigate('/products'), 1500);
     } catch (err) {
       console.error(err);
-      setToast({ show: true, message: err.response?.data?.error || 'Error updating product. Please try again.', type: 'error' });
+      setModal({
+        show: true,
+        title: 'Update Failed',
+        message: err.response?.data?.error || 'Error updating product. Please check your data and try again.',
+        type: 'error',
+        actionLabel: 'Close'
+      });
     } finally {
       setLoading(false);
     }
@@ -227,7 +239,14 @@ export const EditProduct = () => {
           </div>
         </form>
       </div>
-      <Toast show={toast.show} message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, show: false })} />
+      <Modal 
+        show={modal.show} 
+        title={modal.title} 
+        message={modal.message} 
+        type={modal.type} 
+        actionLabel={modal.actionLabel}
+        onClose={() => setModal(prev => ({ ...prev, show: false }))} 
+      />
     </motion.div>
   );
 };
