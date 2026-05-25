@@ -3,10 +3,11 @@ import { motion } from 'framer-motion';
 import { ChevronDown, Image as ImageIcon, Video as VideoIcon } from 'lucide-react';
 import { Check } from '../components/icons/Check';
 import axios from 'axios';
+import { Toast } from '../components/common/Toast';
 
 export const AddProduct = () => {
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [formData, setFormData] = useState({
     name: '', sku: '', description: '', price: '', compareAtPrice: '', quantity: '', category: 'Rings'
   });
@@ -20,7 +21,7 @@ export const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setSuccess(false);
+    setToast({ ...toast, show: false });
     try {
       const data = new FormData();
       Object.keys(formData).forEach(key => data.append(key, formData[key]));
@@ -32,13 +33,13 @@ export const AddProduct = () => {
       await axios.post(`${apiUrl}/api/products`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      setSuccess(true);
+      setToast({ show: true, message: 'Product created and published successfully!', type: 'success' });
       setFormData({ name: '', sku: '', description: '', price: '', compareAtPrice: '', quantity: '', category: 'Rings' });
       setImages([]);
       setVideo(null);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || 'Error creating product: See console for details.');
+      setToast({ show: true, message: err.response?.data?.error || 'Error creating product. Please try again.', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -49,7 +50,6 @@ export const AddProduct = () => {
       <div>
         <h2 className="text-3xl font-bold font-grotesk tracking-tight">Add New Product</h2>
         <p className="text-zinc-400 mt-1">Fill out the form below to list a new piece of jewelry.</p>
-        {success && <p className="text-green-500 mt-2">Product published successfully!</p>}
       </div>
 
       <div className="glass-panel p-6 md:p-8">
@@ -143,6 +143,7 @@ export const AddProduct = () => {
           </div>
         </form>
       </div>
+      <Toast show={toast.show} message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, show: false })} />
     </motion.div>
   );
 };

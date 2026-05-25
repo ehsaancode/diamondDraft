@@ -4,13 +4,14 @@ import { ChevronDown, Image as ImageIcon, Video as VideoIcon, X } from 'lucide-r
 import { useParams, useNavigate } from 'react-router-dom';
 import { Check } from '../components/icons/Check';
 import axios from 'axios';
+import { Toast } from '../components/common/Toast';
 
 export const EditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [success, setSuccess] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [formData, setFormData] = useState({
     name: '', sku: '', description: '', price: '', compareAtPrice: '', quantity: '', category: 'Rings'
   });
@@ -53,7 +54,7 @@ export const EditProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setSuccess(false);
+    setToast({ ...toast, show: false });
     try {
       const data = new FormData();
       Object.keys(formData).forEach(key => data.append(key, formData[key]));
@@ -68,11 +69,11 @@ export const EditProduct = () => {
       await axios.put(`${apiUrl}/api/products/${id}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      setSuccess(true);
+      setToast({ show: true, message: 'Product updated successfully!', type: 'success' });
       setTimeout(() => navigate('/products'), 1500);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || 'Error updating product: See console for details.');
+      setToast({ show: true, message: err.response?.data?.error || 'Error updating product. Please try again.', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -87,7 +88,6 @@ export const EditProduct = () => {
       <div>
         <h2 className="text-3xl font-bold font-grotesk tracking-tight">Edit Product</h2>
         <p className="text-zinc-400 mt-1">Update your jewelry listing information.</p>
-        {success && <p className="text-green-500 mt-2">Product updated successfully! Redirecting...</p>}
       </div>
 
       <div className="glass-panel p-6 md:p-8">
@@ -227,6 +227,7 @@ export const EditProduct = () => {
           </div>
         </form>
       </div>
+      <Toast show={toast.show} message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, show: false })} />
     </motion.div>
   );
 };
