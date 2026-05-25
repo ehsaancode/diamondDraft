@@ -62,16 +62,16 @@ export const Products = () => {
           <Link to="/add-product" className="btn-secondary">Create Product</Link>
         </div>
       ) : (
-        <div className="glass-panel overflow-hidden">
+        <div className="glass-panel overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-surfaceHover border-b border-border">
                 <th className="p-4 text-sm font-semibold text-zinc-400">Product</th>
-                <th className="p-4 text-sm font-semibold text-zinc-400">SKU</th>
-                <th className="p-4 text-sm font-semibold text-zinc-400">Category</th>
+                <th className="p-4 text-sm font-semibold text-zinc-400 hidden sm:table-cell">SKU</th>
+                <th className="p-4 text-sm font-semibold text-zinc-400 hidden md:table-cell">Category</th>
                 <th className="p-4 text-sm font-semibold text-zinc-400">Price</th>
-                <th className="p-4 text-sm font-semibold text-zinc-400">Stock</th>
-                <th className="p-4 text-sm font-semibold text-zinc-400">Status</th>
+                <th className="p-4 text-sm font-semibold text-zinc-400 hidden sm:table-cell">Stock</th>
+                <th className="p-4 text-sm font-semibold text-zinc-400 hidden md:table-cell">Status</th>
                 <th className="p-4 text-sm font-semibold text-zinc-400 text-right">Actions</th>
               </tr>
             </thead>
@@ -80,29 +80,29 @@ export const Products = () => {
                 <tr key={product._id} className="border-b border-border hover:bg-surfaceHover/50 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-surfaceHover overflow-hidden border border-border flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-lg bg-surfaceHover overflow-hidden border border-border flex items-center justify-center flex-shrink-0">
                         {product.images && product.images.length > 0 ? (
-                          <img src={product.images[0].startsWith('http') ? product.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${product.images[0]}`} alt={product.name} className="w-full h-full object-cover" />
+                          <img src={product.images[0].startsWith('http') ? product.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${product.images[0].replace(/^\//, '')}`} alt={product.name} className="w-full h-full object-cover" />
                         ) : (
                           <Package size={20} className="text-zinc-500" />
                         )}
                       </div>
-                      <span className="font-semibold text-zinc-100">{product.name}</span>
+                      <span className="font-semibold text-zinc-100 line-clamp-1">{product.name}</span>
                     </div>
                   </td>
-                  <td className="p-4 text-sm text-zinc-300">{product.sku}</td>
-                  <td className="p-4 text-sm text-zinc-300">{product.category}</td>
+                  <td className="p-4 text-sm text-zinc-300 hidden sm:table-cell">{product.sku}</td>
+                  <td className="p-4 text-sm text-zinc-300 hidden md:table-cell">{product.category}</td>
                   <td className="p-4 text-sm text-zinc-300">₹{product.price}</td>
-                  <td className="p-4 text-sm text-zinc-300">{product.quantity}</td>
-                  <td className="p-4">
+                  <td className="p-4 text-sm text-zinc-300 hidden sm:table-cell">{product.quantity}</td>
+                  <td className="p-4 hidden md:table-cell">
                     <span className={`text-xs px-2 py-1 rounded-full ${product.status === 'Active' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
                       {product.status}
                     </span>
                   </td>
                   <td className="p-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Link to={`/edit-product/${product._id}`} className="p-2 text-zinc-400 hover:text-primary-500 transition-colors"><Edit size={16} /></Link>
-                      <button onClick={() => handleDelete(product._id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+                    <div className="flex items-center justify-end gap-1 sm:gap-2">
+                      <Link to={`/edit-product/${product._id}`} className="p-2 text-zinc-400 hover:text-primary-500 transition-colors" title="Edit Product"><Edit size={16} /></Link>
+                      <button onClick={() => handleDelete(product._id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors" title="Delete Product"><Trash2 size={16} /></button>
                     </div>
                   </td>
                 </tr>
