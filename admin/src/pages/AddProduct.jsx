@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Image as ImageIcon, Video as VideoIcon } from 'lucide-react';
 import { Check } from '../components/icons/Check';
@@ -13,6 +13,28 @@ export const AddProduct = () => {
   });
   const [images, setImages] = useState([]);
   const [video, setVideo] = useState(null);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [videoPreview, setVideoPreview] = useState(null);
+
+  useEffect(() => {
+    if (images.length === 0) {
+      setImagePreviews([]);
+      return;
+    }
+    const urls = Array.from(images).map(file => URL.createObjectURL(file));
+    setImagePreviews(urls);
+    return () => urls.forEach(url => URL.revokeObjectURL(url));
+  }, [images]);
+
+  useEffect(() => {
+    if (!video) {
+      setVideoPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(video);
+    setVideoPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [video]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -129,21 +151,53 @@ export const AddProduct = () => {
           <div className="space-y-4 p-6 rounded-xl bg-surfaceHover/50 border border-border">
             <h3 className="text-lg font-semibold text-zinc-100 border-b border-border pb-2">Product Media</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <label className="relative border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-primary-500/50 hover:bg-primary-500/5 transition-all cursor-pointer group">
+              <label className="relative border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-primary-500/50 hover:bg-primary-500/5 transition-all cursor-pointer group min-h-[180px]">
                 <input type="file" multiple accept="image/*" onChange={(e) => setImages(e.target.files)} className="hidden" />
-                <div className="w-12 h-12 rounded-full bg-surfaceHover border border-border flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                  <ImageIcon size={24} className="text-zinc-400 group-hover:text-primary-500 transition-colors" />
-                </div>
-                <p className="text-sm font-semibold text-zinc-100 mb-1">Click to upload Images</p>
-                <p className="text-xs text-zinc-500">{images.length > 0 ? `${images.length} files selected` : 'SVG, PNG, JPG (max 10MB)'}</p>
+                {imagePreviews.length > 0 ? (
+                  <div className="w-full space-y-3 pointer-events-none">
+                    <div className="grid grid-cols-3 gap-2 justify-center max-w-[240px] mx-auto">
+                      {imagePreviews.slice(0, 6).map((preview, idx) => (
+                        <div key={idx} className="aspect-square rounded-lg border border-border overflow-hidden bg-black/40">
+                          <img src={preview} alt="Selected preview" className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-primary-400">Click anywhere to change selection</p>
+                      <p className="text-[10px] text-zinc-500">{images.length} files selected</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-12 h-12 rounded-full bg-surfaceHover border border-border flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                      <ImageIcon size={24} className="text-zinc-400 group-hover:text-primary-500 transition-colors" />
+                    </div>
+                    <p className="text-sm font-semibold text-zinc-100 mb-1">Click to upload Images</p>
+                    <p className="text-xs text-zinc-500">SVG, PNG, JPG (max 10MB)</p>
+                  </>
+                )}
               </label>
-              <label className="relative border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-accent/50 hover:bg-accent/5 transition-all cursor-pointer group">
+              <label className="relative border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-accent/50 hover:bg-accent/5 transition-all cursor-pointer group min-h-[180px]">
                 <input type="file" accept="video/mp4" onChange={(e) => setVideo(e.target.files[0])} className="hidden" />
-                <div className="w-12 h-12 rounded-full bg-surfaceHover border border-border flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                  <VideoIcon size={24} className="text-zinc-400 group-hover:text-accent transition-colors" />
-                </div>
-                <p className="text-sm font-semibold text-zinc-100 mb-1">Upload 360° Video</p>
-                <p className="text-xs text-zinc-500">{video ? video.name : 'MP4, WEBM (max 50MB)'}</p>
+                {videoPreview ? (
+                  <div className="w-full space-y-3 pointer-events-none">
+                    <div className="w-16 h-16 mx-auto rounded-lg border border-border overflow-hidden bg-black/40 flex items-center justify-center">
+                      <VideoIcon size={28} className="text-accent" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-accent line-clamp-1 max-w-[200px] mx-auto">{video.name}</p>
+                      <p className="text-[10px] text-zinc-500">Click anywhere to change video</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-12 h-12 rounded-full bg-surfaceHover border border-border flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                      <VideoIcon size={24} className="text-zinc-400 group-hover:text-accent transition-colors" />
+                    </div>
+                    <p className="text-sm font-semibold text-zinc-100 mb-1">Upload 360° Video</p>
+                    <p className="text-xs text-zinc-500">MP4, WEBM (max 50MB)</p>
+                  </>
+                )}
               </label>
             </div>
           </div>
