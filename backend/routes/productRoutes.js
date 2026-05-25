@@ -124,17 +124,54 @@ router.put('/:id', upload.fields([{ name: 'images', maxCount: 5 }, { name: 'vide
     const doc = await docRef.get();
     if (!doc.exists) return res.status(404).json({ message: 'Product not found' });
 
+    const product = doc.data();
     const updateData = { ...req.body, updatedAt: admin.firestore.FieldValue.serverTimestamp() };
     
-    // Upload files if new ones are provided
+    // Parse and handle existing images
+    let updatedImages = product.images || [];
+    if (req.body.existingImages !== undefined) {
+      let parsedExisting = [];
+      try {
+        parsedExisting = JSON.parse(req.body.existingImages);
+      } catch (e) {
+        parsedExisting = Array.isArray(req.body.existingImages) ? req.body.existingImages : [req.body.existingImages];
+      }
+
+      // Identify which images were removed, and delete them from storage
+      const deletedImages = (product.images || []).filter(img => !parsedExisting.includes(img));
+      for (const imgUrl of deletedImages) {
+        await deleteFile(imgUrl);
+      }
+      updatedImages = parsedExisting;
+    }
+    delete updateData.existingImages;
+
+    // Upload new files if new ones are provided
     if (req.files?.images) {
       const uploadPromises = req.files.images.map(file => uploadFile(req, file, 'products'));
-      updateData.images = await Promise.all(uploadPromises);
+      const newImageUrls = await Promise.all(uploadPromises);
+      updatedImages = [...updatedImages, ...newImageUrls];
     }
+    updateData.images = updatedImages;
     
-    if (req.files?.video && req.files.video.length > 0) {
-      updateData.video = await uploadFile(req, req.files.video[0], 'videos');
+    // Handle video
+    let updatedVideo = product.video;
+    if (req.body.existingVideo === 'null' || req.body.existingVideo === null) {
+      if (product.video) {
+        await deleteFile(product.video);
+      }
+      updatedVideo = null;
     }
+    delete updateData.existingVideo;
+
+    if (req.files?.video && req.files.video.length > 0) {
+      // Delete old video if a new one is uploaded
+      if (product.video) {
+        await deleteFile(product.video);
+      }
+      updatedVideo = await uploadFile(req, req.files.video[0], 'videos');
+    }
+    updateData.video = updatedVideo;
 
     await docRef.update(updateData);
     const updatedDoc = await docRef.get();

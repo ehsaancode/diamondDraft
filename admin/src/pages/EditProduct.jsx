@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown, Image as ImageIcon, Video as VideoIcon } from 'lucide-react';
+import { ChevronDown, Image as ImageIcon, Video as VideoIcon, X } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Check } from '../components/icons/Check';
 import axios from 'axios';
@@ -16,6 +16,8 @@ export const EditProduct = () => {
   });
   const [images, setImages] = useState([]);
   const [video, setVideo] = useState(null);
+  const [existingImages, setExistingImages] = useState([]);
+  const [existingVideo, setExistingVideo] = useState(null);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,6 +38,8 @@ export const EditProduct = () => {
           quantity: data.quantity || '',
           category: data.category || 'Rings'
         });
+        setExistingImages(data.images || []);
+        setExistingVideo(data.video || null);
       } catch (err) {
         console.error('Failed to load product', err);
         alert('Failed to load product for editing');
@@ -54,6 +58,9 @@ export const EditProduct = () => {
       const data = new FormData();
       Object.keys(formData).forEach(key => data.append(key, formData[key]));
       
+      data.append('existingImages', JSON.stringify(existingImages));
+      data.append('existingVideo', existingVideo !== null ? existingVideo : 'null');
+
       Array.from(images).forEach(image => data.append('images', image));
       if (video) data.append('video', video);
 
@@ -147,13 +154,59 @@ export const EditProduct = () => {
           {/* Media */}
           <div className="space-y-4 p-6 rounded-xl bg-surfaceHover/50 border border-border">
             <h3 className="text-lg font-semibold text-zinc-100 border-b border-border pb-2">Product Media</h3>
+            
+            {/* Existing Media Preview */}
+            {(existingImages.length > 0 || existingVideo) && (
+              <div className="space-y-3 pb-4 border-b border-border">
+                <h4 className="text-sm font-semibold text-zinc-300">Current Media (Click X to remove)</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                  {existingImages.map((imgUrl, idx) => (
+                    <div key={idx} className="relative group rounded-lg overflow-hidden border border-border bg-black aspect-square">
+                      <img 
+                        src={imgUrl.startsWith('http') ? imgUrl : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${imgUrl.replace(/^\//, '')}`} 
+                        alt={`Product ${idx + 1}`} 
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => setExistingImages(existingImages.filter(img => img !== imgUrl))}
+                        className="absolute top-2 right-2 p-1 bg-black/60 hover:bg-red-500 text-white rounded-full transition-all duration-200 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shadow-md"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                  
+                  {existingVideo && (
+                    <div className="relative group rounded-lg overflow-hidden border border-border bg-black aspect-square flex items-center justify-center">
+                      <video 
+                        src={existingVideo.startsWith('http') ? existingVideo : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${existingVideo.replace(/^\//, '')}`} 
+                        className="w-full h-full object-cover" 
+                        muted
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => setExistingVideo(null)}
+                        className="absolute top-2 right-2 p-1 bg-black/60 hover:bg-red-500 text-white rounded-full transition-all duration-200 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shadow-md z-10"
+                      >
+                        <X size={14} />
+                      </button>
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center pointer-events-none">
+                        <VideoIcon size={20} className="text-white" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <label className="relative border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-primary-500/50 hover:bg-primary-500/5 transition-all cursor-pointer group">
                 <input type="file" multiple accept="image/*" onChange={(e) => setImages(e.target.files)} className="hidden" />
                 <div className="w-12 h-12 rounded-full bg-surfaceHover border border-border flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
                   <ImageIcon size={24} className="text-zinc-400 group-hover:text-primary-500 transition-colors" />
                 </div>
-                <p className="text-sm font-semibold text-zinc-100 mb-1">Click to upload Images</p>
+                <p className="text-sm font-semibold text-zinc-100 mb-1">Click to upload new Images</p>
                 <p className="text-xs text-zinc-500">{images.length > 0 ? `${images.length} files selected` : 'SVG, PNG, JPG (max 10MB)'}</p>
               </label>
               <label className="relative border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-accent/50 hover:bg-accent/5 transition-all cursor-pointer group">
@@ -161,7 +214,7 @@ export const EditProduct = () => {
                 <div className="w-12 h-12 rounded-full bg-surfaceHover border border-border flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
                   <VideoIcon size={24} className="text-zinc-400 group-hover:text-accent transition-colors" />
                 </div>
-                <p className="text-sm font-semibold text-zinc-100 mb-1">Upload 360° Video</p>
+                <p className="text-sm font-semibold text-zinc-100 mb-1">Upload new 360° Video</p>
                 <p className="text-xs text-zinc-500">{video ? video.name : 'MP4, WEBM (max 50MB)'}</p>
               </label>
             </div>
