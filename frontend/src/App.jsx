@@ -40,7 +40,7 @@ const AppContent = () => {
           <Route path="/profile" element={<MobileProfile />} />
         </Routes>
       </div>
-      {isMobile && !isProductPage && !isCartPage && <MobileBottomNav />}
+      {isMobile && <MobileBottomNav />}
       {!isMobile && <Footer />}
     </div>
   );

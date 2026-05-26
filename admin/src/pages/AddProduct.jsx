@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown, Image as ImageIcon, Video as VideoIcon } from 'lucide-react';
+import { ChevronDown, Image as ImageIcon, Video as VideoIcon, X } from 'lucide-react';
 import { Check } from '../components/icons/Check';
 import axios from 'axios';
 import { Modal } from '../components/common/Modal';
+
+const CATEGORY_MAP = {
+  'Rings': ['Engagement', 'Wedding Bands', 'Eternity', 'Cocktail'],
+  'Necklaces': ['Chokers', 'Pendants', 'Chains', 'Lariats'],
+  'Earrings': ['Studs', 'Hoops', 'Drops', 'Huggies'],
+  'Bracelets': ['Tennis', 'Bangles', 'Cuffs', 'Chain & Link']
+};
 
 export const AddProduct = () => {
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState({ show: false, title: '', message: '', type: 'success', actionLabel: 'Okay' });
   const [formData, setFormData] = useState({
-    name: '', sku: '', description: '', price: '', compareAtPrice: '', quantity: '', category: 'Rings'
+    name: '', sku: '', description: '', price: '', compareAtPrice: '', quantity: '', category: 'Rings', subcategory: 'Engagement'
   });
+  const [selectedFormats, setSelectedFormats] = useState(['STL', '3DM']);
   const [images, setImages] = useState([]);
   const [video, setVideo] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -37,7 +45,16 @@ export const AddProduct = () => {
   }, [video]);
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'category') {
+      setFormData(prev => ({
+        ...prev,
+        category: value,
+        subcategory: CATEGORY_MAP[value][0]
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -47,6 +64,7 @@ export const AddProduct = () => {
     try {
       const data = new FormData();
       Object.keys(formData).forEach(key => data.append(key, formData[key]));
+      data.append('formats', JSON.stringify(selectedFormats));
       
       Array.from(images).forEach(image => data.append('images', image));
       if (video) data.append('video', video);
@@ -63,6 +81,7 @@ export const AddProduct = () => {
         actionLabel: 'Great'
       });
       setFormData({ name: '', sku: '', description: '', price: '', compareAtPrice: '', quantity: '', category: 'Rings' });
+      setSelectedFormats(['STL', '3DM']);
       setImages([]);
       setVideo(null);
     } catch (err) {
@@ -132,16 +151,51 @@ export const AddProduct = () => {
                 <label className="block text-sm font-medium text-zinc-300 mb-2">Quantity in Stock</label>
                 <input type="number" name="quantity" required value={formData.quantity} onChange={handleInputChange} className="input-field" placeholder="10" />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">Category</label>
-                <div className="relative">
-                  <select name="category" value={formData.category} onChange={handleInputChange} className="input-field appearance-none">
-                    <option value="Rings">Rings</option>
-                    <option value="Necklaces">Necklaces</option>
-                    <option value="Earrings">Earrings</option>
-                    <option value="Bracelets">Bracelets</option>
-                  </select>
-                  <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Category</label>
+                  <div className="relative">
+                    <select name="category" value={formData.category} onChange={handleInputChange} className="input-field appearance-none">
+                      <option value="Rings">Rings</option>
+                      <option value="Necklaces">Necklaces</option>
+                      <option value="Earrings">Earrings</option>
+                      <option value="Bracelets">Bracelets</option>
+                    </select>
+                    <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Subcategory</label>
+                  <div className="relative">
+                    <select name="subcategory" value={formData.subcategory} onChange={handleInputChange} className="input-field appearance-none">
+                      {(CATEGORY_MAP[formData.category] || []).map(sub => (
+                        <option key={sub} value={sub}>{sub}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+              <div className="pt-2">
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Available Formats</label>
+                <div className="flex flex-wrap gap-6 mt-2 bg-black/20 p-3 rounded-lg border border-border/40">
+                  {['STL', '3DM', 'OBJ', 'STEP'].map(fmt => (
+                    <label key={fmt} className="flex items-center gap-2.5 text-sm text-zinc-300 cursor-pointer select-none">
+                      <input 
+                        type="checkbox" 
+                        checked={selectedFormats.includes(fmt)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedFormats(prev => [...prev, fmt]);
+                          } else {
+                            setSelectedFormats(prev => prev.filter(f => f !== fmt));
+                          }
+                        }}
+                        className="rounded border-zinc-700 bg-zinc-800 text-primary-500 focus:ring-primary-500/50 w-4 h-4"
+                      />
+                      <span className="font-semibold">{fmt}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
             </div>
@@ -152,18 +206,29 @@ export const AddProduct = () => {
             <h3 className="text-lg font-semibold text-zinc-100 border-b border-border pb-2">Product Media</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <label className="relative border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-primary-500/50 hover:bg-primary-500/5 transition-all cursor-pointer group min-h-[180px]">
-                <input type="file" multiple accept="image/*" onChange={(e) => setImages(e.target.files)} className="hidden" />
+                <input type="file" multiple accept="image/*" onChange={(e) => setImages(Array.from(e.target.files))} className="hidden" />
                 {imagePreviews.length > 0 ? (
-                  <div className="w-full space-y-3 pointer-events-none">
-                    <div className="grid grid-cols-3 gap-2 justify-center max-w-[240px] mx-auto">
+                  <div className="w-full space-y-3">
+                    <div className="grid grid-cols-3 gap-2 justify-center max-w-[240px] mx-auto pointer-events-auto">
                       {imagePreviews.slice(0, 6).map((preview, idx) => (
-                        <div key={idx} className="aspect-square rounded-lg border border-border overflow-hidden bg-black/40">
+                        <div key={idx} className="relative aspect-square rounded-lg border border-border overflow-hidden bg-black/40 group/item">
                           <img src={preview} alt="Selected preview" className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setImages(prev => prev.filter((_, i) => i !== idx));
+                            }}
+                            className="absolute top-1 right-1 p-0.5 bg-black/70 hover:bg-red-500 text-white rounded-full transition-all duration-200 opacity-100 sm:opacity-0 sm:group-hover/item:opacity-100 shadow-md"
+                          >
+                            <X size={10} />
+                          </button>
                         </div>
                       ))}
                     </div>
                     <div>
-                      <p className="text-xs font-semibold text-primary-400">Click anywhere to change selection</p>
+                      <p className="text-xs font-semibold text-primary-400">Click anywhere else to change selection</p>
                       <p className="text-[10px] text-zinc-500">{images.length} files selected</p>
                     </div>
                   </div>
@@ -180,13 +245,24 @@ export const AddProduct = () => {
               <label className="relative border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-accent/50 hover:bg-accent/5 transition-all cursor-pointer group min-h-[180px]">
                 <input type="file" accept="video/mp4" onChange={(e) => setVideo(e.target.files[0])} className="hidden" />
                 {videoPreview ? (
-                  <div className="w-full space-y-3 pointer-events-none">
-                    <div className="w-16 h-16 mx-auto rounded-lg border border-border overflow-hidden bg-black/40 flex items-center justify-center">
+                  <div className="w-full space-y-3">
+                    <div className="relative w-16 h-16 mx-auto rounded-lg border border-border overflow-hidden bg-black/40 flex items-center justify-center pointer-events-auto group/video">
                       <VideoIcon size={28} className="text-accent" />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setVideo(null);
+                        }}
+                        className="absolute top-1 right-1 p-0.5 bg-black/70 hover:bg-red-500 text-white rounded-full transition-all duration-200 opacity-100 sm:opacity-0 sm:group-hover/video:opacity-100 shadow-md"
+                      >
+                        <X size={10} />
+                      </button>
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-accent line-clamp-1 max-w-[200px] mx-auto">{video.name}</p>
-                      <p className="text-[10px] text-zinc-500">Click anywhere to change video</p>
+                      <p className="text-[10px] text-zinc-500">Click anywhere else to change video</p>
                     </div>
                   </div>
                 ) : (

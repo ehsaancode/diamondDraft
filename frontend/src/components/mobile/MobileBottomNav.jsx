@@ -7,7 +7,7 @@ const MobileBottomNav = () => {
   const { setIsCartOpen, cartCount } = useCart();
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl shadow-gray-200/50 rounded-[40px] px-6 py-4 flex items-center justify-between z-50">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] bg-white border border-gray-100/80 shadow-[0_16px_36px_rgba(0,0,0,0.12)] rounded-[40px] px-6 py-4 flex items-center justify-between z-50">
       <NavLink to="/" className={({ isActive }) => `p-2 rounded-full transition-all duration-300 ${isActive ? 'bg-black text-white' : 'text-gray-400'}`}>
         {({ isActive }) => <Home size={22} strokeWidth={isActive ? 2.5 : 2} />}
       </NavLink>

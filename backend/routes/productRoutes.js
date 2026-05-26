@@ -58,7 +58,7 @@ const uploadFile = async (req, file, folderName) => {
 // POST: Create Product with Images/Video
 router.post('/', upload.fields([{ name: 'images', maxCount: 5 }, { name: 'video', maxCount: 1 }]), async (req, res) => {
   try {
-    const { name, sku, description, price, compareAtPrice, quantity, category, status } = req.body;
+    const { name, sku, description, price, compareAtPrice, quantity, category, subcategory, status, formats } = req.body;
     
     // Upload files
     let imageUrls = [];
@@ -72,6 +72,15 @@ router.post('/', upload.fields([{ name: 'images', maxCount: 5 }, { name: 'video'
       videoUrl = await uploadFile(req, req.files.video[0], 'videos');
     }
 
+    let parsedFormats = ['STL', '3DM'];
+    if (formats) {
+      try {
+        parsedFormats = typeof formats === 'string' ? JSON.parse(formats) : formats;
+      } catch (e) {
+        parsedFormats = Array.isArray(formats) ? formats : [formats];
+      }
+    }
+
     const newProduct = {
       name,
       sku,
@@ -80,9 +89,11 @@ router.post('/', upload.fields([{ name: 'images', maxCount: 5 }, { name: 'video'
       compareAtPrice: compareAtPrice ? Number(compareAtPrice) : null,
       quantity: Number(quantity),
       category,
+      subcategory: subcategory || '',
       images: imageUrls,
       video: videoUrl,
       status: status || 'Active',
+      formats: parsedFormats,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     };
@@ -126,6 +137,18 @@ router.put('/:id', upload.fields([{ name: 'images', maxCount: 5 }, { name: 'vide
 
     const product = doc.data();
     const updateData = { ...req.body, updatedAt: admin.firestore.FieldValue.serverTimestamp() };
+
+    let parsedFormats = undefined;
+    if (req.body.formats !== undefined) {
+      try {
+        parsedFormats = typeof req.body.formats === 'string' ? JSON.parse(req.body.formats) : req.body.formats;
+      } catch (e) {
+        parsedFormats = Array.isArray(req.body.formats) ? req.body.formats : [req.body.formats];
+      }
+    }
+    if (parsedFormats !== undefined) {
+      updateData.formats = parsedFormats;
+    }
     
     // Parse and handle existing images
     let updatedImages = product.images || [];

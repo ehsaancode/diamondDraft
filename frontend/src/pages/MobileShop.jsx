@@ -1,30 +1,54 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Search, Plus, Heart, ChevronDown, Filter, X, Check, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '../context/CartContext';
 import { useFavorites } from '../context/FavoriteContext';
 
 const MobileShop = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { products, loading } = useProducts();
   const { addToCart } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
   
-  const [selectedBrand, setSelectedBrand] = useState('All');
-  const [selectedTag, setSelectedTag] = useState('All');
+  const [selectedBrand, setSelectedBrand] = useState(location.state?.category || 'All');
+  const [selectedTag, setSelectedTag] = useState(location.state?.subcategory || 'All');
   const [sortOrder, setSortOrder] = useState('default');
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 12;
 
+  // Handle state category changes when navigating from homepage
+  useEffect(() => {
+    if (location.state?.category) {
+      setSelectedBrand(location.state.category);
+    }
+    if (location.state?.subcategory) {
+      setSelectedTag(location.state.subcategory);
+    }
+  }, [location.state]);
+
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedBrand, selectedTag, sortOrder]);
 
+  // Reset subcategory filter when category changes
+  useEffect(() => {
+    setSelectedTag('All');
+  }, [selectedBrand]);
+
   const brands = ['All', ...new Set(products.map(p => p.brand))];
-  const tags = ['All', ...new Set(products.map(p => p.tag).filter(Boolean))];
+  
+  // Filter subcategories list based on selected category
+  const tags = useMemo(() => {
+    let list = products;
+    if (selectedBrand !== 'All') {
+      list = list.filter(p => p.brand === selectedBrand);
+    }
+    return ['All', ...new Set(list.map(p => p.tag).filter(Boolean))];
+  }, [products, selectedBrand]);
 
   const filteredProducts = useMemo(() => {
     let result = [...products];
@@ -57,7 +81,7 @@ const MobileShop = () => {
   return (
     <div className="bg-[#f8f9fa] min-h-screen pb-32 font-sans overflow-x-hidden">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-md sticky top-0 z-40 px-4 py-4 flex flex-col gap-5">
+      <div className="bg-white border-b border-gray-100/80 sticky top-0 z-40 px-4 py-4 flex flex-col gap-5">
         <div className="flex items-center justify-between">
           <button onClick={() => navigate(-1)} className="w-11 h-11 flex items-center justify-center bg-white border border-gray-50 rounded-full shadow-sm active:scale-95 transition-transform">
             <ChevronLeft size={22} className="text-gray-800" />
@@ -84,7 +108,7 @@ const MobileShop = () => {
 
           <div className="h-6 w-px bg-gray-200 shrink-0" />
 
-          {['All', 'Wedding', 'New Design', 'Classic'].map((tag) => (
+          {tags.map((tag) => (
             <button 
               key={tag}
               onClick={() => setSelectedTag(tag)}
@@ -114,61 +138,74 @@ const MobileShop = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-x-4 gap-y-6">
-          <AnimatePresence mode='popLayout'>
-            {paginatedProducts.map((product) => (
-              <motion.div 
-                key={product.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-                onClick={() => navigate(`/product/${product.id}`, { state: product })}
-                className="bg-white rounded-[40px] p-2.5 flex flex-col gap-3 shadow-sm border border-gray-50/50 group relative cursor-pointer"
-              >
-                <div className="relative aspect-[4/5] rounded-[32px] overflow-hidden bg-[#f0f2f5] flex items-center justify-center p-3">
-                  <img 
-                    src={product.image || '/images/jewellery_cad_ring.png'} 
-                    alt={product.name} 
-                    className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(product);
-                    }}
-                    className={`absolute top-4 right-4 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center hover:bg-white active:scale-90 transition-all z-10 ${isFavorite(product.id) ? 'text-red-500' : 'text-gray-400'}`}
-                  >
-                    <Heart size={18} fill={isFavorite(product.id) ? "currentColor" : "none"} strokeWidth={2} />
-                  </button>
+          {loading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-[40px] p-2.5 flex flex-col gap-3 shadow-sm border border-gray-50/50">
+                <div className="w-full bg-zinc-150 animate-pulse rounded-[32px] aspect-[4/5] border border-gray-50" />
+                <div className="space-y-2 px-2.5 pb-2">
+                  <div className="h-3.5 bg-zinc-200 animate-pulse rounded w-4/5" />
+                  <div className="h-2.5 bg-zinc-150 animate-pulse rounded w-1/4" />
+                  <div className="h-3.5 bg-zinc-200 animate-pulse rounded w-1/2" />
                 </div>
-                
-                <div className="px-2 pb-1 flex-1 flex flex-col">
-                  <h3 className="text-[13px] font-bold text-gray-900 line-clamp-2 leading-tight h-8 mb-1">
-                    {product.name}
-                  </h3>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">{product.brand}</p>
-                  
-                  <div className="flex items-center justify-between mt-auto">
-                    <div className="flex flex-col">
-                      <span className="text-sm font-black text-gray-900">₹{product.price.toLocaleString('en-IN')}</span>
-                      <span className="text-[10px] text-red-400 line-through font-bold opacity-60">₹{(product.price * 1.2).toLocaleString('en-IN')}</span>
-                    </div>
+              </div>
+            ))
+          ) : (
+            <AnimatePresence mode='popLayout'>
+              {paginatedProducts.map((product) => (
+                <motion.div 
+                  key={product.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                  onClick={() => navigate(`/product/${product.id}`, { state: product })}
+                  className="bg-white rounded-[40px] p-2.5 flex flex-col gap-3 shadow-sm border border-gray-50/50 group relative cursor-pointer"
+                >
+                  <div className="relative aspect-[4/5] rounded-[32px] overflow-hidden bg-[#f0f2f5] flex items-center justify-center p-3">
+                    <img 
+                      src={product.image || '/images/jewellery_cad_ring.png'} 
+                      alt={product.name} 
+                      className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700"
+                    />
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        addToCart(product, 'CAD');
-                        navigate('/cart');
+                        toggleFavorite(product);
                       }}
-                      className="w-10 h-10 rounded-2xl bg-black flex items-center justify-center text-white shadow-lg active:scale-90 transition-all"
+                      className={`absolute top-4 right-4 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center hover:bg-white active:scale-90 transition-all z-10 ${isFavorite(product.id) ? 'text-red-500' : 'text-gray-400'}`}
                     >
-                      <Plus size={20} strokeWidth={3} />
+                      <Heart size={18} fill={isFavorite(product.id) ? "currentColor" : "none"} strokeWidth={2} />
                     </button>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                  
+                  <div className="px-2 pb-1 flex-1 flex flex-col">
+                    <h3 className="text-[13px] font-bold text-gray-900 line-clamp-2 leading-tight h-8 mb-1">
+                      {product.name}
+                    </h3>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">{product.brand}</p>
+                    
+                    <div className="flex items-center justify-between mt-auto">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-black text-gray-900">₹{product.price.toLocaleString('en-IN')}</span>
+                        <span className="text-[10px] text-red-400 line-through font-bold opacity-60">₹{(product.price * 1.2).toLocaleString('en-IN')}</span>
+                      </div>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addToCart(product, 'CAD');
+                          navigate('/cart');
+                        }}
+                        className="w-10 h-10 rounded-2xl bg-black flex items-center justify-center text-white shadow-lg active:scale-90 transition-all"
+                      >
+                        <Plus size={20} strokeWidth={3} />
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
         </div>
 
         {totalPages > 1 && (
@@ -281,9 +318,9 @@ const MobileShop = () => {
                   </div>
                 </div>
 
-                {/* Brand Section */}
+                {/* Category Section */}
                 <div className="flex flex-col gap-4">
-                  <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest px-2">Brand</h3>
+                  <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest px-2">Category</h3>
                   <div className="flex flex-wrap gap-2">
                     {brands.map((brand) => (
                       <button 
@@ -297,9 +334,9 @@ const MobileShop = () => {
                   </div>
                 </div>
 
-                {/* Tags Section */}
+                {/* Subcategory Section */}
                 <div className="flex flex-col gap-4">
-                  <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest px-2">Collection</h3>
+                  <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest px-2">Subcategory</h3>
                   <div className="flex flex-wrap gap-2">
                     {tags.map((tag) => (
                       <button 

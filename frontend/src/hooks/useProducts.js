@@ -14,18 +14,30 @@ export const useProducts = () => {
         
         const getImageUrl = (url) => url?.startsWith('http') ? url : `${apiUrl}${url}`;
         
-        const dbProducts = data.map(p => ({
-          id: p._id,
-          name: p.name,
-          brand: p.category || 'Jewelry',
-          price: p.price,
-          rating: 5.0,
-          reviews: 0,
-          image: p.images && p.images.length > 0 ? getImageUrl(p.images[0]) : '/images/jewellery_cad_ring.png',
-          images: p.images ? p.images.map(img => getImageUrl(img)) : [],
-          tag: p.category,
-          status: p.status
-        }));
+        const DEFAULT_SUBCATEGORIES = {
+          'Rings': 'Engagement',
+          'Necklaces': 'Pendants',
+          'Earrings': 'Studs',
+          'Bracelets': 'Tennis'
+        };
+
+        const dbProducts = data.map(p => {
+          const sub = p.subcategory || DEFAULT_SUBCATEGORIES[p.category] || '';
+          return {
+            id: p._id,
+            name: p.name,
+            brand: p.category || 'Jewelry',
+            category: p.category || 'Jewelry',
+            subcategory: sub,
+            price: p.price,
+            rating: 5.0,
+            reviews: 0,
+            image: p.images && p.images.length > 0 ? getImageUrl(p.images[0]) : '/images/jewellery_cad_ring.png',
+            images: p.images ? p.images.map(img => getImageUrl(img)) : [],
+            tag: sub,
+            status: p.status
+          };
+        });
         
         setProducts(dbProducts);
       } catch (err) {

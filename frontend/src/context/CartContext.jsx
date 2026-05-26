@@ -28,11 +28,7 @@ export const CartProvider = ({ children }) => {
     setCartItems(prev => {
       const existing = prev.find(item => item.id === product.id && item.size === size);
       if (existing) {
-        return prev.map(item => 
-          item.id === product.id && item.size === size 
-            ? { ...item, quantity: item.quantity + 1 } 
-            : item
-        );
+        return prev;
       }
       return [...prev, { ...product, size, quantity: 1 }];
     });

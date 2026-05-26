@@ -13,7 +13,7 @@ const MobileFavorites = () => {
   return (
     <div className="bg-[#f8f9fa] min-h-screen pb-32">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-lg sticky top-0 z-40 px-4 py-4 flex items-center justify-between border-b border-gray-50">
+      <div className="bg-white border-b border-gray-100/80 sticky top-0 z-40 px-4 py-4 flex items-center justify-between">
         <button onClick={() => navigate(-1)} className="w-11 h-11 flex items-center justify-center bg-white border border-gray-100 rounded-full shadow-sm">
           <ChevronLeft size={22} className="text-gray-800" />
         </button>

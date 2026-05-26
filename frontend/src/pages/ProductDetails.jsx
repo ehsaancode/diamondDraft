@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Heart, Star, ChevronLeft, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ShoppingBag, Heart, Star, ChevronLeft, ShieldCheck, Download, RotateCcw } from 'lucide-react';
 import Specifications from '../components/home/Specifications';
 import { useCart } from '../context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,32 +19,104 @@ const fallbackProduct = {
 };
 
 const ProductDetails = () => {
+  const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const isMobile = useMobile();
   
-  // Using passed product from location state, or fallback if accessed directly
-  const product = location.state || fallbackProduct;
+  const [product, setProduct] = useState(location.state || null);
+  const [loading, setLoading] = useState(!location.state);
+
+  useEffect(() => {
+    // If state exists and ID matches the URL param, use it immediately
+    if (location.state && (location.state.id === id || location.state._id === id)) {
+      setProduct(location.state);
+      setLoading(false);
+      return;
+    }
+
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const res = await fetch(`${apiUrl}/api/products/${id}`);
+        if (!res.ok) throw new Error('Product not found');
+        const p = await res.json();
+        
+        const getImageUrl = (url) => url?.startsWith('http') ? url : `${apiUrl}${url}`;
+        const DEFAULT_SUBCATEGORIES = {
+          'Rings': 'Engagement',
+          'Necklaces': 'Pendants',
+          'Earrings': 'Studs',
+          'Bracelets': 'Tennis'
+        };
+        const sub = p.subcategory || DEFAULT_SUBCATEGORIES[p.category] || '';
+        
+        const mappedProduct = {
+          id: p._id,
+          name: p.name,
+          brand: p.category || 'Jewelry',
+          category: p.category || 'Jewelry',
+          subcategory: sub,
+          price: p.price,
+          rating: 5.0,
+          reviews: 0,
+          description: p.description,
+          image: p.images && p.images.length > 0 ? getImageUrl(p.images[0]) : '/images/jewellery_cad_ring.png',
+          images: p.images ? p.images.map(img => getImageUrl(img)) : [],
+          tag: sub,
+          status: p.status
+        };
+        
+        setProduct(mappedProduct);
+      } catch (err) {
+        console.error('Error fetching product details:', err);
+        setProduct(fallbackProduct);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id, location.state]);
+
+  const activeProduct = product || fallbackProduct;
+
+  const [mainImage, setMainImage] = useState(activeProduct.image);
+  const [isLiked, setIsLiked] = useState(activeProduct.isLiked || false);
+  const [format, setFormat] = useState('STL');
+  const [isFormatGuideOpen, setIsFormatGuideOpen] = useState(false);
+
+  useEffect(() => {
+    if (product) {
+      setMainImage(product.image);
+      setIsLiked(product.isLiked || false);
+    }
+  }, [product]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
+        <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   if (isMobile) {
-    return <MobileProductDetails product={product} />;
+    return <MobileProductDetails product={activeProduct} />;
   }
   
   // Existing desktop code...
-  const [mainImage, setMainImage] = useState(product.image);
-  const [isLiked, setIsLiked] = useState(product.isLiked || false);
-  const [format, setFormat] = useState('STL');
-  const [isFormatGuideOpen, setIsFormatGuideOpen] = useState(false);
-  
-  // Generating mock gallery if none exists
-  const gallery = (product.images && product.images.length > 0) ? product.images : [
-    product.image,
+  const gallery = (activeProduct.images && activeProduct.images.length > 0) ? activeProduct.images : [
+    activeProduct.image,
     'https://images.unsplash.com/photo-1605100804763-247f67b25406?w=800&auto=format&fit=crop&q=60',
     'https://images.unsplash.com/photo-1599643477874-dc3b91490214?w=800&auto=format&fit=crop&q=60'
   ];
 
-  const formats = ['STL', '3DM', 'OBJ', 'STEP'];
+  const formats = (activeProduct.formats && activeProduct.formats.length > 0)
+    ? activeProduct.formats
+    : ['STL', '3DM', 'OBJ', 'STEP'];
 
   return (
     <motion.div 
@@ -174,9 +246,9 @@ const ProductDetails = () => {
         <div className="flex flex-col md:flex-row items-center justify-around gap-8 md:gap-4 px-4 md:px-8">
           <div className="flex flex-col items-center text-center gap-3">
             <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 border border-gray-100">
-              <Truck size={22} />
+              <Download size={22} />
             </div>
-            <span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-gray-400">Delivery within 2-3 business days</span>
+            <span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-gray-400">Instant Digital Delivery (STL/3DM)</span>
           </div>
           
           <div className="hidden md:block h-12 w-px bg-gray-100"></div>

@@ -16,9 +16,22 @@ const BestSelling = () => {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-8 gap-y-10 md:gap-y-12">
-        {sellingProducts.map((product, index) => (
-          <ProductCard key={product.id} product={product} index={index} />
-        ))}
+        {loading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-3">
+              <div className="w-full bg-zinc-150 animate-pulse rounded-2xl aspect-square border border-gray-50" />
+              <div className="space-y-2.5 px-2">
+                <div className="h-4 bg-zinc-200 animate-pulse rounded-md w-4/5" />
+                <div className="h-3 bg-zinc-150 animate-pulse rounded-md w-1/4" />
+                <div className="h-4 bg-zinc-200 animate-pulse rounded-md w-1/2" />
+              </div>
+            </div>
+          ))
+        ) : (
+          sellingProducts.map((product, index) => (
+            <ProductCard key={product.id} product={product} index={index} />
+          ))
+        )}
       </div>
     </section>
   );

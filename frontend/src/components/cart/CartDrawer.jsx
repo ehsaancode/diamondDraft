@@ -77,23 +77,8 @@ const CartDrawer = () => {
                       </div>
                       
                       <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-center gap-3 border border-gray-200 bg-white rounded-sm px-2 py-1">
-                          <button 
-                            onClick={() => updateQuantity(item.id, item.size, -1)}
-                            className="text-gray-500 hover:text-black cursor-pointer"
-                            disabled={item.quantity <= 1}
-                          >
-                            <Minus size={14} />
-                          </button>
-                          <span className="text-sm w-4 text-center">{item.quantity}</span>
-                          <button 
-                            onClick={() => updateQuantity(item.id, item.size, 1)}
-                            className="text-gray-500 hover:text-black cursor-pointer"
-                          >
-                            <Plus size={14} />
-                          </button>
-                        </div>
-                        <p className="font-semibold text-gray-900">₹{(item.price * item.quantity).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+                        <span className="text-xs text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full font-medium">Qty: 1 (Digital CAD File)</span>
+                        <p className="font-semibold text-gray-900">₹{item.price.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
                       </div>
                     </div>
                   </div>

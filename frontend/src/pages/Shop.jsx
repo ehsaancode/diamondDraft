@@ -9,9 +9,10 @@ import MobileShop from './MobileShop';
 
 const Shop = () => {
   const isMobile = useMobile();
+  const location = useLocation();
   const { products, loading } = useProducts();
-  const [selectedBrand, setSelectedBrand] = useState('All');
-  const [selectedTag, setSelectedTag] = useState('All');
+  const [selectedBrand, setSelectedBrand] = useState(location.state?.category || 'All');
+  const [selectedTag, setSelectedTag] = useState(location.state?.subcategory || 'All');
   const [sortOrder, setSortOrder] = useState('default');
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
@@ -19,8 +20,17 @@ const Shop = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 12;
   
-  const location = useLocation();
   const searchInputRef = useRef(null);
+
+  // Handle state category changes when navigating from homepage
+  useEffect(() => {
+    if (location.state?.category) {
+      setSelectedBrand(location.state.category);
+    }
+    if (location.state?.subcategory) {
+      setSelectedTag(location.state.subcategory);
+    }
+  }, [location.state]);
 
   // Focus search input if coming from Navbar Search icon
   useEffect(() => {
@@ -45,8 +55,21 @@ const Shop = () => {
     setCurrentPage(1);
   }, [selectedBrand, selectedTag, sortOrder, debouncedSearchQuery]);
 
+  // Reset subcategory filter when category changes
+  useEffect(() => {
+    setSelectedTag('All');
+  }, [selectedBrand]);
+
   const brands = ['All', ...new Set(products.map(p => p.brand))];
-  const tags = ['All', ...new Set(products.map(p => p.tag).filter(Boolean))];
+  
+  // Filter subcategories list based on selected category
+  const tags = useMemo(() => {
+    let list = products;
+    if (selectedBrand !== 'All') {
+      list = list.filter(p => p.brand === selectedBrand);
+    }
+    return ['All', ...new Set(list.map(p => p.tag).filter(Boolean))];
+  }, [products, selectedBrand]);
 
   const filteredAndSortedProducts = useMemo(() => {
     let result = [...products];
@@ -116,7 +139,7 @@ const Shop = () => {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3 md:mb-4 border-b pb-2">Brands</h3>
+            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3 md:mb-4 border-b pb-2">Categories</h3>
             <ul className="flex flex-row flex-wrap md:flex-col gap-x-4 gap-y-2 md:gap-y-2">
               {brands.map(brand => (
                 <li key={brand}>
@@ -133,7 +156,7 @@ const Shop = () => {
 
           {tags.length > 1 && (
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3 md:mb-4 border-b pb-2">Collections</h3>
+              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3 md:mb-4 border-b pb-2">Subcategories</h3>
               <ul className="flex flex-row flex-wrap md:flex-col gap-x-4 gap-y-2 md:gap-y-2">
                 {tags.map(tag => (
                   <li key={tag}>
@@ -169,7 +192,20 @@ const Shop = () => {
             <span className="text-sm text-gray-500">{filteredAndSortedProducts.length} Products</span>
           </div>
 
-          {filteredAndSortedProducts.length > 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-8 gap-y-10 md:gap-y-12">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="flex flex-col gap-3">
+                  <div className="w-full bg-zinc-150 animate-pulse rounded-2xl h-[220px] md:h-[320px] border border-gray-50" />
+                  <div className="space-y-2.5 px-2">
+                    <div className="h-4 bg-zinc-200 animate-pulse rounded-md w-4/5" />
+                    <div className="h-3 bg-zinc-150 animate-pulse rounded-md w-1/4" />
+                    <div className="h-4 bg-zinc-200 animate-pulse rounded-md w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredAndSortedProducts.length > 0 ? (
             <>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-8 gap-y-10 md:gap-y-12">
                 {paginatedProducts.map((product, index) => (

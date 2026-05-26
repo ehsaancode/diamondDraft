@@ -9,13 +9,15 @@ const MobileProductDetails = ({ product }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
-  const [selectedFormat, setSelectedFormat] = useState('STL');
-  const formats = ['STL', '3DM', 'OBJ', 'STEP'];
+  const formats = (product.formats && product.formats.length > 0)
+    ? product.formats
+    : ['STL', '3DM', 'OBJ', 'STEP'];
+  const [selectedFormat, setSelectedFormat] = useState(formats[0] || 'STL');
 
   return (
     <div className="bg-[#f8f9fa] min-h-screen pb-40">
       {/* Header */}
-      <div className="fixed top-0 inset-x-0 z-40 p-4 flex items-center justify-between bg-white/80 backdrop-blur-md">
+      <div className="fixed top-0 inset-x-0 z-40 p-4 flex items-center justify-between bg-white border-b border-gray-100/80">
         <button onClick={() => navigate(-1)} className="w-11 h-11 flex items-center justify-center bg-white border border-gray-50 rounded-full shadow-sm">
           <ChevronLeft size={22} className="text-gray-800" />
         </button>
@@ -115,25 +117,23 @@ const MobileProductDetails = ({ product }) => {
 
       {/* Floating Call to Action */}
       <div className="fixed bottom-0 inset-x-0 p-6 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50 rounded-t-[40px] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-        <div className="flex items-center gap-4">
-          <div className="flex-1 bg-gray-50 rounded-2xl p-2.5 flex items-center justify-between border border-gray-100">
-             <button className="w-9 h-9 rounded-xl bg-white shadow-sm flex items-center justify-center text-gray-400 border border-gray-100">
-                <Minus size={16} />
-             </button>
-             <span className="font-bold text-gray-900">01</span>
-             <button className="w-9 h-9 rounded-xl bg-green-900 flex items-center justify-center text-white shadow-md">
-                <Plus size={16} />
-             </button>
-          </div>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => {
+              addToCart(product, selectedFormat);
+            }}
+            className="flex-1 h-14 border-2 border-black text-black rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform"
+          >
+            Add to Requests
+          </button>
           <button 
             onClick={() => {
               addToCart(product, selectedFormat);
               navigate('/cart');
             }}
-            className="flex-[2] h-14 bg-black text-white rounded-2xl font-bold flex items-center justify-center gap-3 active:scale-95 transition-transform"
+            className="flex-1 h-14 bg-black text-white rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform"
           >
-            <ShoppingBag size={20} />
-            Add to Library
+            Request Now
           </button>
         </div>
       </div>

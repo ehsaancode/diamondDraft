@@ -51,7 +51,13 @@ const ProductCard = ({ product, index }) => {
       <div className="flex flex-col gap-1">
         <h3 className="text-sm font-semibold text-gray-900">{product.name}</h3>
         <p className="text-xs text-gray-500 italic">by {product.brand}</p>
-        <p className="text-sm font-semibold mt-1">₹{product.price.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+        <div className="flex items-center justify-between mt-1">
+          <p className="text-sm font-semibold text-gray-900">₹{product.price.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+          <div className="flex gap-1">
+            <span className="text-[8px] bg-gray-100 text-gray-500 px-1 py-0.5 rounded font-mono font-black">STL</span>
+            <span className="text-[8px] bg-gray-100 text-gray-500 px-1 py-0.5 rounded font-mono font-black">3DM</span>
+          </div>
+        </div>
       </div>
     </motion.div>
   );

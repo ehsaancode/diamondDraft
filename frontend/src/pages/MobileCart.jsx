@@ -11,11 +11,11 @@ const MobileCart = () => {
   return (
     <div className="bg-[#f8f9fa] min-h-screen pb-40">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-lg sticky top-0 z-40 px-4 py-4 flex items-center justify-between border-b border-gray-50">
+      <div className="bg-white border-b border-gray-100/80 sticky top-0 z-40 px-4 py-4 flex items-center justify-between">
         <button onClick={() => navigate(-1)} className="w-11 h-11 flex items-center justify-center bg-white border border-gray-100 rounded-full shadow-sm active:scale-95 transition-transform">
           <ChevronLeft size={22} className="text-gray-800" />
         </button>
-        <h1 className="text-xl font-bold text-gray-800 tracking-tight">Your Cart</h1>
+        <h1 className="text-xl font-bold text-gray-800 tracking-tight">Request Basket</h1>
         <div className="flex items-center justify-center w-11 h-11 bg-gray-50 rounded-full text-xs font-black text-gray-400">
            {cartCount}
         </div>
@@ -33,8 +33,8 @@ const MobileCart = () => {
               </div>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">Your cart is empty</h3>
-              <p className="text-sm text-gray-400 max-w-[240px] mt-2 leading-relaxed">Looks like you haven't added any CAD designs to your library yet.</p>
+              <h3 className="text-xl font-bold text-gray-900">Your basket is empty</h3>
+              <p className="text-sm text-gray-400 max-w-[240px] mt-2 leading-relaxed">Looks like you haven't added any CAD designs to your request list yet.</p>
             </div>
             <button 
               onClick={() => navigate('/shop')}
@@ -81,23 +81,8 @@ const MobileCart = () => {
                     </div>
 
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-lg font-black text-black">₹{(item.price * item.quantity).toLocaleString('en-IN')}</span>
-                      
-                      <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-1 border border-gray-100">
-                        <button 
-                          onClick={() => updateQuantity(item.id, item.size, -1)}
-                          className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-gray-400 active:scale-90"
-                        >
-                          <Minus size={14} />
-                        </button>
-                        <span className="text-sm font-bold text-gray-900 min-w-[20px] text-center">{item.quantity}</span>
-                        <button 
-                          onClick={() => updateQuantity(item.id, item.size, 1)}
-                          className="w-8 h-8 rounded-lg bg-[#1b4332] flex items-center justify-center text-white shadow-sm active:scale-90"
-                        >
-                          <Plus size={14} />
-                        </button>
-                      </div>
+                      <span className="text-lg font-black text-black">₹{item.price.toLocaleString('en-IN')}</span>
+                      <span className="text-xs text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full font-bold">Qty: 1 (Digital CAD)</span>
                     </div>
                   </div>
                 </motion.div>
@@ -107,34 +92,32 @@ const MobileCart = () => {
             {/* Price Summary */}
             <div className="mt-6 bg-white rounded-[32px] p-6 border border-gray-50 shadow-sm flex flex-col gap-4">
                <div className="flex justify-between items-center text-sm font-medium text-gray-500">
-                  <span>Subtotal</span>
+                  <span>Estimated CAD Cost</span>
                   <span className="text-gray-900">₹{cartTotal.toLocaleString('en-IN')}</span>
                </div>
                <div className="flex justify-between items-center text-sm font-medium text-gray-500">
-                  <span>Platform Fee</span>
+                  <span>Consultation Fee</span>
                   <span className="text-green-600">Free</span>
                </div>
                <div className="h-px bg-gray-100 my-1" />
                <div className="flex justify-between items-center text-lg font-black text-gray-900">
-                  <span>Total Amount</span>
+                  <span>Total Estimate</span>
                   <span>₹{cartTotal.toLocaleString('en-IN')}</span>
                </div>
+            </div>
+
+            {/* Checkout Button */}
+            <div className="mt-4">
+              <button 
+                className="w-full h-16 bg-black text-white rounded-2xl font-bold flex items-center justify-center gap-3 shadow-xl shadow-black/10 active:scale-95 transition-transform group"
+              >
+                <span>Submit CAD Request</span>
+                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              </button>
             </div>
           </div>
         )}
       </main>
-
-      {/* Floating Checkout Button */}
-      {cartItems.length > 0 && (
-        <div className="fixed bottom-0 inset-x-0 p-6 bg-white/80 backdrop-blur-xl border-t border-gray-50 z-50 rounded-t-[40px] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-           <button 
-             className="w-full h-16 bg-black text-white rounded-2xl font-bold flex items-center justify-center gap-3 shadow-2xl shadow-black/20 active:scale-95 transition-transform group"
-           >
-             <span>Proceed to Checkout</span>
-             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-           </button>
-        </div>
-      )}
     </div>
   );
 };
