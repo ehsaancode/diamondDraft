@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Package, 
@@ -9,9 +9,21 @@ import {
   LogOut,
   X
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (err) {
+      console.error('Failed to log out:', err);
+    }
+  };
 
   const navItems = [
     { icon: <LayoutDashboard size={20} />, label: "Dashboard", to: "/" },
@@ -73,7 +85,10 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
         </nav>
 
         <div className="p-4 border-t border-border">
-          <button className="flex items-center gap-3 px-4 py-3 w-full text-zinc-400 hover:text-white hover:bg-red-500/10 hover:border-red-500/20 border border-transparent rounded-xl transition-all duration-300 group">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-3 w-full text-zinc-400 hover:text-white hover:bg-red-500/10 hover:border-red-500/20 border border-transparent rounded-xl transition-all duration-300 group cursor-pointer"
+          >
             <LogOut size={20} className="group-hover:text-red-500 transition-colors" />
             <span className="font-medium group-hover:text-red-500 transition-colors">Logout</span>
           </button>

@@ -1,7 +1,14 @@
 import React from 'react';
 import { Menu, Search, Bell } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export const Header = ({ setIsOpen }) => {
+  const { user } = useAuth();
+  
+  const name = user?.displayName || user?.email?.split('@')[0] || 'Admin';
+  const role = user?.email ? 'Administrator' : 'Super Admin';
+  const avatarUrl = user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=10b981&color=fff`;
+
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 glass-panel rounded-none border-t-0 border-l-0 border-r-0 lg:px-10">
       <div className="flex items-center gap-4">
@@ -21,11 +28,11 @@ export const Header = ({ setIsOpen }) => {
         </button>
         <div className="flex items-center gap-3 cursor-pointer group">
           <div className="w-9 h-9 rounded-full bg-surfaceHover border border-border overflow-hidden">
-            <img src="https://ui-avatars.com/api/?name=Admin+User&background=10b981&color=fff" alt="Admin" className="w-full h-full object-cover" />
+            <img src={avatarUrl} alt="Admin" className="w-full h-full object-cover" />
           </div>
           <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-zinc-100 group-hover:text-primary-400 transition-colors">Admin User</p>
-            <p className="text-xs text-zinc-500">Super Admin</p>
+            <p className="text-sm font-semibold text-zinc-100 group-hover:text-primary-400 transition-colors">{name}</p>
+            <p className="text-xs text-zinc-500">{role}</p>
           </div>
         </div>
       </div>
