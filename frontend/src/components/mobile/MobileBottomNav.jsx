@@ -33,8 +33,8 @@ const MobileBottomNav = () => {
               layout
               onClick={isAlreadyInCart ? undefined : () => addToCart(activeProduct.product, activeProduct.selectedFormat)}
               className={`flex-1 h-12 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 rounded-[30px] border transition-all duration-300 ${isAlreadyInCart
-                  ? 'border-emerald-100 bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100/50'
-                  : 'border-black/10 hover:border-black text-black active:scale-95 transition-transform cursor-pointer'
+                ? 'border-emerald-100 bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100/50'
+                : 'border-black/10 hover:border-black text-black active:scale-95 transition-transform cursor-pointer'
                 }`}
             >
               {isAlreadyInCart ? (
@@ -44,7 +44,7 @@ const MobileBottomNav = () => {
                   className="flex items-center gap-1.5"
                 >
                   <Check size={14} strokeWidth={3} />
-                  <span>Added into basket</span>
+                  <span>Added</span>
                 </motion.div>
               ) : (
                 <span>Add to Requests</span>
