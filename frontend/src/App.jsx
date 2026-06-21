@@ -15,6 +15,7 @@ import MobileBottomNav from './components/mobile/MobileBottomNav';
 
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Auth from './pages/Auth';
 
 const AppContent = () => {
   const isMobile = useMobile();
@@ -38,6 +39,7 @@ const AppContent = () => {
           <Route path="/cart" element={<MobileCart />} />
           <Route path="/favorites" element={<MobileFavorites />} />
           <Route path="/profile" element={<MobileProfile />} />
+          <Route path="/login" element={<Auth />} />
         </Routes>
       </div>
       {isMobile && <MobileBottomNav />}

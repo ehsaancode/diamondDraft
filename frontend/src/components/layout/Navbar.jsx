@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Search, Menu, X } from 'lucide-react';
+import { ShoppingBag, Search, Menu, X, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
   const { cartCount, setIsCartOpen } = useCart();
+  const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSearchClick = () => {
@@ -61,6 +64,56 @@ const Navbar = () => {
         >
           <Search size={20} className="text-gray-800" strokeWidth={1.5} />
         </button>
+        
+        {/* User profile dropdown */}
+        {user ? (
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer flex items-center justify-center"
+            >
+              <User size={20} className="text-gray-800" strokeWidth={1.5} />
+            </button>
+            <AnimatePresence>
+              {isDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 z-50 overflow-hidden"
+                >
+                  <div className="px-4 py-2 border-b border-gray-50">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Account</p>
+                    <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
+                  </div>
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors"
+                  >
+                    My Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsDropdownOpen(false);
+                    }}
+                    className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                  >
+                    Sign Out
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <Link
+            to="/login"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer flex items-center justify-center"
+          >
+            <User size={20} className="text-gray-800" strokeWidth={1.5} />
+          </Link>
+        )}
       </div>
       </nav>
       </motion.header>
