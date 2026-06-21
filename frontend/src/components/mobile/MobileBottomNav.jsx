@@ -5,19 +5,39 @@ import { useCart } from '../../context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MobileBottomNav = () => {
-  const { setIsCartOpen, cartCount, activeProduct, addToCart, cartItems } = useCart();
+  const { setIsCartOpen, cartCount, activeProduct, addToCart, removeFromCart, cartItems } = useCart();
   const navigate = useNavigate();
+  const [isJustRemoved, setIsJustRemoved] = useState(false);
 
-  const isAlreadyInCart = activeProduct && cartItems.some(item =>
+  useEffect(() => {
+    setIsJustRemoved(false);
+  }, [activeProduct]);
+
+  const isAlreadyInCart = activeProduct && cartItems.some(item => 
     item.id === activeProduct.product.id && item.size === activeProduct.selectedFormat
   );
 
+  const handleAddToRequests = () => {
+    if (!activeProduct) return;
+    addToCart(activeProduct.product, activeProduct.selectedFormat);
+  };
+
+  const handleRemoveFromRequests = () => {
+    if (!activeProduct) return;
+    removeFromCart(activeProduct.product.id, activeProduct.selectedFormat);
+    setIsJustRemoved(true);
+    setTimeout(() => {
+      setIsJustRemoved(false);
+    }, 1500);
+  };
+
   return (
-    <motion.div
+    <motion.div 
       layout
       transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-      className={`fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] bg-white border border-gray-100/80 shadow-[0_16px_36px_rgba(0,0,0,0.12)] rounded-[40px] z-50 flex items-center transition-all ${activeProduct ? 'p-2' : 'px-6 py-4 justify-between'
-        }`}
+      className={`fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] bg-white border border-gray-100/80 shadow-[0_16px_36px_rgba(0,0,0,0.12)] rounded-[40px] z-50 flex items-center transition-all ${
+        activeProduct ? 'p-2' : 'px-6 py-4 justify-between'
+      }`}
     >
       <AnimatePresence mode="wait">
         {activeProduct ? (
@@ -29,27 +49,44 @@ const MobileBottomNav = () => {
             transition={{ duration: 0.15 }}
             className="flex items-center gap-2 w-full"
           >
-            <motion.button
-              layout
-              onClick={isAlreadyInCart ? undefined : () => addToCart(activeProduct.product, activeProduct.selectedFormat)}
-              className={`flex-1 h-12 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 rounded-[30px] border transition-all duration-300 ${isAlreadyInCart
-                ? 'border-emerald-100 bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100/50'
-                : 'border-black/10 hover:border-black text-black active:scale-95 transition-transform cursor-pointer'
-                }`}
-            >
-              {isAlreadyInCart ? (
-                <motion.div
+            {isJustRemoved ? (
+              <motion.button 
+                layout
+                disabled
+                className="flex-1 h-12 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 rounded-[30px] border border-red-100 bg-red-50 text-red-500 shadow-sm shadow-red-100/50"
+              >
+                <motion.div 
                   initial={{ scale: 0.8 }}
                   animate={{ scale: 1 }}
                   className="flex items-center gap-1.5"
                 >
-                  <Check size={14} strokeWidth={3} />
-                  <span>Added</span>
+                  <span>Removed</span>
                 </motion.div>
-              ) : (
-                <span>Add to Requests</span>
-              )}
-            </motion.button>
+              </motion.button>
+            ) : (
+              <motion.button 
+                layout
+                onClick={isAlreadyInCart ? handleRemoveFromRequests : handleAddToRequests}
+                className={`flex-1 h-12 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 rounded-[30px] border transition-all duration-300 ${
+                  isAlreadyInCart 
+                    ? 'border-emerald-100 bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100/50 active:scale-95 transition-transform cursor-pointer' 
+                    : 'border-black/10 hover:border-black text-black active:scale-95 transition-transform cursor-pointer'
+                }`}
+              >
+                {isAlreadyInCart ? (
+                  <motion.div 
+                    initial={{ scale: 0.8 }}
+                    animate={{ scale: 1 }}
+                    className="flex items-center gap-1.5"
+                  >
+                    <Check size={14} strokeWidth={3} />
+                    <span>Added</span>
+                  </motion.div>
+                ) : (
+                  <span>Add to Requests</span>
+                )}
+              </motion.button>
+            )}
             <button
               onClick={() => {
                 addToCart(activeProduct.product, activeProduct.selectedFormat);
