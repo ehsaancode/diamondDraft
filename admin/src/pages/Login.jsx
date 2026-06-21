@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { 
-  Mail, 
-  Lock, 
-  Sparkles, 
-  Loader2, 
+import {
+  Mail,
+  Lock,
+  Sparkles,
+  Loader2,
   ArrowRight,
   ShieldAlert,
   Gem
@@ -18,7 +18,7 @@ export const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  
+
   const { loginWithEmail, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
@@ -28,7 +28,7 @@ export const Login = () => {
       setError('Please fill in all fields.');
       return;
     }
-    
+
     setError('');
     setLoading(true);
     try {
@@ -68,7 +68,7 @@ export const Login = () => {
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-600/10 blur-[150px] pointer-events-none animate-blob"></div>
       <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[50%] rounded-full bg-accent/10 blur-[130px] pointer-events-none animate-blob" style={{ animationDelay: '2s' }}></div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -80,7 +80,7 @@ export const Login = () => {
             <Gem size={32} className="text-white" />
           </div>
           <h1 className="text-3xl font-black tracking-tight text-white font-grotesk">
-            DIAMOND<span className="text-primary-500">DRAFT</span>
+            GWEL<span className="text-primary-500"> ADMIN</span>
           </h1>
           <p className="text-sm text-zinc-400 mt-2 font-outfit">
             Control Center & Inventory Administrator
@@ -90,7 +90,7 @@ export const Login = () => {
         {/* Login Card */}
         <div className="glass-panel p-8 bg-surface/50 border border-border/80 backdrop-blur-2xl rounded-3xl shadow-2xl relative overflow-hidden">
           {error && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start gap-3"
@@ -110,11 +110,11 @@ export const Login = () => {
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
                   <Mail size={18} />
                 </span>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@diamonddraft.com" 
+                  placeholder="admin@gwel.com"
                   disabled={loading || googleLoading}
                   className="w-full bg-surfaceHover/80 border border-border rounded-2xl pl-12 pr-4 py-3.5 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 font-outfit text-sm"
                 />
@@ -132,11 +132,11 @@ export const Login = () => {
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
                   <Lock size={18} />
                 </span>
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••" 
+                  placeholder="••••••••••••"
                   disabled={loading || googleLoading}
                   className="w-full bg-surfaceHover/80 border border-border rounded-2xl pl-12 pr-4 py-3.5 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition-all duration-300 font-outfit text-sm"
                 />
@@ -144,7 +144,7 @@ export const Login = () => {
             </div>
 
             {/* Submit Button */}
-            <button 
+            <button
               type="submit"
               disabled={loading || googleLoading}
               className="w-full h-12 bg-primary-600 hover:bg-primary-500 text-white font-bold rounded-2xl flex items-center justify-center gap-2 transition-all duration-300 shadow-[0_0_20px_rgba(5,150,105,0.3)] hover:shadow-[0_0_30px_rgba(5,150,105,0.5)] active:scale-95 disabled:opacity-50 disabled:pointer-events-none mt-2 font-outfit text-sm cursor-pointer"
@@ -174,7 +174,7 @@ export const Login = () => {
           </div>
 
           {/* Google Login Button */}
-          <button 
+          <button
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading || googleLoading}

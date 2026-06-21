@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Share2, Heart, Star, ShoppingBag, Plus, Minus, Info, ShieldCheck, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -7,12 +7,17 @@ import { useFavorites } from '../context/FavoriteContext';
 
 const MobileProductDetails = ({ product }) => {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, setActiveProduct } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
   const formats = (product.formats && product.formats.length > 0)
     ? product.formats
     : ['STL', '3DM', 'OBJ', 'STEP'];
   const [selectedFormat, setSelectedFormat] = useState(formats[0] || 'STL');
+
+  useEffect(() => {
+    setActiveProduct({ product, selectedFormat });
+    return () => setActiveProduct(null);
+  }, [product, selectedFormat, setActiveProduct]);
 
   return (
     <div className="bg-[#f8f9fa] min-h-screen pb-40">
@@ -114,29 +119,6 @@ const MobileProductDetails = ({ product }) => {
            </div>
         </div>
       </main>
-
-      {/* Floating Call to Action */}
-      <div className="fixed bottom-0 inset-x-0 p-6 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50 rounded-t-[40px] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => {
-              addToCart(product, selectedFormat);
-            }}
-            className="flex-1 h-14 border-2 border-black text-black rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform"
-          >
-            Add to Requests
-          </button>
-          <button 
-            onClick={() => {
-              addToCart(product, selectedFormat);
-              navigate('/cart');
-            }}
-            className="flex-1 h-14 bg-black text-white rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform"
-          >
-            Request Now
-          </button>
-        </div>
-      </div>
     </div>
   );
 };

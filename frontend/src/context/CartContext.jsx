@@ -7,6 +7,7 @@ export const useCart = () => useContext(CartContext);
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [activeProduct, setActiveProduct] = useState(null);
 
   // You can optionally persist to localStorage here
   useEffect(() => {
@@ -61,7 +62,9 @@ export const CartProvider = ({ children }) => {
       removeFromCart,
       updateQuantity,
       cartTotal,
-      cartCount
+      cartCount,
+      activeProduct,
+      setActiveProduct
     }}>
       {children}
     </CartContext.Provider>
