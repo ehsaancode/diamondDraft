@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 // Layout
 import { Sidebar } from './components/layout/Sidebar';
@@ -40,10 +40,25 @@ const AdminLayout = () => {
   );
 };
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant'
+    });
+  }, [pathname]);
+
+  return null;
+};
+
 const AppView = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTop />
         {/* Background Ornaments */}
         <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-600/10 blur-[120px] pointer-events-none -z-10 mix-blend-screen mix-blend-color-dodge"></div>
         <div className="fixed bottom-[-10%] right-[-5%] w-[30%] h-[50%] rounded-full bg-accent/10 blur-[100px] pointer-events-none -z-10"></div>
