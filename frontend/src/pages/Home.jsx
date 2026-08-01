@@ -17,7 +17,7 @@ const Home = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-slate-950 text-slate-100">
+    <div className="w-full min-h-screen bg-[#fafafa] text-gray-900">
       <Hero />
       <Explore3DModels />
       <YouMayAlsoLike />
