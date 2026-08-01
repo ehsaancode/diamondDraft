@@ -62,6 +62,12 @@ const ProductDetails = () => {
         const modelFileUrl = p.glbUrl || p.modelUrl || null;
         const is3DAsset = !!modelFileUrl || p.category === '3D Models';
 
+        const templateImgUrl = p.templateImage ? getImageUrl(p.templateImage) : null;
+        let allImages = p.images ? p.images.map((img) => getImageUrl(img)) : (p.image ? [getImageUrl(p.image)] : []);
+        if (templateImgUrl && !allImages.includes(templateImgUrl)) {
+          allImages = [templateImgUrl, ...allImages];
+        }
+
         const mappedProduct = {
           id: p._id || p.id || id,
           sku: p.sku || p._id || id,
@@ -73,8 +79,9 @@ const ProductDetails = () => {
           rating: 5.0,
           reviews: 0,
           description: p.description,
-          image: p.images && p.images.length > 0 ? getImageUrl(p.images[0]) : p.image || '/images/jewellery_cad_ring.png',
-          images: p.images ? p.images.map((img) => getImageUrl(img)) : (p.image ? [p.image] : []),
+          templateImage: templateImgUrl,
+          image: templateImgUrl || (allImages.length > 0 ? allImages[0] : '/images/jewellery_cad_ring.png'),
+          images: allImages,
           tag: sub,
           status: p.status,
           glbUrl: modelFileUrl ? getImageUrl(modelFileUrl) : null,
