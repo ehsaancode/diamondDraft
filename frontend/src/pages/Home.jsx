@@ -1,7 +1,6 @@
 import React from 'react';
 import Hero from '../components/home/Hero';
 import Explore3DModels from '../components/home/Explore3DModels';
-import FeaturesGrid from '../components/home/FeaturesGrid';
 import BestSelling from '../components/home/BestSelling';
 import FeaturedSection from '../components/home/FeaturedSection';
 import YouMayAlsoLike from '../components/home/YouMayAlsoLike';
@@ -24,7 +23,6 @@ const Home = () => {
       <EditorialSection />
       <BestSelling />
       <FeaturedSection />
-      <FeaturesGrid />
     </div>
   );
 };
