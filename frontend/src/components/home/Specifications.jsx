@@ -13,10 +13,10 @@ const Specifications = ({ product }) => {
       <h2 className="text-3xl font-serif text-black mb-12">Specifications</h2>
 
       <div className="w-full">
-        <AccordionItem 
-          number="01" 
-          title="CAD Deliverables" 
-          isOpen={openIndex === 0} 
+        <AccordionItem
+          number="01"
+          title="CAD Deliverables"
+          isOpen={openIndex === 0}
           onClick={() => toggleAccordion(0)}
         >
           <p className="text-sm text-gray-600 leading-relaxed mb-4">
@@ -24,10 +24,10 @@ const Specifications = ({ product }) => {
           </p>
         </AccordionItem>
 
-        <AccordionItem 
-          number="02" 
-          title="Design Parameters" 
-          isOpen={openIndex === 1} 
+        <AccordionItem
+          number="02"
+          title="Design Parameters"
+          isOpen={openIndex === 1}
           onClick={() => toggleAccordion(1)}
         >
           <div className="flex flex-col md:flex-row gap-8">
@@ -49,17 +49,13 @@ const Specifications = ({ product }) => {
                 <div className="text-gray-600">Calculated for standard lost-wax casting</div>
               </div>
             </div>
-            
-            <div className="w-48 flex-shrink-0 flex items-center justify-center">
-              <img src="/images/ring_1_1772534075731.png" alt="CAD details" className="w-full object-contain grayscale" />
-            </div>
           </div>
         </AccordionItem>
 
-        <AccordionItem 
-          number="03" 
-          title="Revisions" 
-          isOpen={openIndex === 2} 
+        <AccordionItem
+          number="03"
+          title="Revisions"
+          isOpen={openIndex === 2}
           onClick={() => toggleAccordion(2)}
         >
           <p className="text-sm text-gray-600 leading-relaxed mb-4">
@@ -67,24 +63,26 @@ const Specifications = ({ product }) => {
           </p>
         </AccordionItem>
 
-        <AccordionItem 
-          number="04" 
-          title="Photo-Realistic Renders" 
-          isOpen={openIndex === 3} 
+        <AccordionItem
+          number="04"
+          title="Photo-Realistic Renders"
+          isOpen={openIndex === 3}
           onClick={() => toggleAccordion(3)}
         >
           <p className="text-sm text-gray-600 leading-relaxed mb-4">
             Includes 3 high-resolution rendered images from different angles to present to your clients before final production.
           </p>
         </AccordionItem>
-        
-        <AccordionItem 
-          number="05" 
-          title="Support" 
-          isOpen={openIndex === 4} 
+
+        <AccordionItem
+          number="05"
+          title="Support"
+          isOpen={openIndex === 4}
           onClick={() => toggleAccordion(4)}
         >
-          <p className="text-sm text-gray-600 leading-relaxed mb-4">Dedicated technical support for issues relating to slicing and 3D printing the provide models.</p>
+          <p className="text-sm text-gray-600 leading-relaxed mb-4">
+            Dedicated technical support for issues relating to slicing and 3D printing the provided models.
+          </p>
         </AccordionItem>
       </div>
     </div>

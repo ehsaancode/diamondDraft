@@ -1,53 +1,86 @@
-/* eslint-disable */
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { Box, Sparkles, ArrowRight, Layers, ShieldCheck } from 'lucide-react';
 
 const Hero = () => {
-  const videoRef = useRef(null);
-
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.5; // Plays video at half speed
-    }
-  }, []);
-
   return (
-    <section className="relative w-full h-[85vh] md:h-[90vh] flex items-center justify-center overflow-hidden bg-[#fafafa]">
-      
-      {/* Video Background Layer */}
-      <div className="absolute inset-0 z-0">
-        <video 
-          ref={videoRef}
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
-          className="w-full h-full object-cover mix-blend-multiply opacity-90"
-        >
-          <source src="/images/Video_Generation_Request_Fulfilled.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      </div>
+    <section className="relative w-full min-h-[80vh] flex items-center justify-center overflow-hidden bg-slate-950 text-slate-100 py-16">
+      {/* Ambient Radial Background Glows */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/10 blur-[140px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
 
-      {/* Gradual Blend from Bottom */}
-      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#fafafa] via-[#fafafa]/80 to-transparent z-10 pointer-events-none" />
+      {/* Geometric Background Mesh Grid Overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.07] pointer-events-none"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle, #38bdf8 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+      />
 
       {/* Centered Top-Level Content */}
-      <motion.div 
-        className="relative z-20 flex flex-col items-center text-center px-6 max-w-4xl mx-auto -mt-10"
-        initial={{ opacity: 0, y: 30 }}
+      <motion.div
+        className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl mx-auto space-y-8"
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
+        transition={{ duration: 0.7 }}
       >
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif leading-[1.1] text-black mb-6 md:mb-8 tracking-tight">
-          Precision Crafted <br className="hidden md:block" /> Jewelry CAD Design
+        {/* CGTrader Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 border border-slate-800 text-xs font-semibold text-cyan-400">
+          <Sparkles className="w-4 h-4" />
+          <span>Production-Ready 3D Models & CGTrader Marketplace</span>
+        </div>
+
+        {/* Hero Title */}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight">
+          Precision 3D Models & <br className="hidden md:block" />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400">
+            CAD Asset Vault
+          </span>
         </h1>
-        <p className="text-gray-700 text-sm md:text-lg mb-8 md:mb-10 max-w-xl font-medium px-4">
-          Discover exquisite 3D models ready for seamless printing and precision casting.
+
+        {/* Subtitle */}
+        <p className="text-slate-400 text-base md:text-lg max-w-2xl leading-relaxed">
+          Discover high-poly & low-poly 3D models with interactive WebGL inspection, PBR channel controls, and temporal signed file downloads.
         </p>
-        <button className="bg-black text-white px-8 md:px-10 py-4 text-xs md:text-sm font-semibold tracking-wider uppercase hover:bg-gray-800 transition-all shadow-2xl tracking-[0.2em]">
-          Browse CAD Models
-        </button>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
+          <Link
+            to="/shop"
+            className="px-8 py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm transition-all shadow-xl shadow-cyan-500/20 flex items-center gap-2"
+          >
+            <Box className="w-4 h-4" />
+            <span>Browse 3D Catalog</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+
+          <Link
+            to="/escrow"
+            className="px-8 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 font-semibold text-sm transition-all flex items-center gap-2"
+          >
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <span>Custom Freelance Projects</span>
+          </Link>
+        </div>
+
+        {/* Features Row */}
+        <div className="grid grid-cols-3 gap-6 pt-10 border-t border-slate-800/80 w-full max-w-2xl text-xs text-slate-400">
+          <div className="flex flex-col items-center gap-1">
+            <span className="font-extrabold text-white text-sm">3D WebGL Viewer</span>
+            <span>Interactive R3F Shader Inspection</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <span className="font-extrabold text-white text-sm">All 3D Formats</span>
+            <span>.blend, .fbx, .obj, .stl, .gltf</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <span className="font-extrabold text-white text-sm">Temporal Signed URLs</span>
+            <span>Secure Direct S3 Link Delivery</span>
+          </div>
+        </div>
       </motion.div>
     </section>
   );

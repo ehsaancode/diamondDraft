@@ -47,7 +47,7 @@ const CartDrawer = () => {
                 <div className="flex flex-col items-center justify-center h-full text-gray-500">
                   <ShoppingBag size={48} className="mb-4 opacity-20" />
                   <p>No design requests yet.</p>
-                  <button 
+                  <button
                     onClick={() => setIsCartOpen(false)}
                     className="mt-6 text-sm underline hover:text-black cursor-pointer"
                   >
@@ -57,16 +57,16 @@ const CartDrawer = () => {
               ) : (
                 cartItems.map((item) => (
                   <div key={`${item.id}-${item.size}`} className="flex gap-4 p-4 bg-gray-50 rounded-sm">
-                    <img 
-                      src={item.image} 
-                      alt={item.name} 
+                    <img
+                      src={item.image}
+                      alt={item.name}
                       className="w-20 h-20 object-contain mix-blend-multiply bg-white rounded-sm p-2"
                     />
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
                         <div className="flex justify-between items-start">
                           <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">{item.name}</h3>
-                          <button 
+                          <button
                             onClick={() => removeFromCart(item.id, item.size)}
                             className="text-gray-400 hover:text-red-500 transition-colors p-1 cursor-pointer"
                           >
@@ -75,7 +75,7 @@ const CartDrawer = () => {
                         </div>
                         <p className="text-xs text-gray-500 mt-1">Format: {item.size}</p>
                       </div>
-                      
+
                       <div className="flex items-center justify-between mt-2">
                         <span className="text-xs text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full font-medium">Qty: 1 (Digital CAD File)</span>
                         <p className="font-semibold text-gray-900">₹{item.price.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>

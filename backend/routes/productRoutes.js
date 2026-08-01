@@ -2,7 +2,6 @@ import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
 import { admin, bucket, db } from '../config/firebase.js';
 import cloudinary from '../config/cloudinary.js';
 
@@ -55,62 +54,97 @@ const uploadFile = async (req, file, folderName) => {
   return `${req.protocol}://${req.get('host')}/uploads/${folderName}/${localFileName}`;
 };
 
-// POST: Create Product with Images/Video
-router.post('/', upload.fields([{ name: 'images', maxCount: 5 }, { name: 'video', maxCount: 1 }]), async (req, res) => {
-  try {
-    const { name, sku, description, price, compareAtPrice, quantity, category, subcategory, status, formats } = req.body;
-    
-    // Upload files
-    let imageUrls = [];
-    if (req.files?.images) {
-      const uploadPromises = req.files.images.map(file => uploadFile(req, file, 'products'));
-      imageUrls = await Promise.all(uploadPromises);
-    }
-    
-    let videoUrl = null;
-    if (req.files?.video && req.files.video.length > 0) {
-      videoUrl = await uploadFile(req, req.files.video[0], 'videos');
-    }
+// POST: Create Product with Images, Video, and 3D Model File
+router.post(
+  '/',
+  upload.fields([
+    { name: 'images', maxCount: 5 },
+    { name: 'video', maxCount: 1 },
+    { name: 'modelFile', maxCount: 1 }
+  ]),
+  async (req, res) => {
+    try {
+      const {
+        name,
+        sku,
+        description,
+        price,
+        compareAtPrice,
+        quantity,
+        category,
+        subcategory,
+        status,
+        formats,
+        polyCount,
+        vertexCount,
+        license
+      } = req.body;
 
-    let parsedFormats = ['STL', '3DM'];
-    if (formats) {
-      try {
-        parsedFormats = typeof formats === 'string' ? JSON.parse(formats) : formats;
-      } catch (e) {
-        parsedFormats = Array.isArray(formats) ? formats : [formats];
+      // Upload Images
+      let imageUrls = [];
+      if (req.files?.images) {
+        const uploadPromises = req.files.images.map((file) => uploadFile(req, file, 'products'));
+        imageUrls = await Promise.all(uploadPromises);
       }
+
+      // Upload Video
+      let videoUrl = null;
+      if (req.files?.video && req.files.video.length > 0) {
+        videoUrl = await uploadFile(req, req.files.video[0], 'videos');
+      }
+
+      // Upload 3D Model File (.glb, .gltf, .fbx, .obj, .stl, .zip)
+      let glbUrl = null;
+      if (req.files?.modelFile && req.files.modelFile.length > 0) {
+        glbUrl = await uploadFile(req, req.files.modelFile[0], 'models');
+      }
+
+      let parsedFormats = ['.blend', '.fbx', '.obj', '.stl', '.glb'];
+      if (formats) {
+        try {
+          parsedFormats = typeof formats === 'string' ? JSON.parse(formats) : formats;
+        } catch (e) {
+          parsedFormats = Array.isArray(formats) ? formats : [formats];
+        }
+      }
+
+      const newProduct = {
+        name,
+        sku,
+        description,
+        price: Number(price),
+        compareAtPrice: compareAtPrice ? Number(compareAtPrice) : null,
+        quantity: Number(quantity),
+        category: category || '3D Models',
+        subcategory: subcategory || '',
+        images: imageUrls,
+        image: imageUrls.length > 0 ? imageUrls[0] : null,
+        video: videoUrl,
+        glbUrl: glbUrl,
+        modelUrl: glbUrl,
+        polyCount: polyCount ? Number(polyCount) : 45000,
+        vertexCount: vertexCount ? Number(vertexCount) : 52000,
+        license: license || 'Royalty-Free',
+        status: status || 'Active',
+        formats: parsedFormats,
+        createdAt: admin ? admin.firestore.FieldValue.serverTimestamp() : new Date().toISOString(),
+        updatedAt: admin ? admin.firestore.FieldValue.serverTimestamp() : new Date().toISOString()
+      };
+
+      const docRef = await db.collection('products').add(newProduct);
+      res.status(201).json({ _id: docRef.id, ...newProduct });
+    } catch (err) {
+      console.error('Error creating product:', err);
+      res.status(500).json({ error: err.message });
     }
-
-    const newProduct = {
-      name,
-      sku,
-      description,
-      price: Number(price),
-      compareAtPrice: compareAtPrice ? Number(compareAtPrice) : null,
-      quantity: Number(quantity),
-      category,
-      subcategory: subcategory || '',
-      images: imageUrls,
-      video: videoUrl,
-      status: status || 'Active',
-      formats: parsedFormats,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    };
-
-    const docRef = await db.collection('products').add(newProduct);
-    res.status(201).json({ _id: docRef.id, ...newProduct });
-  } catch (err) {
-    console.error('Error creating product:', err);
-    res.status(500).json({ error: err.message });
   }
-});
+);
 
 // GET: Fetch all products
 router.get('/', async (req, res) => {
   try {
     const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
-    const products = snapshot.docs.map(doc => ({ _id: doc.id, ...doc.data() }));
+    const products = snapshot.docs.map((doc) => ({ _id: doc.id, ...doc.data() }));
     res.status(200).json(products);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -129,85 +163,104 @@ router.get('/:id', async (req, res) => {
 });
 
 // PUT: Update a product
-router.put('/:id', upload.fields([{ name: 'images', maxCount: 5 }, { name: 'video', maxCount: 1 }]), async (req, res) => {
-  try {
-    const docRef = db.collection('products').doc(req.params.id);
-    const doc = await docRef.get();
-    if (!doc.exists) return res.status(404).json({ message: 'Product not found' });
+router.put(
+  '/:id',
+  upload.fields([
+    { name: 'images', maxCount: 5 },
+    { name: 'video', maxCount: 1 },
+    { name: 'modelFile', maxCount: 1 }
+  ]),
+  async (req, res) => {
+    try {
+      const docRef = db.collection('products').doc(req.params.id);
+      const doc = await docRef.get();
+      if (!doc.exists) return res.status(404).json({ message: 'Product not found' });
 
-    const product = doc.data();
-    const updateData = { ...req.body, updatedAt: admin.firestore.FieldValue.serverTimestamp() };
+      const product = doc.data();
+      const updateData = { ...req.body, updatedAt: admin ? admin.firestore.FieldValue.serverTimestamp() : new Date().toISOString() };
 
-    let parsedFormats = undefined;
-    if (req.body.formats !== undefined) {
-      try {
-        parsedFormats = typeof req.body.formats === 'string' ? JSON.parse(req.body.formats) : req.body.formats;
-      } catch (e) {
-        parsedFormats = Array.isArray(req.body.formats) ? req.body.formats : [req.body.formats];
+      if (req.body.price) updateData.price = Number(req.body.price);
+      if (req.body.polyCount) updateData.polyCount = Number(req.body.polyCount);
+      if (req.body.vertexCount) updateData.vertexCount = Number(req.body.vertexCount);
+
+      let parsedFormats = undefined;
+      if (req.body.formats !== undefined) {
+        try {
+          parsedFormats = typeof req.body.formats === 'string' ? JSON.parse(req.body.formats) : req.body.formats;
+        } catch (e) {
+          parsedFormats = Array.isArray(req.body.formats) ? req.body.formats : [req.body.formats];
+        }
       }
-    }
-    if (parsedFormats !== undefined) {
-      updateData.formats = parsedFormats;
-    }
-    
-    // Parse and handle existing images
-    let updatedImages = product.images || [];
-    if (req.body.existingImages !== undefined) {
-      let parsedExisting = [];
-      try {
-        parsedExisting = JSON.parse(req.body.existingImages);
-      } catch (e) {
-        parsedExisting = Array.isArray(req.body.existingImages) ? req.body.existingImages : [req.body.existingImages];
+      if (parsedFormats !== undefined) {
+        updateData.formats = parsedFormats;
       }
 
-      // Identify which images were removed, and delete them from storage
-      const deletedImages = (product.images || []).filter(img => !parsedExisting.includes(img));
-      for (const imgUrl of deletedImages) {
-        await deleteFile(imgUrl);
-      }
-      updatedImages = parsedExisting;
-    }
-    delete updateData.existingImages;
+      // Handle images
+      let updatedImages = product.images || [];
+      if (req.body.existingImages !== undefined) {
+        let parsedExisting = [];
+        try {
+          parsedExisting = JSON.parse(req.body.existingImages);
+        } catch (e) {
+          parsedExisting = Array.isArray(req.body.existingImages) ? req.body.existingImages : [req.body.existingImages];
+        }
 
-    // Upload new files if new ones are provided
-    if (req.files?.images) {
-      const uploadPromises = req.files.images.map(file => uploadFile(req, file, 'products'));
-      const newImageUrls = await Promise.all(uploadPromises);
-      updatedImages = [...updatedImages, ...newImageUrls];
-    }
-    updateData.images = updatedImages;
-    
-    // Handle video
-    let updatedVideo = product.video;
-    if (req.body.existingVideo === 'null' || req.body.existingVideo === null) {
-      if (product.video) {
-        await deleteFile(product.video);
+        const deletedImages = (product.images || []).filter((img) => !parsedExisting.includes(img));
+        for (const imgUrl of deletedImages) {
+          await deleteFile(imgUrl);
+        }
+        updatedImages = parsedExisting;
       }
-      updatedVideo = null;
-    }
-    delete updateData.existingVideo;
+      delete updateData.existingImages;
 
-    if (req.files?.video && req.files.video.length > 0) {
-      // Delete old video if a new one is uploaded
-      if (product.video) {
-        await deleteFile(product.video);
+      if (req.files?.images) {
+        const uploadPromises = req.files.images.map((file) => uploadFile(req, file, 'products'));
+        const newImageUrls = await Promise.all(uploadPromises);
+        updatedImages = [...updatedImages, ...newImageUrls];
       }
-      updatedVideo = await uploadFile(req, req.files.video[0], 'videos');
-    }
-    updateData.video = updatedVideo;
+      updateData.images = updatedImages;
 
-    await docRef.update(updateData);
-    const updatedDoc = await docRef.get();
-    res.status(200).json({ _id: updatedDoc.id, ...updatedDoc.data() });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+      // Handle video
+      let updatedVideo = product.video;
+      if (req.body.existingVideo === 'null' || req.body.existingVideo === null) {
+        if (product.video) {
+          await deleteFile(product.video);
+        }
+        updatedVideo = null;
+      }
+      delete updateData.existingVideo;
+
+      if (req.files?.video && req.files.video.length > 0) {
+        if (product.video) {
+          await deleteFile(product.video);
+        }
+        updatedVideo = await uploadFile(req, req.files.video[0], 'videos');
+      }
+      updateData.video = updatedVideo;
+
+      // Handle 3D model file (.glb, .gltf, .fbx, .obj, .stl, .zip)
+      if (req.files?.modelFile && req.files.modelFile.length > 0) {
+        if (product.glbUrl) {
+          await deleteFile(product.glbUrl);
+        }
+        const newModelUrl = await uploadFile(req, req.files.modelFile[0], 'models');
+        updateData.glbUrl = newModelUrl;
+        updateData.modelUrl = newModelUrl;
+      }
+
+      await docRef.update(updateData);
+      const updatedDoc = await docRef.get();
+      res.status(200).json({ _id: updatedDoc.id, ...updatedDoc.data() });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
-});
+);
 
 // Helper for deletion
 const deleteFile = async (fileUrl) => {
   if (!fileUrl) return;
-  
+
   if (fileUrl.includes('cloudinary.com')) {
     try {
       const urlParts = fileUrl.split('/upload/');
@@ -262,15 +315,16 @@ router.delete('/:id', async (req, res) => {
 
     const product = doc.data();
 
-    // Delete associated images
     if (product.images && product.images.length > 0) {
       for (const imgUrl of product.images) {
         await deleteFile(imgUrl);
       }
     }
-    // Delete associated video
     if (product.video) {
       await deleteFile(product.video);
+    }
+    if (product.glbUrl) {
+      await deleteFile(product.glbUrl);
     }
 
     await docRef.delete();

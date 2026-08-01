@@ -1,61 +1,118 @@
-/* eslint-disable */
-import React, { useState } from 'react';
-import { Heart, Star } from 'lucide-react';
+import React from 'react';
+import { Heart, ShoppingBag, Eye, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useCartStore } from '../../store/useCartStore';
+import { useFavorites } from '../../context/FavoriteContext';
 
-// A reusable Product Card Component
 const ProductCard = ({ product, index }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isLiked, setIsLiked] = useState(product.isLiked || false);
   const navigate = useNavigate();
+  const addToCart = useCartStore((state) => state.addToCart);
+  const { isFavorite, toggleFavorite } = useFavorites();
+
+  const productId = product.id || product._id || 'MD-3001';
+  const isFav = isFavorite(productId);
+  const formats = product.formats || [];
+
+  const productImage =
+    product.image ||
+    (Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : null) ||
+    product.thumbnail ||
+    'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=60';
 
   return (
-    <motion.div 
-      className="flex flex-col group cursor-pointer"
-      initial={{ opacity: 0, y: 30 }}
+    <motion.div
+      className="group relative bg-slate-900 border border-slate-800 hover:border-slate-600 rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-black/40 cursor-pointer flex flex-col justify-between"
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() => navigate(`/product/${product.id}`, { state: product })}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.4, delay: (index || 0) * 0.05 }}
+      onClick={() => navigate(`/product/${productId}`, { state: product })}
     >
-      <div className="relative bg-white pt-4 pb-8 px-4 rounded-sm shadow-sm overflow-hidden mb-4 h-[220px] md:h-[320px] flex items-center justify-center transition-all duration-300 hover:shadow-md">
-        {/* Top bar with rating and heart */}
-        <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
-          <div className="flex items-center gap-1 text-[10px] md:text-xs text-gray-500 font-medium">
-            <Star size={10} className="text-gray-400 md:w-3 md:h-3" fill="currentColor" />
-            <span>{product.rating}</span>
-            <span className="text-gray-400 hidden sm:inline">({product.reviews})</span>
-          </div>
-          <button 
-            onClick={(e) => { e.stopPropagation(); setIsLiked(!isLiked); }} 
-            className="p-1 md:p-1.5 bg-white/50 hover:bg-white rounded-full transition-colors"
-          >
-            <Heart size={14} className={isLiked ? "text-red-500 md:w-4 md:h-4" : "text-gray-400 md:w-4 md:h-4"} fill={isLiked ? "currentColor" : "none"} />
-          </button>
-        </div>
- 
-        {/* Product Image */}
-        <motion.img 
-          initial={false}
-          animate={{ scale: isHovered ? 1.05 : 1 }}
-          transition={{ duration: 0.4 }}
-          src={product.image} 
-          alt={product.name} 
-          className="max-h-[140px] md:max-h-[200px] object-contain drop-shadow-lg" 
+      {/* Image Container */}
+      <div className="relative aspect-square bg-slate-950 overflow-hidden flex items-center justify-center p-3">
+        <img
+          src={productImage}
+          alt={product.name}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
+
+        {/* Wishlist Icon Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleFavorite(product);
+          }}
+          title={isFav ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          className={`absolute top-3 right-3 p-2 rounded-xl backdrop-blur-md border transition-all z-10 ${
+            isFav
+              ? 'bg-red-500/20 border-red-500/50 text-red-400'
+              : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+          }`}
+        >
+          <Heart className="w-4 h-4" fill={isFav ? 'currentColor' : 'none'} />
+        </button>
+
+        {/* Format Badges (if 3D asset) */}
+        {formats.length > 0 && (
+          <div className="absolute bottom-3 left-3 right-3 flex items-center gap-1 overflow-x-auto">
+            {formats.slice(0, 3).map((fmt) => (
+              <span
+                key={fmt}
+                className="px-2 py-0.5 rounded-md bg-slate-950/90 border border-slate-800 text-[10px] font-mono text-slate-300 font-medium"
+              >
+                {fmt}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-semibold text-gray-900">{product.name}</h3>
-        <p className="text-xs text-gray-500 italic">by {product.brand}</p>
-        <div className="flex items-center justify-between mt-1">
-          <p className="text-sm font-semibold text-gray-900">₹{product.price.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
-          <div className="flex gap-1">
-            <span className="text-[8px] bg-gray-100 text-gray-500 px-1 py-0.5 rounded font-mono font-black">STL</span>
-            <span className="text-[8px] bg-gray-100 text-gray-500 px-1 py-0.5 rounded font-mono font-black">3DM</span>
+      {/* Details Section */}
+      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+        <div>
+          <div className="flex items-center justify-between text-xs text-slate-400 font-mono mb-1">
+            {product.polyCount > 0 ? (
+              <span className="flex items-center gap-1">
+                <Layers className="w-3.5 h-3.5 text-slate-500" />
+                {product.polyCount.toLocaleString()} Polys
+              </span>
+            ) : (
+              <span className="text-slate-500">Standard Product</span>
+            )}
+            <span className="text-slate-300 font-medium">{product.category || 'Jewelry'}</span>
+          </div>
+
+          <h3 className="text-sm font-bold text-white group-hover:text-slate-200 transition-colors line-clamp-2">
+            {product.name}
+          </h3>
+        </div>
+
+        {/* Footer Actions & Price */}
+        <div className="flex items-center justify-between pt-3 border-t border-slate-800/80">
+          <div>
+            <span className="text-[10px] text-slate-400 block font-mono">Price</span>
+            <span className="text-base font-black text-white">${product.price || 49}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                addToCart(product);
+              }}
+              title="Add to Cart"
+              className="p-2.5 rounded-xl bg-slate-200 hover:bg-white text-slate-950 transition-colors shadow-sm"
+            >
+              <ShoppingBag className="w-4 h-4" />
+            </button>
+
+            <div
+              title="View Product Details"
+              className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+            >
+              <Eye className="w-4 h-4 text-slate-300" />
+            </div>
           </div>
         </div>
       </div>

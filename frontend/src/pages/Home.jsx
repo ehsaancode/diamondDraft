@@ -1,5 +1,6 @@
 import React from 'react';
 import Hero from '../components/home/Hero';
+import Explore3DModels from '../components/home/Explore3DModels';
 import FeaturesGrid from '../components/home/FeaturesGrid';
 import BestSelling from '../components/home/BestSelling';
 import FeaturedSection from '../components/home/FeaturedSection';
@@ -16,8 +17,9 @@ const Home = () => {
   }
 
   return (
-    <div className="w-full min-h-screen">
+    <div className="w-full min-h-screen bg-slate-950 text-slate-100">
       <Hero />
+      <Explore3DModels />
       <YouMayAlsoLike />
       <EditorialSection />
       <BestSelling />
