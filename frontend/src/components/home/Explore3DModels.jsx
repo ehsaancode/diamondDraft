@@ -35,7 +35,7 @@ export default function Explore3DModels() {
         {/* View All Products Button */}
         <Link
           to="/shop?category=3D+Models"
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-black hover:bg-gray-800 text-white font-bold text-xs transition-all shadow-md shrink-0 uppercase tracking-wider"
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-sm bg-black hover:bg-gray-800 text-white font-bold text-xs transition-all shadow-md shrink-0 uppercase tracking-wider"
         >
           <span>View All Products</span>
           <ArrowRight className="w-4 h-4" />
@@ -46,7 +46,7 @@ export default function Explore3DModels() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="h-72 bg-gray-100 animate-pulse rounded-2xl border border-gray-200" />
+            <div key={i} className="h-72 bg-gray-100 animate-pulse rounded-sm border border-gray-200" />
           ))}
         </div>
       ) : (
@@ -65,7 +65,7 @@ export default function Explore3DModels() {
               <div
                 key={productId}
                 onClick={() => navigate(`/product/${productId}`, { state: product })}
-                className="group relative bg-white border border-gray-200 hover:border-gray-400 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 cursor-pointer flex flex-col justify-between"
+                className="group relative bg-white border border-gray-200 hover:border-gray-400 rounded-sm overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer flex flex-col justify-between"
               >
                 {/* Product Image & Badges */}
                 <div className="relative aspect-square bg-gray-50 overflow-hidden flex items-center justify-center p-3 border-b border-gray-100">
@@ -82,7 +82,7 @@ export default function Explore3DModels() {
                       toggleFavorite(product);
                     }}
                     title={isFav ? 'Remove from Wishlist' : 'Add to Wishlist'}
-                    className={`absolute top-2.5 right-2.5 p-2 rounded-xl backdrop-blur-md border transition-all z-10 ${
+                    className={`absolute top-2.5 right-2.5 p-2 rounded-sm backdrop-blur-md border transition-all z-10 ${
                       isFav
                         ? 'bg-red-50 border-red-200 text-red-500'
                         : 'bg-white/90 border-gray-200 text-gray-500 hover:text-black hover:border-gray-300 shadow-xs'
@@ -97,7 +97,7 @@ export default function Explore3DModels() {
                       {formats.slice(0, 3).map((fmt) => (
                         <span
                           key={fmt}
-                          className="px-1.5 py-0.5 rounded-md bg-white/90 border border-gray-200 text-[9px] font-mono text-gray-800 font-semibold"
+                          className="px-1.5 py-0.5 rounded-sm bg-white/90 border border-gray-200 text-[9px] font-mono text-gray-800 font-semibold"
                         >
                           {fmt}
                         </span>
@@ -140,14 +140,14 @@ export default function Explore3DModels() {
                           addToCart(product);
                         }}
                         title="Add to Cart"
-                        className="p-2 rounded-xl bg-black hover:bg-gray-800 text-white transition-colors shadow-xs"
+                        className="p-2 rounded-sm bg-black hover:bg-gray-800 text-white transition-colors shadow-xs"
                       >
                         <ShoppingBag className="w-3.5 h-3.5" />
                       </button>
 
                       <div
                         title="View Details"
-                        className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+                        className="p-2 rounded-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
                       >
                         <Eye className="w-3.5 h-3.5" />
                       </div>

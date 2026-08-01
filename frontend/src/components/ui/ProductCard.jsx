@@ -22,7 +22,7 @@ const ProductCard = ({ product, index }) => {
 
   return (
     <motion.div
-      className="group relative bg-white border border-gray-200/80 hover:border-gray-400 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 cursor-pointer flex flex-col justify-between"
+      className="group relative bg-white border border-gray-200 hover:border-gray-400 rounded-sm overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer flex flex-col justify-between"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
@@ -44,7 +44,7 @@ const ProductCard = ({ product, index }) => {
             toggleFavorite(product);
           }}
           title={isFav ? 'Remove from Wishlist' : 'Add to Wishlist'}
-          className={`absolute top-3 right-3 p-2 rounded-xl backdrop-blur-md border transition-all z-10 ${
+          className={`absolute top-3 right-3 p-2 rounded-sm backdrop-blur-md border transition-all z-10 ${
             isFav
               ? 'bg-red-50 border-red-200 text-red-500'
               : 'bg-white/90 border-gray-200 text-gray-500 hover:text-black hover:border-gray-300 shadow-xs'
@@ -59,7 +59,7 @@ const ProductCard = ({ product, index }) => {
             {formats.slice(0, 3).map((fmt) => (
               <span
                 key={fmt}
-                className="px-2 py-0.5 rounded-md bg-white/90 border border-gray-200 text-[10px] font-mono text-gray-800 font-semibold shadow-xs"
+                className="px-2 py-0.5 rounded-sm bg-white/90 border border-gray-200 text-[10px] font-mono text-gray-800 font-semibold shadow-xs"
               >
                 {fmt}
               </span>
@@ -102,14 +102,14 @@ const ProductCard = ({ product, index }) => {
                 addToCart(product);
               }}
               title="Add to Cart"
-              className="p-2.5 rounded-xl bg-black hover:bg-gray-800 text-white transition-colors shadow-xs"
+              className="p-2.5 rounded-sm bg-black hover:bg-gray-800 text-white transition-colors shadow-xs"
             >
               <ShoppingBag className="w-4 h-4" />
             </button>
 
             <div
               title="View Product Details"
-              className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+              className="p-2.5 rounded-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
             >
               <Eye className="w-4 h-4" />
             </div>
