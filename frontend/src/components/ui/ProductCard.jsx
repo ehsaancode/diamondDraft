@@ -22,7 +22,7 @@ const ProductCard = ({ product, index }) => {
 
   return (
     <motion.div
-      className="group relative bg-white border border-gray-200/80 hover:border-gray-400 rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 cursor-pointer flex flex-col justify-between"
+      className="group relative bg-white border border-gray-200/80 hover:border-gray-400 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 cursor-pointer flex flex-col justify-between"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
@@ -47,7 +47,7 @@ const ProductCard = ({ product, index }) => {
           className={`absolute top-3 right-3 p-2 rounded-xl backdrop-blur-md border transition-all z-10 ${
             isFav
               ? 'bg-red-50 border-red-200 text-red-500'
-              : 'bg-white/90 border-gray-200 text-gray-500 hover:text-black hover:border-gray-300 shadow-sm'
+              : 'bg-white/90 border-gray-200 text-gray-500 hover:text-black hover:border-gray-300 shadow-xs'
           }`}
         >
           <Heart className="w-4 h-4" fill={isFav ? 'currentColor' : 'none'} />
@@ -102,7 +102,7 @@ const ProductCard = ({ product, index }) => {
                 addToCart(product);
               }}
               title="Add to Cart"
-              className="p-2.5 rounded-xl bg-black hover:bg-gray-800 text-white transition-colors shadow-sm"
+              className="p-2.5 rounded-xl bg-black hover:bg-gray-800 text-white transition-colors shadow-xs"
             >
               <ShoppingBag className="w-4 h-4" />
             </button>

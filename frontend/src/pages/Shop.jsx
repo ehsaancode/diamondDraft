@@ -123,7 +123,7 @@ const Shop = () => {
       </motion.div>
 
       <div className="flex flex-col md:flex-row gap-8 items-start">
-        {/* Desktop Sidebar Filters */}
+        {/* Desktop Sidebar Filters Panel */}
         <aside className="hidden md:flex w-64 flex-col gap-8 shrink-0 sticky top-24 bg-white border border-gray-200 p-6 rounded-3xl shadow-xs">
           <div>
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 pb-2 border-b border-gray-100">
@@ -225,7 +225,7 @@ const Shop = () => {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-3xl border border-gray-200" />
+                <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-2xl border border-gray-200" />
               ))}
             </div>
           ) : filteredAndSortedProducts.length > 0 ? (
