@@ -109,24 +109,24 @@ const Shop = () => {
   );
 
   return (
-    <div className="px-8 py-12 max-w-7xl mx-auto w-full text-slate-100">
+    <div className="px-8 py-12 max-w-7xl mx-auto w-full text-gray-900 bg-[#fafafa]">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="mb-8 md:mb-12"
       >
-        <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-2">CAD & Product Catalog</h1>
-        <p className="text-slate-400 max-w-2xl text-sm">
+        <h1 className="text-4xl md:text-5xl font-serif font-extrabold text-gray-900 mb-2">CAD & Product Catalog</h1>
+        <p className="text-gray-500 max-w-2xl text-sm font-sans">
           Browse fine jewelry designs, CAD models, and 3D assets.
         </p>
       </motion.div>
 
       <div className="flex flex-col md:flex-row gap-8 items-start">
         {/* Desktop Sidebar Filters */}
-        <aside className="hidden md:flex w-64 flex-col gap-8 shrink-0 sticky top-24 bg-slate-900 border border-slate-800 p-6 rounded-3xl">
+        <aside className="hidden md:flex w-64 flex-col gap-8 shrink-0 sticky top-24 bg-white border border-gray-200 p-6 rounded-3xl shadow-xs">
           <div>
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 pb-2 border-b border-gray-100">
               Search Products
             </h3>
             <input
@@ -135,12 +135,12 @@ const Shop = () => {
               placeholder="Search by name, SKU..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 focus:outline-none focus:border-slate-600 transition-colors"
+              className="w-full text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-gray-900 focus:outline-none focus:border-black focus:bg-white transition-colors"
             />
           </div>
 
           <div>
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 pb-2 border-b border-gray-100">
               Categories
             </h3>
             <ul className="flex flex-col gap-1.5">
@@ -153,8 +153,8 @@ const Shop = () => {
                     }}
                     className={`text-xs text-left w-full px-3 py-2 rounded-xl transition-all ${
                       selectedBrand === brand
-                        ? 'bg-slate-800 border border-slate-700 text-white font-bold shadow-sm'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-950'
+                        ? 'bg-black text-white font-bold shadow-sm'
+                        : 'text-gray-600 hover:text-black hover:bg-gray-100'
                     }`}
                   >
                     {brand === 'All' ? 'All Categories' : brand}
@@ -166,7 +166,7 @@ const Shop = () => {
 
           {tags.length > 1 && (
             <div>
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800">
+              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 pb-2 border-b border-gray-100">
                 Subcategories
               </h3>
               <ul className="flex flex-col gap-1.5">
@@ -176,8 +176,8 @@ const Shop = () => {
                       onClick={() => setSelectedTag(tag)}
                       className={`text-xs text-left w-full px-3 py-2 rounded-xl transition-all ${
                         selectedTag === tag
-                          ? 'bg-slate-800 border border-slate-700 text-white font-bold shadow-sm'
-                          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-950'
+                          ? 'bg-black text-white font-bold shadow-sm'
+                          : 'text-gray-600 hover:text-black hover:bg-gray-100'
                       }`}
                     >
                       {tag}
@@ -189,13 +189,13 @@ const Shop = () => {
           )}
 
           <div>
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 pb-2 border-b border-gray-100">
               Sort By
             </h3>
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
-              className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 cursor-pointer focus:outline-none focus:border-slate-600"
+              className="w-full text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-900 cursor-pointer focus:outline-none focus:border-black"
             >
               <option value="default">Featured</option>
               <option value="price-asc">Price: Low to High</option>
@@ -206,7 +206,7 @@ const Shop = () => {
 
         {/* Product Grid */}
         <div className="flex-1 w-full space-y-6">
-          <div className="flex justify-between items-center text-xs text-slate-400 font-mono">
+          <div className="flex justify-between items-center text-xs text-gray-500 font-mono">
             <span>Showing {filteredAndSortedProducts.length} Products</span>
             {(selectedBrand !== 'All' || selectedTag !== 'All' || searchQuery) && (
               <button
@@ -215,7 +215,7 @@ const Shop = () => {
                   setSelectedTag('All');
                   setSearchQuery('');
                 }}
-                className="text-slate-300 underline font-semibold hover:text-white"
+                className="text-black underline font-semibold hover:text-gray-700"
               >
                 Clear All Filters
               </button>
@@ -225,7 +225,7 @@ const Shop = () => {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-80 bg-slate-900 animate-pulse rounded-3xl border border-slate-800" />
+                <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-3xl border border-gray-200" />
               ))}
             </div>
           ) : filteredAndSortedProducts.length > 0 ? (
@@ -238,7 +238,7 @@ const Shop = () => {
 
               {/* Pagination Controls */}
               {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 mt-12 bg-slate-900 rounded-full px-6 py-3 w-fit mx-auto border border-slate-800 shadow-sm">
+                <div className="flex justify-center items-center gap-2 mt-12 bg-white rounded-full px-6 py-3 w-fit mx-auto border border-gray-200 shadow-xs">
                   <button
                     onClick={() => {
                       setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -246,7 +246,7 @@ const Shop = () => {
                     }}
                     disabled={currentPage === 1}
                     className={`p-2 rounded-full transition-colors ${
-                      currentPage === 1 ? 'text-slate-600 cursor-not-allowed' : 'text-slate-300 hover:bg-slate-800'
+                      currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
                     <ChevronLeft size={20} />
@@ -261,7 +261,7 @@ const Shop = () => {
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
                         className={`min-w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs transition-all px-3 shrink-0 ${
-                          currentPage === i + 1 ? 'bg-slate-200 text-slate-950 font-extrabold' : 'text-slate-400 hover:bg-slate-800'
+                          currentPage === i + 1 ? 'bg-black text-white font-extrabold shadow-sm' : 'text-gray-600 hover:bg-gray-100'
                         }`}
                       >
                         {i + 1}
@@ -276,7 +276,7 @@ const Shop = () => {
                     }}
                     disabled={currentPage === totalPages}
                     className={`p-2 rounded-full transition-colors ${
-                      currentPage === totalPages ? 'text-slate-600 cursor-not-allowed' : 'text-slate-300 hover:bg-slate-800'
+                      currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
                     <ChevronRight size={20} />
@@ -285,15 +285,15 @@ const Shop = () => {
               )}
             </>
           ) : (
-            <div className="py-20 text-center bg-slate-900 border border-slate-800 rounded-3xl p-8">
-              <p className="text-slate-400 mb-4 text-xs font-mono">No products found matching your search.</p>
+            <div className="py-20 text-center bg-white border border-gray-200 rounded-3xl p-8 shadow-xs">
+              <p className="text-gray-500 mb-4 text-xs font-mono">No products found matching your search.</p>
               <button
                 onClick={() => {
                   setSelectedBrand('All');
                   setSelectedTag('All');
                   setSearchQuery('');
                 }}
-                className="text-xs font-bold text-slate-200 underline"
+                className="text-xs font-bold text-black underline"
               >
                 Clear All Filters
               </button>
