@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, ShoppingBag, Eye, Layers, Star } from 'lucide-react';
+import { Heart, ShoppingBag, Eye, Layers, Star, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../store/useCartStore';
@@ -18,7 +18,7 @@ const ProductCard = ({ product, index }) => {
     product.image ||
     (Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : null) ||
     product.thumbnail ||
-    'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=60';
+    null;
 
   const rating = product.rating !== undefined && product.rating !== null ? Number(product.rating) : 5.0;
   const reviews = product.reviews !== undefined && product.reviews !== null ? Number(product.reviews) : 0;
@@ -34,11 +34,18 @@ const ProductCard = ({ product, index }) => {
     >
       {/* Image Container */}
       <div className="relative aspect-square bg-gray-50 overflow-hidden flex items-center justify-center p-3 border-b border-gray-100">
-        <img
-          src={productImage}
-          alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+        {productImage ? (
+          <img
+            src={productImage}
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center p-4 text-center text-gray-400 rounded-xs">
+            <ImageIcon className="w-8 h-8 mb-1.5 text-gray-300" />
+            <span className="text-[11px] font-semibold text-gray-500">No Image Uploaded</span>
+          </div>
+        )}
 
         {/* Wishlist Icon Button */}
         <button

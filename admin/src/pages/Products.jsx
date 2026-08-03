@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { PlusCircle, Package, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Package, Edit, Trash2, ImageOff } from 'lucide-react';
 import axios from 'axios';
 
 export const Products = () => {
@@ -28,7 +28,7 @@ export const Products = () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         await axios.delete(`${apiUrl}/api/products/${id}`);
-        setProducts(products.filter(p => p._id !== id));
+        setProducts(products.filter((p) => p._id !== id));
       } catch (err) {
         console.error('Failed to delete product', err);
         alert('Failed to delete product');
@@ -49,8 +49,13 @@ export const Products = () => {
       </div>
 
       {loading ? (
-        <div className="glass-panel p-8 flex items-center justify-center min-h-[400px]">
-          <p className="text-zinc-400">Loading products...</p>
+        <div className="glass-panel p-6 space-y-4 animate-pulse">
+          <div className="h-6 bg-zinc-800 rounded w-1/4" />
+          <div className="space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-14 bg-zinc-800/60 rounded-xl" />
+            ))}
+          </div>
         </div>
       ) : products.length === 0 ? (
         <div className="glass-panel p-8 flex flex-col items-center justify-center min-h-[400px] text-center border-dashed border-2">
@@ -82,9 +87,23 @@ export const Products = () => {
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-lg bg-surfaceHover overflow-hidden border border-border flex items-center justify-center flex-shrink-0">
                         {product.images && product.images.length > 0 ? (
-                          <img src={product.images[0].startsWith('http') ? product.images[0] : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${product.images[0].replace(/^\//, '')}`} alt={product.name} className="w-full h-full object-cover" />
+                          <img
+                            src={
+                              product.images[0].startsWith('http')
+                                ? product.images[0]
+                                : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/${product.images[0].replace(
+                                    /^\//,
+                                    ''
+                                  )}`
+                            }
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
                         ) : (
-                          <Package size={20} className="text-zinc-500" />
+                          <div className="flex flex-col items-center text-zinc-500">
+                            <ImageOff size={16} />
+                            <span className="text-[8px] font-mono text-zinc-500 mt-0.5">No Image</span>
+                          </div>
                         )}
                       </div>
                       <span className="font-semibold text-zinc-100 line-clamp-1">{product.name}</span>
@@ -92,7 +111,7 @@ export const Products = () => {
                   </td>
                   <td className="p-4 text-sm text-zinc-300 hidden sm:table-cell">{product.sku}</td>
                   <td className="p-4 text-sm text-zinc-300 hidden md:table-cell">{product.category}</td>
-                  <td className="p-4 text-sm text-zinc-300">₹{product.price}</td>
+                  <td className="p-4 text-sm text-zinc-300">₹{Number(product.price || 0).toLocaleString('en-IN')}</td>
                   <td className="p-4 text-sm text-zinc-300 hidden sm:table-cell">{product.quantity}</td>
                   <td className="p-4 hidden md:table-cell">
                     <span className={`text-xs px-2 py-1 rounded-full ${product.status === 'Active' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
@@ -100,9 +119,13 @@ export const Products = () => {
                     </span>
                   </td>
                   <td className="p-4 text-right">
-                    <div className="flex items-center justify-end gap-1 sm:gap-2">
-                      <Link to={`/edit-product/${product._id}`} className="p-2 text-zinc-400 hover:text-primary-500 transition-colors" title="Edit Product"><Edit size={16} /></Link>
-                      <button onClick={() => handleDelete(product._id)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors" title="Delete Product"><Trash2 size={16} /></button>
+                    <div className="flex items-center justify-end gap-2">
+                      <Link to={`/edit-product/${product._id}`} className="p-2 text-zinc-400 hover:text-white hover:bg-surfaceHover rounded-lg transition-colors">
+                        <Edit size={16} />
+                      </Link>
+                      <button onClick={() => handleDelete(product._id)} className="p-2 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                   </td>
                 </tr>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Heart, Eye, ArrowRight, Layers, Sparkles } from 'lucide-react';
+import { ShoppingBag, Heart, Eye, ArrowRight, Layers, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { useProducts } from '../../hooks/useProducts';
 import { useCartStore } from '../../store/useCartStore';
 import { useFavorites } from '../../context/FavoriteContext';
@@ -46,7 +46,10 @@ export default function Explore3DModels() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="h-72 bg-gray-100 animate-pulse rounded-sm border border-gray-200" />
+            <div
+              key={i}
+              className="h-72 rounded-sm border border-gray-200 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse"
+            />
           ))}
         </div>
       ) : (
@@ -59,7 +62,7 @@ export default function Explore3DModels() {
               product.image ||
               (Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : null) ||
               product.thumbnail ||
-              'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=60';
+              null;
 
             return (
               <div
@@ -69,11 +72,18 @@ export default function Explore3DModels() {
               >
                 {/* Product Image & Badges */}
                 <div className="relative aspect-square bg-gray-50 overflow-hidden flex items-center justify-center p-3 border-b border-gray-100">
-                  <img
-                    src={productImage}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
+                  {productImage ? (
+                    <img
+                      src={productImage}
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center p-3 text-center text-gray-400">
+                      <ImageIcon className="w-6 h-6 mb-1 text-gray-300" />
+                      <span className="text-[10px] font-semibold text-gray-500">No Image Uploaded</span>
+                    </div>
+                  )}
 
                   {/* Wishlist Icon Button */}
                   <button
@@ -106,32 +116,30 @@ export default function Explore3DModels() {
                   )}
                 </div>
 
-                {/* Details Body */}
-                <div className="p-4 flex-1 flex flex-col justify-between space-y-3 bg-white">
+                {/* Details Section */}
+                <div className="p-3 md:p-4 flex-1 flex flex-col justify-between space-y-3 bg-white">
                   <div>
-                    <div className="flex items-center justify-between text-[11px] font-mono mb-1">
+                    <div className="flex items-center justify-between text-[11px] font-mono text-gray-400 mb-1">
                       {product.polyCount > 0 ? (
                         <span className="flex items-center gap-1 text-gray-500">
                           <Layers className="w-3 h-3 text-gray-400" />
                           {product.polyCount.toLocaleString()} Polys
                         </span>
                       ) : (
-                        <span className="text-gray-400">Standard Product</span>
+                        <span className="text-gray-400">CAD Model</span>
                       )}
-                      <span className="text-gray-900 font-semibold">{product.category || 'Jewelry'}</span>
                     </div>
 
-                    <h3 className="text-xs font-bold text-gray-900 group-hover:text-black transition-colors line-clamp-2">
+                    <h3 className="text-xs font-bold text-gray-900 group-hover:text-black transition-colors line-clamp-2 leading-tight">
                       {product.name}
                     </h3>
                   </div>
 
-                  {/* Price & Action Icons */}
+                  {/* Price & Actions */}
                   <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                    <div>
-                      <span className="text-[10px] text-gray-400 block font-mono">Price</span>
-                      <span className="text-sm font-black text-gray-900">${product.price || 49}</span>
-                    </div>
+                    <span className="text-sm font-black text-gray-900">
+                      ₹{Number(product.price || 0).toLocaleString('en-IN')}
+                    </span>
 
                     <div className="flex items-center gap-1.5">
                       <button

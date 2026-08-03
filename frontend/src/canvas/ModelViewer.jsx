@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState, useEffect, Component, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, Float, Center, useGLTF } from '@react-three/drei';
+import { OrbitControls, Environment, Html, useGLTF } from '@react-three/drei';
 import { Maximize, Minimize } from 'lucide-react';
 import * as THREE from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
@@ -40,6 +40,30 @@ class CanvasErrorBoundary extends Component {
   }
 }
 
+function Canvas3DLoader() {
+  return (
+    <Html center>
+      <div className="flex flex-col items-center gap-2 bg-slate-900/90 text-white px-4 py-3 rounded-2xl border border-slate-700 backdrop-blur-md shadow-2xl pointer-events-none">
+        <div className="w-6 h-6 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
+        <span className="text-[11px] font-mono tracking-wider font-semibold text-slate-300">
+          Loading 3D Model...
+        </span>
+      </div>
+    </Html>
+  );
+}
+
+function CanvasErrorNotice() {
+  return (
+    <Html center>
+      <div className="flex flex-col items-center gap-1 bg-slate-900/90 text-white px-4 py-3 rounded-2xl border border-slate-800 backdrop-blur-md text-center pointer-events-none">
+        <span className="text-xs font-semibold text-red-400">3D Asset Unavailable</span>
+        <span className="text-[10px] text-slate-400 font-mono">Unable to parse 3D file geometry</span>
+      </div>
+    </Html>
+  );
+}
+
 const getPbrMaterialProps = (activePbrChannel, wireframe) => {
   const base = {
     wireframe: wireframe,
@@ -64,7 +88,7 @@ const getPbrMaterialProps = (activePbrChannel, wireframe) => {
   }
 };
 
-function LoadedSTLModel({ url, modelType }) {
+function LoadedSTLModel({ url }) {
   const meshRef = useRef();
   const [geometry, setGeometry] = useState(null);
   const [hasError, setHasError] = useState(false);
@@ -109,8 +133,12 @@ function LoadedSTLModel({ url, modelType }) {
     [activePbrChannel, wireframe]
   );
 
-  if (hasError || !geometry) {
-    return <InspectableMesh modelType={modelType} />;
+  if (hasError) {
+    return <CanvasErrorNotice />;
+  }
+
+  if (!geometry) {
+    return <Canvas3DLoader />;
   }
 
   return (
@@ -173,48 +201,16 @@ function LoadedGLTFModel({ url }) {
   );
 }
 
-function InspectableMesh({ modelType = 'character' }) {
-  const meshRef = useRef();
-  const { wireframe, activePbrChannel, autoRotate } = useViewportStore();
-
-  useFrame((_, delta) => {
-    if (autoRotate && meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.5;
-    }
-  });
-
-  const materialProps = useMemo(
-    () => getPbrMaterialProps(activePbrChannel, wireframe),
-    [activePbrChannel, wireframe]
-  );
-
-  return (
-    <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
-      <group ref={meshRef}>
-        {modelType === 'diamond' ? (
-          <mesh castShadow receiveShadow>
-            <octahedronGeometry args={[1.8, 2]} />
-            <meshStandardMaterial {...materialProps} envMapIntensity={1.5} />
-          </mesh>
-        ) : modelType === 'character' ? (
-          <mesh castShadow receiveShadow>
-            <torusKnotGeometry args={[1.2, 0.4, 128, 32]} />
-            <meshStandardMaterial {...materialProps} envMapIntensity={1.5} />
-          </mesh>
-        ) : (
-          <mesh castShadow receiveShadow>
-            <icosahedronGeometry args={[1.6, 3]} />
-            <meshStandardMaterial {...materialProps} envMapIntensity={1.5} />
-          </mesh>
-        )}
-      </group>
-    </Float>
-  );
-}
-
-function Smart3DModelLoader({ glbUrl, formats = [], modelType }) {
+function Smart3DModelLoader({ glbUrl, formats = [] }) {
   if (!glbUrl) {
-    return <InspectableMesh modelType={modelType} />;
+    return (
+      <Html center>
+        <div className="flex flex-col items-center gap-1 bg-slate-900/90 text-white px-4 py-3 rounded-2xl border border-slate-800 backdrop-blur-md text-center pointer-events-none">
+          <span className="text-xs font-semibold text-slate-300">No 3D Model File Attached</span>
+          <span className="text-[10px] text-slate-500 font-mono">Upload a .glb or .stl file to view in 3D</span>
+        </div>
+      </Html>
+    );
   }
 
   const urlLower = glbUrl.toLowerCase();
@@ -225,10 +221,10 @@ function Smart3DModelLoader({ glbUrl, formats = [], modelType }) {
     (!urlLower.includes('.glb') && !urlLower.includes('.gltf'));
 
   return (
-    <CanvasErrorBoundary fallback={<InspectableMesh modelType={modelType} />}>
-      <Suspense fallback={<InspectableMesh modelType={modelType} />}>
+    <CanvasErrorBoundary fallback={<CanvasErrorNotice />}>
+      <Suspense fallback={<Canvas3DLoader />}>
         {isStl ? (
-          <LoadedSTLModel url={glbUrl} modelType={modelType} />
+          <LoadedSTLModel url={glbUrl} />
         ) : (
           <LoadedGLTFModel url={glbUrl} />
         )}
@@ -278,66 +274,69 @@ export default function ModelViewer({ glbUrl, formats = [], modelType = 'charact
       >
         <color attach="background" args={['#090d16']} />
         <ambientLight intensity={0.7} />
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1.2} castShadow />
-        <pointLight position={[-10, -10, -10]} intensity={0.5} />
+        <directionalLight position={[10, 10, 5]} intensity={1.5} castShadow />
+        <directionalLight position={[-10, -10, -5]} intensity={0.5} />
 
-        <Center>
-          <Smart3DModelLoader glbUrl={glbUrl} formats={formats} modelType={modelType} />
-        </Center>
+        <Environment preset={environment || 'studio'} />
 
-        <Environment preset={environment === 'studio' ? 'city' : environment} />
-        <OrbitControls makeDefault enablePan={true} enableZoom={true} minDistance={2} maxDistance={10} />
+        <Smart3DModelLoader glbUrl={glbUrl} formats={formats} modelType={modelType} />
+
+        <OrbitControls
+          makeDefault
+          enablePan={true}
+          enableZoom={true}
+          minDistance={1}
+          maxDistance={20}
+        />
       </Canvas>
 
-      {/* Floating Toolbar Controls */}
-      <div className="absolute top-4 left-4 right-4 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
-        <div className="flex items-center gap-2 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/60 pointer-events-auto shadow-lg text-xs text-slate-200">
-          <span className="text-slate-400 font-medium font-mono text-[11px]">PBR Channel:</span>
-          {['full', 'albedo', 'normal', 'roughness', 'metallic', 'ao'].map((channel) => (
+      {/* Floating Toolbar */}
+      <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none z-20">
+        <div className="flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 shadow-md text-xs text-slate-300 pointer-events-auto">
+          {['full', 'albedo', 'normal', 'roughness', 'metallic'].map((ch) => (
             <button
-              key={channel}
-              onClick={() => setPbrChannel(channel)}
-              className={`px-2 py-0.5 rounded-lg capitalize transition-colors font-mono font-medium text-[11px] ${
-                activePbrChannel === channel
-                  ? 'bg-cyan-500 text-slate-950 font-bold'
-                  : 'hover:bg-slate-800 text-slate-300'
+              key={ch}
+              onClick={() => setPbrChannel(ch)}
+              className={`px-2.5 py-1 rounded-lg font-mono text-[10px] uppercase font-bold transition-all ${
+                activePbrChannel === ch
+                  ? 'bg-sky-500 text-slate-950 shadow-sm'
+                  : 'hover:bg-slate-800 text-slate-400'
               }`}
             >
-              {channel}
+              {ch}
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-2 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/60 pointer-events-auto shadow-lg text-xs text-slate-200">
+        <div className="flex items-center gap-2 pointer-events-auto">
           <button
             onClick={() => setWireframe(!wireframe)}
-            className={`px-2.5 py-1 rounded-lg border text-xs font-mono font-medium transition-all ${
+            className={`px-3 py-1.5 rounded-xl border text-xs font-mono font-bold transition-all ${
               wireframe
-                ? 'bg-indigo-600/80 border-indigo-400 text-white'
-                : 'bg-slate-800/80 border-slate-700 hover:border-slate-500 text-slate-300'
+                ? 'bg-sky-500/20 border-sky-500/50 text-sky-300'
+                : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:text-white'
             }`}
           >
-            Wireframe: {wireframe ? 'ON' : 'OFF'}
+            Wireframe
           </button>
 
           <button
             onClick={toggleAutoRotate}
-            className={`px-2.5 py-1 rounded-lg border text-xs font-mono font-medium transition-all ${
+            className={`px-3 py-1.5 rounded-xl border text-xs font-mono font-bold transition-all ${
               autoRotate
-                ? 'bg-cyan-600/80 border-cyan-400 text-white'
-                : 'bg-slate-800/80 border-slate-700 hover:border-slate-500 text-slate-300'
+                ? 'bg-sky-500/20 border-sky-500/50 text-sky-300'
+                : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:text-white'
             }`}
           >
-            Rotate: {autoRotate ? 'ON' : 'OFF'}
+            Rotate
           </button>
 
           <button
             onClick={toggleFullscreen}
-            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-mono font-medium bg-slate-800/80 border-slate-700 hover:border-cyan-400 text-cyan-400 transition-all"
+            title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+            className="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-all"
           >
-            {isFullscreen ? <Minimize className="w-3.5 h-3.5" /> : <Maximize className="w-3.5 h-3.5" />}
-            <span>{isFullscreen ? 'Exit' : 'Fullscreen'}</span>
+            {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
           </button>
         </div>
       </div>
