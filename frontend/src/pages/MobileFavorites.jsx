@@ -11,7 +11,7 @@ const MobileFavorites = () => {
   const { addToCart } = useCart();
 
   return (
-    <div className="bg-[#f8f9fa] min-h-screen pb-32">
+    <div className="bg-[#f8f9fa] min-h-screen pb-48">
       {/* Header */}
       <div className="bg-white border-b border-gray-100/80 sticky top-0 z-40 px-4 py-4 flex items-center justify-between">
         <button onClick={() => navigate(-1)} className="w-11 h-11 flex items-center justify-center bg-white border border-gray-100 rounded-full shadow-sm">

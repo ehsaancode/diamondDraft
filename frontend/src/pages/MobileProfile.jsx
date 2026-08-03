@@ -95,7 +95,7 @@ const MobileProfile = () => {
   }
 
   return (
-    <div className="bg-[#f8f9fa] min-h-screen pb-32">
+    <div className="bg-[#f8f9fa] min-h-screen pb-48">
       {/* Profile Header */}
       <div className="bg-white px-6 pt-16 pb-8 rounded-b-[48px] shadow-sm flex flex-col items-center gap-4 text-center">
         <div className="relative">
