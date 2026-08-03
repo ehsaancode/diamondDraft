@@ -7,8 +7,8 @@ export const SettingsPage = () => {
   const [settings, setSettings] = useState({
     maintenanceMode: false,
     emailNotifications: true,
-    storeName: 'DiamondDraft CAD Marketplace',
-    supportEmail: 'support@diamonddraft.com',
+    storeName: 'Gwel CAD Marketplace',
+    supportEmail: 'support@gwel.com',
     defaultCurrency: 'INR'
   });
   const [loading, setLoading] = useState(true);
@@ -133,7 +133,7 @@ export const SettingsPage = () => {
               value={settings.storeName}
               onChange={handleInputChange}
               className="input-field"
-              placeholder="DiamondDraft CAD Marketplace"
+              placeholder="Gwel CAD Marketplace"
             />
           </div>
 
@@ -146,7 +146,7 @@ export const SettingsPage = () => {
               value={settings.supportEmail}
               onChange={handleInputChange}
               className="input-field"
-              placeholder="support@diamonddraft.com"
+              placeholder="support@gwel.com"
             />
           </div>
 

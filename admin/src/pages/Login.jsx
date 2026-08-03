@@ -80,7 +80,7 @@ export const Login = () => {
             <Gem size={32} className="text-white" />
           </div>
           <h1 className="text-3xl font-black tracking-tight text-white font-grotesk">
-            DIAMONDDRAFT<span className="text-primary-500"> ADMIN</span>
+            GWEL<span className="text-primary-500"> ADMIN</span>
           </h1>
           <p className="text-sm text-zinc-400 mt-2 font-outfit">
             Control Center & Inventory Administrator

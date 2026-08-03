@@ -26,7 +26,7 @@ const uploadFile = async (req, file, folderName) => {
       const resultUrl = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
-            folder: `diamondDraft/${folderName}`,
+            folder: `gwel/${folderName}`,
             resource_type: 'auto',
           },
           (error, result) => {

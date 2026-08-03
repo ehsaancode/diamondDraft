@@ -95,8 +95,8 @@ router.get('/settings', async (req, res) => {
     const defaultSettings = {
       maintenanceMode: false,
       emailNotifications: true,
-      storeName: 'DiamondDraft CAD Marketplace',
-      supportEmail: 'support@diamonddraft.com',
+      storeName: 'Gwel CAD Marketplace',
+      supportEmail: 'support@gwel.com',
       defaultCurrency: 'INR'
     };
 
