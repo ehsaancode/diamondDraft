@@ -1,28 +1,20 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Heart, Eye, ArrowRight, Layers, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { useProducts } from '../../hooks/useProducts';
-import { useCartStore } from '../../store/useCartStore';
-import { useFavorites } from '../../context/FavoriteContext';
+import ProductCard from '../ui/ProductCard';
 
 export default function Explore3DModels() {
-  const navigate = useNavigate();
   const { products, loading } = useProducts();
-  const addToCart = useCartStore((state) => state.addToCart);
-  const { isFavorite, toggleFavorite } = useFavorites();
 
   // Take top 10 products
-  const displayProducts = products.slice(0, 10);
-
-  if (!loading && displayProducts.length === 0) {
-    return null;
-  }
+  const displayProducts = Array.isArray(products) ? products.slice(0, 10) : [];
 
   return (
     <section className="py-16 px-4 max-w-7xl mx-auto w-full text-gray-900 bg-[#fafafa]">
       {/* Top Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between items-center text-center md:text-left gap-4 mb-10 pb-6 border-b border-gray-200">
-        <div className="flex flex-col items-center md:items-start text-center md:text-left">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-6 border-b border-gray-200">
+        <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">
             <Sparkles className="w-4 h-4 text-gray-700" /> Featured Asset Collection
           </div>
@@ -35,7 +27,7 @@ export default function Explore3DModels() {
         {/* View All Products Button */}
         <Link
           to="/shop?category=3D+Models"
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-sm bg-black hover:bg-gray-800 text-white font-bold text-xs transition-all shadow-md shrink-0 uppercase tracking-wider w-full md:w-auto"
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-sm bg-black hover:bg-gray-800 text-white font-bold text-xs transition-all shadow-md shrink-0 uppercase tracking-wider"
         >
           <span>View All Products</span>
           <ArrowRight className="w-4 h-4" />
@@ -52,119 +44,15 @@ export default function Explore3DModels() {
             />
           ))}
         </div>
-      ) : (
+      ) : displayProducts.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {displayProducts.map((product) => {
-            const productId = product.id || product._id || 'MD-3001';
-            const isFav = isFavorite(productId);
-            const formats = product.formats || [];
-            const productImage =
-              product.image ||
-              (Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : null) ||
-              product.thumbnail ||
-              null;
-
-            return (
-              <div
-                key={productId}
-                onClick={() => navigate(`/product/${productId}`, { state: product })}
-                className="group relative bg-white border border-gray-200 hover:border-gray-400 rounded-sm overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer flex flex-col justify-between"
-              >
-                {/* Product Image & Badges */}
-                <div className="relative aspect-square bg-gray-50 overflow-hidden flex items-center justify-center p-3 border-b border-gray-100">
-                  {productImage ? (
-                    <img
-                      src={productImage}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center p-3 text-center text-gray-400">
-                      <ImageIcon className="w-6 h-6 mb-1 text-gray-300" />
-                      <span className="text-[10px] font-semibold text-gray-500">No Image Uploaded</span>
-                    </div>
-                  )}
-
-                  {/* Wishlist Icon Button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(product);
-                    }}
-                    title={isFav ? 'Remove from Wishlist' : 'Add to Wishlist'}
-                    className={`absolute top-2.5 right-2.5 p-2 rounded-sm backdrop-blur-md border transition-all z-10 ${
-                      isFav
-                        ? 'bg-red-50 border-red-200 text-red-500'
-                        : 'bg-white/90 border-gray-200 text-gray-500 hover:text-black hover:border-gray-300 shadow-xs'
-                    }`}
-                  >
-                    <Heart className="w-3.5 h-3.5" fill={isFav ? 'currentColor' : 'none'} />
-                  </button>
-
-                  {/* Format Badges */}
-                  {formats.length > 0 && (
-                    <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center gap-1 overflow-x-auto">
-                      {formats.slice(0, 3).map((fmt) => (
-                        <span
-                          key={fmt}
-                          className="px-1.5 py-0.5 rounded-sm bg-white/90 border border-gray-200 text-[9px] font-mono text-gray-800 font-semibold"
-                        >
-                          {fmt}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Details Section */}
-                <div className="p-3 md:p-4 flex-1 flex flex-col justify-between space-y-3 bg-white">
-                  <div>
-                    <div className="flex items-center justify-between text-[11px] font-mono text-gray-400 mb-1">
-                      {product.polyCount > 0 ? (
-                        <span className="flex items-center gap-1 text-gray-500">
-                          <Layers className="w-3 h-3 text-gray-400" />
-                          {product.polyCount.toLocaleString()} Polys
-                        </span>
-                      ) : (
-                        <span className="text-gray-400">CAD Model</span>
-                      )}
-                    </div>
-
-                    <h3 className="text-xs font-bold text-gray-900 group-hover:text-black transition-colors line-clamp-2 leading-tight">
-                      {product.name}
-                    </h3>
-                  </div>
-
-                  {/* Price & Actions */}
-                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                    <span className="text-sm font-black text-gray-900">
-                      ₹{Number(product.price || 0).toLocaleString('en-IN')}
-                    </span>
-
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addToCart(product);
-                        }}
-                        title="Add to Cart"
-                        className="p-2 rounded-sm bg-black hover:bg-gray-800 text-white transition-colors shadow-xs"
-                      >
-                        <ShoppingBag className="w-3.5 h-3.5" />
-                      </button>
-
-                      <div
-                        title="View Details"
-                        className="p-2 rounded-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {displayProducts.map((product, index) => (
+            <ProductCard key={product.id || product._id || index} product={product} index={index} />
+          ))}
+        </div>
+      ) : (
+        <div className="py-12 text-center bg-white border border-gray-200 rounded-sm p-6 shadow-xs">
+          <p className="text-gray-500 text-xs font-mono">No 3D Models available in the catalog yet.</p>
         </div>
       )}
     </section>

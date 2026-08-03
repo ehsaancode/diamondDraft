@@ -1,8 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ShoppingBag, Heart, Star, ChevronLeft, ShieldCheck, Download, RotateCcw, Info, X, Smartphone } from 'lucide-react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Specifications from '../components/home/Specifications';
+import {
+  ChevronLeft,
+  Share2,
+  Heart,
+  Star,
+  ShoppingBag,
+  Info,
+  ShieldCheck,
+  RotateCcw,
+  Smartphone,
+  Download,
+  CheckCircle2,
+  Clock,
+  Layers,
+  Image as ImageIcon
+} from 'lucide-react';
 import CanvasWrapper from '../canvas/CanvasWrapper';
 import WebARModal from '../components/WebARModal';
 import { useCartStore } from '../store/useCartStore';
@@ -10,21 +24,10 @@ import { useFavorites } from '../context/FavoriteContext';
 import { useMobile } from '../hooks/useMobile';
 import MobileProductDetails from './MobileProductDetails';
 
-const fallbackProduct = {
-  id: 'mock',
-  name: 'Elegant Diamond Ring',
-  brand: 'Jewelry',
-  price: 350.0,
-  rating: 4.8,
-  reviews: 124,
-  description: 'Exquisite fine jewelry CAD design crafted with mathematical accuracy, suitable for direct 3D printing and casting.',
-  image: 'https://images.unsplash.com/photo-1605100804763-247f67b25406?w=800&auto=format&fit=crop&q=60'
-};
-
 const ProductDetails = () => {
   const { id } = useParams();
-  const location = useLocation();
   const navigate = useNavigate();
+  const location = useLocation();
   const addToCart = useCartStore((state) => state.addToCart);
   const { isFavorite, toggleFavorite } = useFavorites();
   const isMobile = useMobile();
@@ -35,6 +38,8 @@ const ProductDetails = () => {
   const [isFormatGuideOpen, setIsFormatGuideOpen] = useState(false);
   const [isWebAROpen, setIsWebAROpen] = useState(false);
   const [activeTab, setActiveTab] = useState('image'); // 'image' or '3d'
+  const [signedDownload, setSignedDownload] = useState(null);
+  const [isClaimingSignedUrl, setIsClaimingSignedUrl] = useState(false);
 
   useEffect(() => {
     if (location.state && (location.state.id === id || location.state._id === id)) {
@@ -48,47 +53,40 @@ const ProductDetails = () => {
         setLoading(true);
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         const res = await fetch(`${apiUrl}/api/products/${id}`);
-        if (!res.ok) throw new Error('Product not found');
-        const p = await res.json();
+        if (!res.ok) throw new Error('Failed to fetch product details');
+        const data = await res.json();
 
         const getImageUrl = (url) => (url?.startsWith('http') ? url : `${apiUrl}${url}`);
-        const DEFAULT_SUBCATEGORIES = {
-          Rings: 'Engagement',
-          Necklaces: 'Pendants',
-          Earrings: 'Studs',
-          Bracelets: 'Tennis'
-        };
-        const sub = p.subcategory || DEFAULT_SUBCATEGORIES[p.category] || '';
-        const modelFileUrl = p.glbUrl || p.modelUrl || null;
-        const is3DAsset = !!modelFileUrl || p.category === '3D Models';
+        const modelFileUrl = data.glbUrl || data.modelUrl || null;
+        const is3DAsset = !!modelFileUrl || data.category === '3D Models';
 
         const mappedProduct = {
-          id: p._id || p.id || id,
-          sku: p.sku || p._id || id,
-          name: p.name,
-          brand: p.category || 'Jewelry',
-          category: p.category || 'Jewelry',
-          subcategory: sub,
-          price: p.price,
-          rating: 5.0,
-          reviews: 0,
-          description: p.description,
-          image: p.images && p.images.length > 0 ? getImageUrl(p.images[0]) : p.image || '/images/jewellery_cad_ring.png',
-          images: p.images ? p.images.map((img) => getImageUrl(img)) : (p.image ? [p.image] : []),
-          tag: sub,
-          status: p.status,
+          id: data._id || data.id,
+          sku: data.sku || data._id || data.id,
+          name: data.name,
+          brand: data.category || 'Jewelry',
+          category: data.category || 'Jewelry',
+          price: Number(data.price) || 0,
+          rating: data.rating !== undefined ? Number(data.rating) : 5.0,
+          reviews: data.reviews !== undefined ? Number(data.reviews) : 0,
+          description: data.description || '',
+          image:
+            data.images && data.images.length > 0
+              ? getImageUrl(data.images[0])
+              : data.image || null,
+          images: data.images ? data.images.map((img) => getImageUrl(img)) : (data.image ? [data.image] : []),
           glbUrl: modelFileUrl ? getImageUrl(modelFileUrl) : null,
           is3D: is3DAsset,
-          formats: p.formats || (is3DAsset ? ['.FBX', '.OBJ', '.STL', '.BLEND', '.GLB'] : ['STL', '3DM', 'OBJ', 'STEP']),
-          polyCount: p.polyCount || (is3DAsset ? 45000 : 0),
-          vertexCount: p.vertexCount || (is3DAsset ? 52000 : 0),
-          license: p.license || 'Royalty-Free'
+          formats: data.formats || (is3DAsset ? ['.FBX', '.OBJ', '.STL', '.GLB'] : ['STL', '3DM', 'OBJ']),
+          polyCount: Number(data.polyCount) || (is3DAsset ? 45000 : 0),
+          vertexCount: Number(data.vertexCount) || (is3DAsset ? 52000 : 0),
+          license: data.license || 'Royalty-Free'
         };
 
         setProduct(mappedProduct);
       } catch (err) {
         console.error('Error fetching product details:', err);
-        setProduct(fallbackProduct);
+        setProduct(null);
       } finally {
         setLoading(false);
       }
@@ -97,11 +95,9 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id, location.state]);
 
-  const activeProduct = product || fallbackProduct;
-  const isFav = isFavorite(activeProduct.id || activeProduct._id);
-  const is3DProduct = activeProduct.is3D || !!activeProduct.glbUrl;
+  const activeProduct = product;
 
-  const [mainImage, setMainImage] = useState(activeProduct.image);
+  const [mainImage, setMainImage] = useState(activeProduct?.image || null);
 
   useEffect(() => {
     if (product) {
@@ -109,10 +105,54 @@ const ProductDetails = () => {
     }
   }, [product]);
 
+  const handleClaimSignedDownloadUrl = async () => {
+    setIsClaimingSignedUrl(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/vault/signed-download`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: activeProduct.id, format: selectedFormat }),
+      });
+      const data = await res.json();
+      setSignedDownload(data);
+    } catch (e) {
+      setSignedDownload({
+        downloadUrl: activeProduct?.glbUrl || '#',
+        expiresInSeconds: 900,
+        format: selectedFormat,
+        productName: activeProduct?.name || '3D Asset',
+      });
+    } finally {
+      setIsClaimingSignedUrl(false);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
-        <div className="w-10 h-10 border-4 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 animate-pulse space-y-8 bg-[#fafafa]">
+        <div className="h-6 w-32 bg-gray-200 rounded-lg" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-7 h-[450px] bg-gray-200 rounded-3xl" />
+          <div className="lg:col-span-5 space-y-6">
+            <div className="h-8 w-3/4 bg-gray-200 rounded-xl" />
+            <div className="h-6 w-1/3 bg-gray-200 rounded-lg" />
+            <div className="h-32 w-full bg-gray-200 rounded-2xl" />
+            <div className="h-12 w-full bg-gray-200 rounded-xl" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!activeProduct) {
+    return (
+      <div className="max-w-7xl mx-auto px-8 py-20 text-center bg-[#fafafa]">
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Product Not Found</h2>
+        <p className="text-xs text-gray-500 mb-6">The requested product could not be located in our catalog.</p>
+        <button onClick={() => navigate('/shop')} className="px-6 py-2.5 bg-black text-white text-xs font-bold rounded-xl">
+          Return to Shop
+        </button>
       </div>
     );
   }
@@ -121,14 +161,15 @@ const ProductDetails = () => {
     return <MobileProductDetails product={activeProduct} />;
   }
 
+  const isFav = isFavorite(activeProduct.id || activeProduct._id);
+  const is3DProduct = activeProduct.is3D || !!activeProduct.glbUrl;
+
   const gallery =
     activeProduct.images && activeProduct.images.length > 0
       ? activeProduct.images
-      : [
-          activeProduct.image,
-          'https://images.unsplash.com/photo-1605100804763-247f67b25406?w=800&auto=format&fit=crop&q=60',
-          'https://images.unsplash.com/photo-1599643477874-dc3b91490214?w=800&auto=format&fit=crop&q=60'
-        ];
+      : activeProduct.image
+      ? [activeProduct.image]
+      : [];
 
   const formats =
     activeProduct.formats && activeProduct.formats.length > 0
@@ -235,17 +276,24 @@ const ProductDetails = () => {
 
               {/* Main Preview Container */}
               <div className="flex-1 aspect-square bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden flex items-center justify-center p-6">
-                <img
-                  src={mainImage || activeProduct.image}
-                  alt={activeProduct.name}
-                  className="w-full h-full object-contain max-h-[500px]"
-                />
+                {mainImage || activeProduct.image ? (
+                  <img
+                    src={mainImage || activeProduct.image}
+                    alt={activeProduct.name}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center p-6 text-center text-gray-400">
+                    <ImageIcon className="w-12 h-12 mb-2 text-gray-300" />
+                    <span className="text-xs font-semibold text-gray-500">No Image Uploaded</span>
+                  </div>
+                )}
               </div>
             </div>
           )}
         </div>
 
-        {/* Right Column: Product Information & Purchase Form */}
+        {/* Right Column: Information & Actions */}
         <div className="lg:col-span-5 space-y-6">
           <div>
             <span className="text-xs font-semibold uppercase tracking-widest text-gray-400 block mb-1 font-sans">
@@ -263,7 +311,7 @@ const ProductDetails = () => {
                 ))}
               </div>
               <span className="text-xs text-gray-500 font-medium">
-                {activeProduct.rating || 5.0} ({activeProduct.reviews || 24} reviews)
+                {activeProduct.rating || 5.0} ({activeProduct.reviews || 0} reviews)
               </span>
             </div>
 
@@ -320,64 +368,92 @@ const ProductDetails = () => {
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
               onClick={() => addToCart(activeProduct)}
-              className="cursor-pointer flex-1 bg-black text-white px-6 py-4 flex items-center justify-center gap-3 text-sm font-medium uppercase tracking-wider hover:bg-gray-800 transition-colors rounded-xl shadow-md"
+              className="flex-1 cursor-pointer py-4 px-6 bg-black hover:bg-gray-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
             >
               <ShoppingBag size={18} />
-              Add to Requests
+              Add to Cart
             </button>
 
             <button
               onClick={() => toggleFavorite(activeProduct)}
               className={`cursor-pointer p-4 rounded-xl border flex items-center justify-center transition-colors ${
                 isFav
-                  ? 'border-red-500 bg-red-50 text-red-500'
-                  : 'border-gray-300 text-gray-900 hover:border-black'
+                  ? 'border-red-200 bg-red-50 text-red-500'
+                  : 'border-gray-300 text-gray-700 hover:border-black'
               }`}
             >
               <Heart size={20} fill={isFav ? 'currentColor' : 'none'} />
             </button>
           </div>
-        </div>
-      </div>
 
-      {/* Specifications Section */}
-      <div className="mt-16 md:mt-24 border-t border-gray-100 pt-16">
-        <Specifications product={activeProduct} />
-      </div>
+          {/* Signed Download Mutation Button */}
+          {is3DProduct && (
+            <div className="p-4 bg-gray-50 border border-gray-200 rounded-2xl space-y-3">
+              <button
+                onClick={handleClaimSignedDownloadUrl}
+                disabled={isClaimingSignedUrl}
+                className="w-full py-3 bg-gray-900 hover:bg-black text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                <Download className="w-4 h-4 text-gray-300" />
+                <span>
+                  {isClaimingSignedUrl ? 'Generating Temporal Signed Link...' : 'Generate Temporal Signed Download Link'}
+                </span>
+              </button>
 
-      {/* Features Banner */}
-      <div className="mt-12 md:mt-20 border-t border-gray-100 py-12 md:py-16 bg-gray-50/50 rounded-3xl">
-        <div className="flex flex-col md:flex-row items-center justify-around gap-8 md:gap-4 px-4 md:px-8">
-          <div className="flex flex-col items-center text-center gap-3">
-            <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 border border-gray-100">
-              <Download size={22} />
+              {signedDownload && (
+                <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs space-y-2">
+                  <div className="flex items-center justify-between text-emerald-700 font-bold">
+                    <span className="flex items-center gap-1">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Temporal Signed Link Active
+                    </span>
+                    <span className="text-[10px] font-mono text-gray-500 flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> Expires in 15 mins
+                    </span>
+                  </div>
+                  <a
+                    href={signedDownload.downloadUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-center py-2 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors"
+                  >
+                    Download {selectedFormat} File Package
+                  </a>
+                </div>
+              )}
             </div>
-            <span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-gray-400">
-              Instant Digital Delivery ({formats.join('/')})
-            </span>
-          </div>
+          )}
 
-          <div className="hidden md:block h-12 w-px bg-gray-100"></div>
+          {/* Specifications Card */}
+          {is3DProduct && (
+            <div className="p-6 bg-gray-50 border border-gray-200 rounded-2xl space-y-4">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-900">
+                3D CAD Technical Specifications
+              </h4>
 
-          <div className="flex flex-col items-center text-center gap-3">
-            <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 border border-gray-100">
-              <ShieldCheck size={22} />
+              <div className="grid grid-cols-2 gap-4 text-xs font-mono">
+                <div>
+                  <span className="text-gray-400 block text-[10px]">Polygons</span>
+                  <span className="font-semibold text-gray-800">
+                    {(activeProduct.polyCount || 45000).toLocaleString()}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block text-[10px]">Vertices</span>
+                  <span className="font-semibold text-gray-800">
+                    {(activeProduct.vertexCount || 52000).toLocaleString()}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block text-[10px]">License</span>
+                  <span className="font-semibold text-gray-800">{activeProduct.license || 'Royalty-Free'}</span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block text-[10px]">Geometry Mesh</span>
+                  <span className="font-semibold text-gray-800">Watertight / Solid</span>
+                </div>
+              </div>
             </div>
-            <span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-gray-400">
-              Production-ready precision
-            </span>
-          </div>
-
-          <div className="hidden md:block h-12 w-px bg-gray-100"></div>
-
-          <div className="flex flex-col items-center text-center gap-3">
-            <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center text-gray-400 border border-gray-100">
-              <RotateCcw size={22} />
-            </div>
-            <span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-gray-400">
-              Includes 3 free design revisions
-            </span>
-          </div>
+          )}
         </div>
       </div>
 
@@ -390,69 +466,41 @@ const ProductDetails = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsFormatGuideOpen(false)}
-              className="fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm"
+              className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-lg bg-white z-[110] shadow-2xl rounded-2xl overflow-hidden flex flex-col max-h-[90vh] text-gray-900"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white z-50 shadow-2xl rounded-2xl p-6 space-y-4 text-gray-900"
             >
-              <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50 sticky top-0">
-                <span className="text-xl font-serif font-bold text-gray-900 flex items-center gap-2">
-                  <Info size={20} className="text-black" /> File Formats Guide
-                </span>
-                <button
-                  onClick={() => setIsFormatGuideOpen(false)}
-                  className="p-2 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
-                >
-                  <X size={20} className="text-gray-900" />
-                </button>
-              </div>
-
-              <div className="p-6 md:p-8 overflow-y-auto space-y-6">
+              <h3 className="text-lg font-bold border-b border-gray-100 pb-2">3D File Format Guide</h3>
+              <div className="space-y-3 text-xs text-gray-600">
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-1">STL (Stereolithography)</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    The industry standard for 3D printing. Represents the model surface using a mesh of triangles. Best for sending directly to your 3D printer or casting house.{' '}
-                    <span className="text-black font-semibold">Cannot be easily edited.</span>
-                  </p>
+                  <span className="font-bold text-gray-900 block">STL (Stereolithography)</span>
+                  <span>Triangle mesh file for direct 3D printing & SLA resin printers.</span>
                 </div>
-
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-1">3DM (Rhinoceros 3D)</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    The native file format for Rhino and Matrix/MatrixGold. Contains full NURBS geometry and is the best choice if your jeweler intends to{' '}
-                    <span className="text-black font-semibold">manipulate or edit the design</span> before printing.
-                  </p>
+                  <span className="font-bold text-gray-900 block">3DM (Rhinoceros 3D)</span>
+                  <span>NURBS surface file for MatrixGold & Rhino editing.</span>
                 </div>
-
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-1">OBJ (Wavefront)</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    A universally accepted format that supports polygonal geometry, commonly used in rendering software (like Blender or KeyShot) or animation pipelines.
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-1">STEP (Standard Exchange)</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    A highly accurate, cross-platform solid modeling format widely used in precision engineering. Retains mathematical accuracy of curves and surfaces.
-                  </p>
+                  <span className="font-bold text-gray-900 block">OBJ / GLB</span>
+                  <span>Open polygonal mesh formats for WebGL & AR inspection.</span>
                 </div>
               </div>
-
-              <div className="p-6 bg-gray-50 border-t border-gray-100 text-center sticky bottom-0">
-                <p className="text-xs text-gray-500 italic">
-                  Select <span className="font-bold text-black">STL</span> for direct 3D printing, or <span className="font-bold text-black">3DM</span> if your local jeweler needs to edit the design.
-                </p>
-              </div>
+              <button
+                onClick={() => setIsFormatGuideOpen(false)}
+                className="w-full py-2.5 bg-black text-white text-xs font-bold rounded-xl"
+              >
+                Close Guide
+              </button>
             </motion.div>
           </>
         )}
       </AnimatePresence>
 
-      {/* WebAR Trigger Modal */}
+      {/* WebAR Modal */}
       {is3DProduct && (
         <WebARModal
           isOpen={isWebAROpen}
