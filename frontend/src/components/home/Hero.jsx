@@ -30,13 +30,13 @@ const Hero = () => {
           </div>
 
           {/* Hero Title */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-extrabold text-gray-900 tracking-tight leading-tight">
+          <h1 className="hidden md:block text-4xl sm:text-5xl md:text-6xl font-serif font-extrabold text-gray-900 tracking-tight leading-tight">
             High-Precision CAD Models <br className="hidden sm:block" />
             & Jewelry 3D Asset Vault
           </h1>
 
           {/* Subtitle */}
-          <p className="text-gray-600 text-base md:text-lg leading-relaxed font-sans max-w-2xl">
+          <p className="hidden md:block text-gray-600 text-base md:text-lg leading-relaxed font-sans max-w-2xl">
             Browse production-ready 3D printing STL files, Rhinoceros 3DM designs, and WebGL inspectable models for master jewelers and manufacturers.
           </p>
 
