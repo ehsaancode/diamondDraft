@@ -270,9 +270,9 @@ const ProductDetails = () => {
             {/* Price */}
             <div className="mt-4 flex items-baseline gap-3">
               <span className="text-2xl md:text-3xl font-bold text-gray-900">
-                ${activeProduct.price}
+                ₹{Number(activeProduct.price || 0).toLocaleString('en-IN')}
               </span>
-              <span className="text-xs text-gray-400 font-medium">USD</span>
+              <span className="text-xs text-gray-400 font-medium font-mono">INR</span>
             </div>
           </div>
 
