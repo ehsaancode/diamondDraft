@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Home, ShoppingBag, Heart, User, Search, Check } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useFavorites } from '../../context/FavoriteContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MobileBottomNav = () => {
   const { setIsCartOpen, cartCount, activeProduct, addToCart, removeFromCart, cartItems } = useCart();
+  const { favorites } = useFavorites();
   const navigate = useNavigate();
   const [isJustRemoved, setIsJustRemoved] = useState(false);
+
+  const favoriteCount = Array.isArray(favorites) ? favorites.length : 0;
 
   useEffect(() => {
     setIsJustRemoved(false);
@@ -90,7 +94,7 @@ const MobileBottomNav = () => {
             <button
               onClick={() => {
                 addToCart(activeProduct.product, activeProduct.selectedFormat);
-                navigate('/cart');
+                setIsCartOpen(true);
               }}
               className="flex-1 h-12 bg-black text-white rounded-[30px] font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1 active:scale-95 transition-transform shadow-md cursor-pointer"
             >
@@ -113,13 +117,14 @@ const MobileBottomNav = () => {
               {({ isActive }) => <Search size={22} strokeWidth={isActive ? 2.5 : 2} />}
             </NavLink>
 
-            <NavLink to="/cart" className={({ isActive }) => `p-2 rounded-full transition-all duration-300 relative ${isActive ? 'bg-black text-white' : 'text-gray-400'}`}>
+            {/* Wishlist Heart Button in Mobile Bottom Dock */}
+            <NavLink to="/favorites" className={({ isActive }) => `p-2 rounded-full transition-all duration-300 relative ${isActive ? 'bg-black text-white' : 'text-gray-400'}`}>
               {({ isActive }) => (
                 <>
-                  <ShoppingBag size={22} strokeWidth={isActive ? 2.5 : 2} />
-                  {cartCount > 0 && (
-                    <span className={`absolute top-1 right-1 text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center border shadow-sm ${isActive ? 'bg-white text-black border-black' : 'bg-red-500 text-white border-white'}`}>
-                      {cartCount}
+                  <Heart size={22} strokeWidth={isActive ? 2.5 : 2} className={isActive ? 'fill-white' : ''} />
+                  {favoriteCount > 0 && (
+                    <span className={`absolute top-1 right-1 text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center border shadow-xs ${isActive ? 'bg-white text-black border-black' : 'bg-red-500 text-white border-white'}`}>
+                      {favoriteCount}
                     </span>
                   )}
                 </>

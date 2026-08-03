@@ -81,16 +81,16 @@ const Navbar = () => {
 
         {/* Right Actions Container */}
         <div className="flex items-center gap-3">
-          {/* Mobile View ONLY: Functioning Wishlist Heart Button */}
+          {/* Mobile View ONLY: Functioning Cart ShoppingBag Button */}
           <button
-            onClick={() => navigate('/favorites')}
-            title="Wishlist"
+            onClick={() => setIsCartOpen(true)}
+            title="Shopping Cart"
             className="md:hidden relative p-2 text-gray-800 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
           >
-            <Heart size={22} className={favoriteCount > 0 ? 'text-red-500 fill-red-500' : 'text-gray-800'} />
-            {favoriteCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
-                {favoriteCount}
+            <ShoppingBag size={22} className="text-gray-800" strokeWidth={1.5} />
+            {cartCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                {cartCount}
               </span>
             )}
           </button>
