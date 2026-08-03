@@ -139,7 +139,7 @@ const ProductDetails = () => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12 bg-white text-gray-900"
+      className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12 pb-32 md:pb-24 bg-white text-gray-900"
     >
       {/* Back Button */}
       <button

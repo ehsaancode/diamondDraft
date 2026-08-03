@@ -29,26 +29,29 @@ export const useProducts = () => {
 
             return {
               id: p._id || p.id || `PRD-${index + 1}`,
+              sku: p.sku || p._id || p.id,
               name: p.name,
               brand: p.category || 'Jewelry',
               category: p.category || 'Jewelry',
               subcategory: sub,
-              price: p.price,
-              rating: 5.0,
-              reviews: 0,
+              price: Number(p.price) || 0,
+              rating: p.rating !== undefined && p.rating !== null ? Number(p.rating) : 5.0,
+              reviews: p.reviews !== undefined && p.reviews !== null ? Number(p.reviews) : 0,
+              description: p.description || '',
               image:
                 p.images && p.images.length > 0
                   ? getImageUrl(p.images[0])
                   : p.image || '/images/jewellery_cad_ring.png',
               images: p.images ? p.images.map((img) => getImageUrl(img)) : (p.image ? [p.image] : []),
               tag: sub,
-              status: p.status,
+              status: p.status || 'Active',
               glbUrl: modelFileUrl ? getImageUrl(modelFileUrl) : null,
               modelUrl: modelFileUrl ? getImageUrl(modelFileUrl) : null,
+              usdzUrl: p.usdzUrl ? getImageUrl(p.usdzUrl) : null,
               is3D: has3D,
-              formats: p.formats || (has3D ? ['.fbx', '.obj', '.stl', '.blend', '.glb'] : []),
-              polyCount: p.polyCount || (has3D ? 24500 : 0),
-              vertexCount: p.vertexCount || (has3D ? 28000 : 0),
+              formats: p.formats || (has3D ? ['.FBX', '.OBJ', '.STL', '.GLB'] : ['STL', '3DM', 'OBJ']),
+              polyCount: Number(p.polyCount) || (has3D ? 45000 : 0),
+              vertexCount: Number(p.vertexCount) || (has3D ? 52000 : 0),
               license: p.license || 'Royalty-Free',
               modelType: p.modelType || 'diamond'
             };

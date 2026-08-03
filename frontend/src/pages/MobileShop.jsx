@@ -1,88 +1,60 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Search, Filter, X, Check, ChevronRight } from 'lucide-react';
+import { ChevronLeft, Search, Filter, X, ChevronRight } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useProducts } from '../hooks/useProducts';
-import { useCartStore } from '../store/useCartStore';
-import { useFavorites } from '../context/FavoriteContext';
+import { useSearch } from '../hooks/useSearch';
 import ProductCard from '../components/ui/ProductCard';
 
 const MobileShop = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { products, loading } = useProducts();
-  const addToCart = useCartStore((state) => state.addToCart);
-  const { isFavorite } = useFavorites();
 
-  const [selectedBrand, setSelectedBrand] = useState(location.state?.category || 'All');
-  const [selectedTag, setSelectedTag] = useState(location.state?.subcategory || 'All');
-  const [sortOrder, setSortOrder] = useState('default');
+  const queryCategory = location.state?.category || 'All';
+  const querySubcategory = location.state?.subcategory || 'All';
+  const initialQuery = location.state?.query || '';
+
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    selectedSubcategory,
+    setSelectedSubcategory,
+    sortOrder,
+    setSortOrder,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    categories,
+    subcategories,
+    filteredProducts,
+    paginatedProducts,
+    activeFilterCount,
+    clearFilters
+  } = useSearch(products, queryCategory, querySubcategory);
+
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 10;
 
-  // Handle state category changes when navigating from homepage
+  useEffect(() => {
+    if (initialQuery) {
+      setSearchQuery(initialQuery);
+    }
+  }, [initialQuery, setSearchQuery]);
+
   useEffect(() => {
     if (location.state?.category) {
-      setSelectedBrand(location.state.category);
+      setSelectedCategory(location.state.category);
     }
     if (location.state?.subcategory) {
-      setSelectedTag(location.state.subcategory);
+      setSelectedSubcategory(location.state.subcategory);
     }
-  }, [location.state]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedBrand, selectedTag, sortOrder]);
-
-  // Reset subcategory filter when category changes
-  useEffect(() => {
-    setSelectedTag('All');
-  }, [selectedBrand]);
-
-  const brands = ['All', ...new Set(products.map((p) => p.brand || p.category))];
-
-  // Filter subcategories list based on selected category
-  const tags = useMemo(() => {
-    let list = products;
-    if (selectedBrand !== 'All') {
-      list = list.filter((p) => (p.brand || p.category) === selectedBrand);
-    }
-    return ['All', ...new Set(list.map((p) => p.tag || p.subcategory).filter(Boolean))];
-  }, [products, selectedBrand]);
-
-  const filteredProducts = useMemo(() => {
-    let result = [...products];
-
-    if (selectedBrand !== 'All') {
-      result = result.filter((p) => (p.brand || p.category) === selectedBrand);
-    }
-
-    if (selectedTag !== 'All') {
-      result = result.filter((p) => (p.tag || p.subcategory) === selectedTag);
-    }
-
-    if (sortOrder === 'price-asc') {
-      result.sort((a, b) => a.price - b.price);
-    } else if (sortOrder === 'price-desc') {
-      result.sort((a, b) => b.price - a.price);
-    }
-
-    return result;
-  }, [products, selectedBrand, selectedTag, sortOrder]);
-
-  const activeFilterCount =
-    (selectedBrand !== 'All' ? 1 : 0) + (selectedTag !== 'All' ? 1 : 0) + (sortOrder !== 'default' ? 1 : 0);
-
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  }, [location.state, setSelectedCategory, setSelectedSubcategory]);
 
   return (
-    <div className="bg-[#f8f9fa] min-h-screen pb-32 font-sans overflow-x-hidden">
-      {/* Header */}
+    <div className="bg-[#f8f9fa] min-h-screen pb-36 font-sans overflow-x-hidden">
+      {/* Header Bar */}
       <div className="bg-white border-b border-gray-100/80 sticky top-0 z-40 px-4 py-4 flex flex-col gap-4 shadow-xs">
         <div className="flex items-center justify-between">
           <button
@@ -93,11 +65,23 @@ const MobileShop = () => {
           </button>
           <h1 className="text-lg font-bold text-gray-900 tracking-tight">CAD Gallery</h1>
           <button
-            onClick={() => navigate('/shop', { state: { focusSearch: true } })}
+            onClick={() => setIsFilterDrawerOpen(true)}
             className="w-10 h-10 flex items-center justify-center bg-white border border-gray-200 rounded-full shadow-xs active:scale-95 transition-transform"
           >
             <Search size={18} className="text-gray-800" />
           </button>
+        </div>
+
+        {/* Global Search Input Field */}
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by name, SKU, format (.stl, .3dm)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 pl-10 text-xs text-gray-900 focus:outline-none focus:border-black focus:bg-white transition-all font-medium"
+          />
+          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
         </div>
 
         {/* Global Category Filters Bar */}
@@ -119,34 +103,37 @@ const MobileShop = () => {
             )}
           </button>
 
-          {brands.map((brand) => (
+          {categories.map((category) => (
             <button
-              key={brand}
-              onClick={() => setSelectedBrand(brand)}
+              key={category}
+              onClick={() => {
+                setSelectedCategory(category);
+                setSelectedSubcategory('All');
+              }}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold shrink-0 transition-all border ${
-                selectedBrand === brand
+                selectedCategory === category
                   ? 'bg-black text-white border-black shadow-xs'
                   : 'bg-white text-gray-700 border-gray-200 shadow-xs'
               }`}
             >
-              {brand === 'All' ? 'All Items' : brand}
+              {category === 'All' ? 'All Items' : category}
             </button>
           ))}
         </div>
       </div>
 
       {/* Subcategory Pills */}
-      {tags.length > 1 && (
+      {subcategories.length > 1 && (
         <div className="px-4 py-3 bg-white/60 border-b border-gray-100 flex items-center gap-2 overflow-x-auto scrollbar-hide">
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider shrink-0 font-mono">
             Subcategory:
           </span>
-          {tags.map((t) => (
+          {subcategories.map((t) => (
             <button
               key={t}
-              onClick={() => setSelectedTag(t)}
+              onClick={() => setSelectedSubcategory(t)}
               className={`px-3 py-1 rounded-lg text-xs font-semibold shrink-0 transition-all ${
-                selectedTag === t ? 'bg-gray-900 text-white' : 'text-gray-600 hover:text-black'
+                selectedSubcategory === t ? 'bg-gray-900 text-white' : 'text-gray-600 hover:text-black'
               }`}
             >
               {t}
@@ -163,7 +150,7 @@ const MobileShop = () => {
               <div key={i} className="h-64 bg-gray-200/60 animate-pulse rounded-sm border border-gray-200" />
             ))}
           </div>
-        ) : paginatedProducts.length > 0 ? (
+        ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-2 gap-4">
             {paginatedProducts.map((product, index) => (
               <ProductCard key={product.id || product._id} product={product} index={index} />
@@ -171,12 +158,9 @@ const MobileShop = () => {
           </div>
         ) : (
           <div className="py-20 text-center bg-white border border-gray-200 rounded-2xl p-6 shadow-xs">
-            <p className="text-gray-500 mb-4 text-xs font-mono">No CAD models found in this category.</p>
+            <p className="text-gray-500 mb-4 text-xs font-mono">No CAD models found matching your search.</p>
             <button
-              onClick={() => {
-                setSelectedBrand('All');
-                setSelectedTag('All');
-              }}
+              onClick={clearFilters}
               className="text-xs font-bold text-black underline"
             >
               Clear Filters
@@ -186,7 +170,7 @@ const MobileShop = () => {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-8 bg-white rounded-full px-5 py-2.5 w-fit mx-auto border border-gray-200 shadow-xs">
+          <div className="flex justify-center items-center gap-2 mt-8 bg-white rounded-full px-5 py-2.5 w-fit mx-auto border border-gray-200 shadow-xs mb-8">
             <button
               onClick={() => {
                 setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -243,6 +227,18 @@ const MobileShop = () => {
                 </button>
               </div>
 
+              {/* Search input in modal */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Search Keyword</h4>
+                <input
+                  type="text"
+                  placeholder="Search name, SKU, format..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full text-xs bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 font-medium"
+                />
+              </div>
+
               {/* Sort Order */}
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Sort Order</h4>
@@ -251,9 +247,10 @@ const MobileShop = () => {
                   onChange={(e) => setSortOrder(e.target.value)}
                   className="w-full text-xs bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 font-medium"
                 >
-                  <option value="default font-medium">Featured</option>
-                  <option value="price-asc font-medium">Price: Low to High</option>
-                  <option value="price-desc font-medium">Price: High to Low</option>
+                  <option value="default">Featured</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="rating">Highest Rated</option>
                 </select>
               </div>
 
@@ -261,12 +258,15 @@ const MobileShop = () => {
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Category</h4>
                 <div className="flex flex-wrap gap-2">
-                  {brands.map((b) => (
+                  {categories.map((b) => (
                     <button
                       key={b}
-                      onClick={() => setSelectedBrand(b)}
+                      onClick={() => {
+                        setSelectedCategory(b);
+                        setSelectedSubcategory('All');
+                      }}
                       className={`px-3 py-2 rounded-xl text-xs font-bold border ${
-                        selectedBrand === b ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-700 border-gray-200'
+                        selectedCategory === b ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-700 border-gray-200'
                       }`}
                     >
                       {b}

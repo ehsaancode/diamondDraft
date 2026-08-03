@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, ShoppingBag, Eye, Layers } from 'lucide-react';
+import { Heart, ShoppingBag, Eye, Layers, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../store/useCartStore';
@@ -19,6 +19,9 @@ const ProductCard = ({ product, index }) => {
     (Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : null) ||
     product.thumbnail ||
     'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=60';
+
+  const rating = product.rating !== undefined && product.rating !== null ? Number(product.rating) : 5.0;
+  const reviews = product.reviews !== undefined && product.reviews !== null ? Number(product.reviews) : 0;
 
   return (
     <motion.div
@@ -69,7 +72,7 @@ const ProductCard = ({ product, index }) => {
       </div>
 
       {/* Details Section */}
-      <div className="p-5 flex-1 flex flex-col justify-between space-y-4 bg-white">
+      <div className="p-4 md:p-5 flex-1 flex flex-col justify-between space-y-4 bg-white">
         <div>
           <div className="flex items-center justify-between text-xs font-mono mb-1">
             {product.polyCount > 0 ? (
@@ -80,10 +83,15 @@ const ProductCard = ({ product, index }) => {
             ) : (
               <span className="text-gray-400">Standard Product</span>
             )}
-            <span className="text-gray-900 font-semibold">{product.category || 'Jewelry'}</span>
+            <div className="flex items-center gap-1">
+              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+              <span className="text-[11px] font-bold text-gray-700">
+                {rating.toFixed(1)} {reviews > 0 ? `(${reviews})` : ''}
+              </span>
+            </div>
           </div>
 
-          <h3 className="text-sm font-bold text-gray-900 group-hover:text-black transition-colors line-clamp-2">
+          <h3 className="text-xs md:text-sm font-bold text-gray-900 group-hover:text-black transition-colors line-clamp-2">
             {product.name}
           </h3>
         </div>
@@ -92,7 +100,9 @@ const ProductCard = ({ product, index }) => {
         <div className="flex items-center justify-between pt-3 border-t border-gray-100">
           <div>
             <span className="text-[10px] text-gray-400 block font-mono">Price</span>
-            <span className="text-base font-black text-gray-900">${product.price || 49}</span>
+            <span className="text-sm md:text-base font-black text-gray-900">
+              ₹{Number(product.price || 0).toLocaleString('en-IN')}
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -102,14 +112,14 @@ const ProductCard = ({ product, index }) => {
                 addToCart(product);
               }}
               title="Add to Cart"
-              className="p-2.5 rounded-sm bg-black hover:bg-gray-800 text-white transition-colors shadow-xs"
+              className="p-2 md:p-2.5 rounded-sm bg-black hover:bg-gray-800 text-white transition-colors shadow-xs"
             >
               <ShoppingBag className="w-4 h-4" />
             </button>
 
             <div
               title="View Product Details"
-              className="p-2.5 rounded-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+              className="p-2 md:p-2.5 rounded-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
             >
               <Eye className="w-4 h-4" />
             </div>
