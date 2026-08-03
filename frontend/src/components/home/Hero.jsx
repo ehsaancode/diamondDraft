@@ -91,7 +91,7 @@ const Hero = () => {
           </div>
 
           {/* Practical Highlights Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-10 border-t border-gray-200/80 w-full text-xs text-gray-600">
+          <div className="hidden sm:grid grid-cols-1 sm:grid-cols-3 gap-4 pt-10 border-t border-gray-200/80 w-full text-xs text-gray-600">
             <div className="flex items-center justify-center gap-2 bg-white p-3 rounded-xl border border-gray-100 shadow-xs">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span className="font-semibold text-gray-800">100% Watertight Mesh Files</span>
