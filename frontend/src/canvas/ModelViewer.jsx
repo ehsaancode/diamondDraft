@@ -190,7 +190,8 @@ export default function ModelViewer({ glbUrl, formats = [], className = 'h-[450p
   return (
     <div
       ref={containerRef}
-      className={`relative rounded-3xl overflow-hidden bg-slate-950 border border-slate-800 ${
+      style={{ touchAction: 'none' }}
+      className={`relative rounded-3xl overflow-hidden bg-slate-950 border border-slate-800 touch-none select-none ${
         isFullscreen ? 'w-screen h-screen rounded-none border-none z-50' : className
       }`}
     >
@@ -216,7 +217,19 @@ export default function ModelViewer({ glbUrl, formats = [], className = 'h-[450p
         </Center>
 
         <Environment preset={environment === 'studio' ? 'city' : environment} />
-        <OrbitControls makeDefault enablePan={true} enableZoom={true} minDistance={1.5} maxDistance={12} />
+        <OrbitControls
+          makeDefault
+          enablePan={true}
+          enableZoom={true}
+          minDistance={0.5}
+          maxDistance={50}
+          zoomSpeed={1.2}
+          rotateSpeed={0.8}
+          touches={{
+            ONE: THREE.TOUCH.ROTATE,
+            TWO: THREE.TOUCH.DOLLY_PAN
+          }}
+        />
       </Canvas>
 
       {/* Floating Viewport Toolbar Controls */}
