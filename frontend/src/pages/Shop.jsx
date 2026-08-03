@@ -167,8 +167,15 @@ const Shop = () => {
         {/* Product Grid */}
         <div className="flex-1 w-full space-y-6">
           <div className="flex justify-between items-center text-xs text-gray-500 font-mono">
-            <span>Showing {filteredProducts.length} Products</span>
-            {(selectedCategory !== 'All' || selectedSubcategory !== 'All' || searchQuery) && (
+            {loading ? (
+              <span className="flex items-center gap-2 text-gray-700 font-semibold">
+                <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                Loading Products...
+              </span>
+            ) : (
+              <span>Showing {filteredProducts.length} Products</span>
+            )}
+            {!loading && (selectedCategory !== 'All' || selectedSubcategory !== 'All' || searchQuery) && (
               <button
                 onClick={clearFilters}
                 className="text-black underline font-semibold hover:text-gray-700 cursor-pointer"

@@ -142,6 +142,18 @@ const MobileShop = () => {
         </div>
       )}
 
+      {/* Status Bar */}
+      <div className="px-4 pt-3 flex justify-between items-center text-xs text-gray-500 font-mono">
+        {loading ? (
+          <span className="flex items-center gap-2 text-gray-700 font-semibold">
+            <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+            Loading CAD Catalog...
+          </span>
+        ) : (
+          <span>Showing {filteredProducts.length} Items</span>
+        )}
+      </div>
+
       {/* Main Product Grid */}
       <div className="p-4">
         {loading ? (
