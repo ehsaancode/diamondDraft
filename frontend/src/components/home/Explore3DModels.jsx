@@ -13,25 +13,13 @@ export default function Explore3DModels() {
   return (
     <section className="py-16 px-4 max-w-7xl mx-auto w-full text-gray-900 bg-[#fafafa]">
       {/* Top Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-6 border-b border-gray-200">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">
-            <Sparkles className="w-4 h-4 text-gray-700" /> Featured Asset Collection
-          </div>
+      <div className="flex flex-col items-center text-center mb-10 pb-6 border-b border-gray-200">
+        <div className="flex flex-col items-center text-center max-w-xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-serif font-extrabold text-gray-900">Explore 3D Models</h2>
-          <p className="text-sm text-gray-500 mt-1 max-w-xl">
+          <p className="text-sm text-gray-500 mt-2">
             Browse production-ready CAD and 3D models with downloadable file formats.
           </p>
         </div>
-
-        {/* View All Products Button */}
-        <Link
-          to="/shop?category=3D+Models"
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-sm bg-black hover:bg-gray-800 text-white font-bold text-xs transition-all shadow-md shrink-0 uppercase tracking-wider"
-        >
-          <span>View All Products</span>
-          <ArrowRight className="w-4 h-4" />
-        </Link>
       </div>
 
       {/* 10 3D Products Grid */}
