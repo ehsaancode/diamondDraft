@@ -11,10 +11,10 @@ export default function Explore3DModels() {
   const displayProducts = Array.isArray(products) ? products.slice(0, 10) : [];
 
   return (
-    <section className="py-16 px-4 max-w-7xl mx-auto w-full text-gray-900 bg-[#fafafa]">
+    <section className="pt-8 pb-16 px-4 max-w-7xl mx-auto w-full text-gray-900 bg-[#fafafa]">
       {/* Top Header Section */}
-      <div className="flex flex-col items-center justify-center text-center w-full mb-10 pb-6 border-b border-gray-200">
-        <div className="flex flex-col items-center justify-center text-center max-w-xl mx-auto w-full my-auto">
+      <div className="flex flex-col items-center text-center w-full mb-10 pb-6 border-b border-gray-200">
+        <div className="flex flex-col items-center text-center max-w-xl mx-auto w-full">
           <h2 className="text-3xl md:text-4xl font-serif font-extrabold text-gray-900 leading-tight">Explore 3D Models</h2>
           <p className="text-sm text-gray-500 mt-2 leading-relaxed">
             Browse production-ready CAD and 3D models with downloadable file formats.
