@@ -1,71 +1,140 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Search, Menu, X, User } from 'lucide-react';
+import { ShoppingBag, Search, User, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { useFavorites } from '../../context/FavoriteContext';
 
 const Navbar = () => {
   const { cartCount, setIsCartOpen } = useCart();
+  const { favorites } = useFavorites();
   const { user, logout } = useAuth();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
+  const favoriteCount = Array.isArray(favorites) ? favorites.length : 0;
+
   const handleSearchClick = () => {
-    setIsMobileMenuOpen(false);
     navigate('/shop', { state: { focusSearch: true } });
   };
 
   return (
-    <>
-      <motion.header
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        className="sticky top-0 z-50 w-full bg-[#fafafa]/80 backdrop-blur-md transition-all"
-      >
-        <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full group">
+    <motion.header
+      initial={{ y: -50, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className="sticky top-0 z-50 w-full bg-[#fafafa]/90 backdrop-blur-md border-b border-gray-200/60 transition-all"
+    >
+      <nav className="flex items-center justify-between px-4 md:px-8 py-3.5 max-w-7xl mx-auto w-full">
+        {/* Brand Name Logo */}
+        <Link
+          to="/"
+          className="text-2xl font-serif font-extrabold tracking-wide text-gray-900 cursor-pointer hover:opacity-80 transition-opacity"
+        >
+          Gwel
+        </Link>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 -ml-2 text-gray-800 focus:outline-none"
-            onClick={() => setIsMobileMenuOpen(true)}
+        {/* Desktop Links */}
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `transition-colors pb-1 border-b-2 ${
+                isActive ? 'text-black border-black font-semibold' : 'text-gray-500 border-transparent hover:text-black'
+              }`
+            }
           >
-            <Menu size={24} />
+            Home
+          </NavLink>
+          <NavLink
+            to="/shop"
+            className={({ isActive }) =>
+              `transition-colors pb-1 border-b-2 ${
+                isActive ? 'text-black border-black font-semibold' : 'text-gray-500 border-transparent hover:text-black'
+              }`
+            }
+          >
+            CAD Library
+          </NavLink>
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              `transition-colors pb-1 border-b-2 ${
+                isActive ? 'text-black border-black font-semibold' : 'text-gray-500 border-transparent hover:text-black'
+              }`
+            }
+          >
+            About
+          </NavLink>
+          <NavLink
+            to="/contact"
+            className={({ isActive }) =>
+              `transition-colors pb-1 border-b-2 ${
+                isActive ? 'text-black border-black font-semibold' : 'text-gray-500 border-transparent hover:text-black'
+              }`
+            }
+          >
+            Contact
+          </NavLink>
+        </div>
+
+        {/* Right Actions Container */}
+        <div className="flex items-center gap-3">
+          {/* Mobile View ONLY: Functioning Wishlist Heart Button */}
+          <button
+            onClick={() => navigate('/favorites')}
+            title="Wishlist"
+            className="md:hidden relative p-2 text-gray-800 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+          >
+            <Heart size={22} className={favoriteCount > 0 ? 'text-red-500 fill-red-500' : 'text-gray-800'} />
+            {favoriteCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                {favoriteCount}
+              </span>
+            )}
           </button>
 
-          <Link to="/" className="text-2xl font-serif font-semibold tracking-wide cursor-pointer hover:opacity-80 transition-opacity">
-            Gwel
-          </Link>
+          {/* Desktop View ONLY: Full Cart, Search, Wishlist & Profile Header Actions */}
+          <div className="hidden md:flex items-center gap-3">
+            {/* Wishlist Icon */}
+            <button
+              onClick={() => navigate('/favorites')}
+              title="Wishlist"
+              className="relative p-2 text-gray-800 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+            >
+              <Heart size={20} className={favoriteCount > 0 ? 'text-red-500 fill-red-500' : 'text-gray-800'} strokeWidth={1.5} />
+              {favoriteCount > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {favoriteCount}
+                </span>
+              )}
+            </button>
 
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
-            <NavLink to="/" className={({ isActive }) => `transition-colors pb-1 border-b-2 ${isActive ? 'text-black border-black' : 'text-gray-500 border-transparent hover:text-black'}`}>Home</NavLink>
-            <NavLink to="/shop" className={({ isActive }) => `transition-colors pb-1 border-b-2 ${isActive ? 'text-black border-black' : 'text-gray-500 border-transparent hover:text-black'}`}>CAD Library</NavLink>
-            <NavLink to="/about" className={({ isActive }) => `transition-colors pb-1 border-b-2 ${isActive ? 'text-black border-black' : 'text-gray-500 border-transparent hover:text-black'}`}>About</NavLink>
-            <NavLink to="/contact" className={({ isActive }) => `transition-colors pb-1 border-b-2 ${isActive ? 'text-black border-black' : 'text-gray-500 border-transparent hover:text-black'}`}>Contact</NavLink>
-          </div>
-
-          <div className="flex items-center gap-4">
+            {/* Cart Icon */}
             <button
               onClick={() => setIsCartOpen(true)}
+              title="Shopping Cart"
               className="relative p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
             >
               <ShoppingBag size={20} className="text-gray-800" strokeWidth={1.5} />
               {cartCount > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="absolute top-0 right-0 bg-black text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
             </button>
+
+            {/* Search Icon */}
             <button
               onClick={handleSearchClick}
+              title="Search"
               className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
             >
               <Search size={20} className="text-gray-800" strokeWidth={1.5} />
             </button>
 
-            {/* User profile dropdown */}
+            {/* User Profile */}
             {user ? (
               <div className="relative">
                 <button
@@ -81,9 +150,9 @@ const Navbar = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 z-50 overflow-hidden"
+                      className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-2xl shadow-xl py-2 z-50 overflow-hidden"
                     >
-                      <div className="px-4 py-2 border-b border-gray-50">
+                      <div className="px-4 py-2 border-b border-gray-100">
                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Account</p>
                         <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
                       </div>
@@ -109,50 +178,16 @@ const Navbar = () => {
             ) : (
               <Link
                 to="/login"
+                title="Account Login"
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer flex items-center justify-center"
               >
                 <User size={20} className="text-gray-800" strokeWidth={1.5} />
               </Link>
             )}
           </div>
-        </nav>
-      </motion.header>
-
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/50 z-[60] md:hidden"
-            />
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'tween', duration: 0.3 }}
-              className="fixed top-0 left-0 h-full w-4/5 max-w-sm bg-white z-[70] shadow-2xl flex flex-col md:hidden"
-            >
-              <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                <span className="text-xl font-serif font-bold">Menu</span>
-                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                  <X size={24} className="text-gray-900" />
-                </button>
-              </div>
-              <div className="flex flex-col p-6 gap-6 text-lg font-medium">
-                <NavLink to="/" onClick={() => setIsMobileMenuOpen(false)} className={({ isActive }) => `pb-2 border-b ${isActive ? 'text-black border-black' : 'text-gray-500 border-gray-100'}`}>Home</NavLink>
-                <NavLink to="/shop" onClick={() => setIsMobileMenuOpen(false)} className={({ isActive }) => `pb-2 border-b ${isActive ? 'text-black border-black' : 'text-gray-500 border-gray-100'}`}>CAD Library</NavLink>
-                <NavLink to="/about" onClick={() => setIsMobileMenuOpen(false)} className={({ isActive }) => `pb-2 border-b ${isActive ? 'text-black border-black' : 'text-gray-500 border-gray-100'}`}>About</NavLink>
-                <NavLink to="/contact" onClick={() => setIsMobileMenuOpen(false)} className={({ isActive }) => `pb-2 border-b ${isActive ? 'text-black border-black' : 'text-gray-500 border-gray-100'}`}>Contact</NavLink>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </>
+        </div>
+      </nav>
+    </motion.header>
   );
 };
 
