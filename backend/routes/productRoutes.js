@@ -54,14 +54,13 @@ const uploadFile = async (req, file, folderName) => {
   return `${req.protocol}://${req.get('host')}/uploads/${folderName}/${localFileName}`;
 };
 
-// POST: Create Product with Images, Video, 3D Model File, and Template Image
+// POST: Create Product with Images, Video, and 3D Model File
 router.post(
   '/',
   upload.fields([
     { name: 'images', maxCount: 5 },
     { name: 'video', maxCount: 1 },
-    { name: 'modelFile', maxCount: 1 },
-    { name: 'templateImage', maxCount: 1 }
+    { name: 'modelFile', maxCount: 1 }
   ]),
   async (req, res) => {
     try {
@@ -100,12 +99,6 @@ router.post(
         glbUrl = await uploadFile(req, req.files.modelFile[0], 'models');
       }
 
-      // Upload Template Image (Product Card Image)
-      let templateImageUrl = null;
-      if (req.files?.templateImage && req.files.templateImage.length > 0) {
-        templateImageUrl = await uploadFile(req, req.files.templateImage[0], 'templateImages');
-      }
-
       let parsedFormats = ['.blend', '.fbx', '.obj', '.stl', '.glb'];
       if (formats) {
         try {
@@ -114,9 +107,6 @@ router.post(
           parsedFormats = Array.isArray(formats) ? formats : [formats];
         }
       }
-
-      const primaryImage = templateImageUrl || (imageUrls.length > 0 ? imageUrls[0] : null);
-      const combinedImages = templateImageUrl ? [templateImageUrl, ...imageUrls] : imageUrls;
 
       const newProduct = {
         name,
@@ -127,9 +117,8 @@ router.post(
         quantity: Number(quantity),
         category: category || '3D Models',
         subcategory: subcategory || '',
-        templateImage: templateImageUrl,
-        images: combinedImages,
-        image: primaryImage,
+        images: imageUrls,
+        image: imageUrls.length > 0 ? imageUrls[0] : null,
         video: videoUrl,
         glbUrl: glbUrl,
         modelUrl: glbUrl,
@@ -179,8 +168,7 @@ router.put(
   upload.fields([
     { name: 'images', maxCount: 5 },
     { name: 'video', maxCount: 1 },
-    { name: 'modelFile', maxCount: 1 },
-    { name: 'templateImage', maxCount: 1 }
+    { name: 'modelFile', maxCount: 1 }
   ]),
   async (req, res) => {
     try {
@@ -205,16 +193,6 @@ router.put(
       }
       if (parsedFormats !== undefined) {
         updateData.formats = parsedFormats;
-      }
-
-      // Handle template image
-      if (req.files?.templateImage && req.files.templateImage.length > 0) {
-        if (product.templateImage) {
-          await deleteFile(product.templateImage);
-        }
-        const newTemplateUrl = await uploadFile(req, req.files.templateImage[0], 'templateImages');
-        updateData.templateImage = newTemplateUrl;
-        updateData.image = newTemplateUrl;
       }
 
       // Handle images
@@ -337,9 +315,6 @@ router.delete('/:id', async (req, res) => {
 
     const product = doc.data();
 
-    if (product.templateImage) {
-      await deleteFile(product.templateImage);
-    }
     if (product.images && product.images.length > 0) {
       for (const imgUrl of product.images) {
         await deleteFile(imgUrl);

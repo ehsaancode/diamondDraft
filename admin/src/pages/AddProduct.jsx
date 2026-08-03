@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown, Image as ImageIcon, Video as VideoIcon, Box as BoxIcon, X, FileCheck, Sparkles } from 'lucide-react';
+import { ChevronDown, Image as ImageIcon, Video as VideoIcon, Box as BoxIcon, X, FileCheck } from 'lucide-react';
 import { Check } from '../components/icons/Check';
 import axios from 'axios';
 import { Modal } from '../components/common/Modal';
@@ -33,11 +33,9 @@ export const AddProduct = () => {
   const [images, setImages] = useState([]);
   const [video, setVideo] = useState(null);
   const [modelFile, setModelFile] = useState(null);
-  const [templateImage, setTemplateImage] = useState(null);
 
   const [imagePreviews, setImagePreviews] = useState([]);
   const [videoPreview, setVideoPreview] = useState(null);
-  const [templateImagePreview, setTemplateImagePreview] = useState(null);
 
   useEffect(() => {
     if (images.length === 0) {
@@ -58,16 +56,6 @@ export const AddProduct = () => {
     setVideoPreview(url);
     return () => URL.revokeObjectURL(url);
   }, [video]);
-
-  useEffect(() => {
-    if (!templateImage) {
-      setTemplateImagePreview(null);
-      return;
-    }
-    const url = URL.createObjectURL(templateImage);
-    setTemplateImagePreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [templateImage]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -94,7 +82,6 @@ export const AddProduct = () => {
       Array.from(images).forEach(image => data.append('images', image));
       if (video) data.append('video', video);
       if (modelFile) data.append('modelFile', modelFile);
-      if (templateImage) data.append('templateImage', templateImage);
 
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       await axios.post(`${apiUrl}/api/products`, data, {
@@ -103,7 +90,7 @@ export const AddProduct = () => {
       setModal({
         show: true,
         title: 'Success!',
-        message: '3D Product listing & template image created and published successfully.',
+        message: '3D Product listing has been created and published to the live catalog successfully.',
         type: 'success',
         actionLabel: 'Great'
       });
@@ -114,7 +101,6 @@ export const AddProduct = () => {
       setImages([]);
       setVideo(null);
       setModelFile(null);
-      setTemplateImage(null);
     } catch (err) {
       console.error(err);
       setModal({
@@ -133,7 +119,7 @@ export const AddProduct = () => {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="max-w-4xl mx-auto space-y-8">
       <div>
         <h2 className="text-3xl font-bold font-grotesk tracking-tight">Add New 3D Product</h2>
-        <p className="text-zinc-400 mt-1">Upload 3D model files (.glb, .gltf, .fbx, .obj, .stl, .zip), template card image, and specs.</p>
+        <p className="text-zinc-400 mt-1">Upload 3D model files (.glb, .gltf, .fbx, .obj, .stl, .zip), images, and technical specifications.</p>
       </div>
 
       <div className="glass-panel p-6 md:p-8">
@@ -162,17 +148,17 @@ export const AddProduct = () => {
             <div className="space-y-4 p-6 rounded-xl bg-surfaceHover/50 border border-border relative overflow-hidden">
               <h3 className="text-lg font-semibold text-zinc-100 border-b border-border pb-2 relative z-10">Pricing & License</h3>
               <div className="relative z-10">
-                <label className="block text-sm font-medium text-zinc-300 mb-2">Price ($ USD)</label>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Price (₹ INR)</label>
                 <div className="relative text-zinc-400 focus-within:text-primary-500 transition-colors">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2">$</span>
-                  <input type="number" name="price" required value={formData.price} onChange={handleInputChange} className="input-field pl-8" placeholder="49" />
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2">₹</span>
+                  <input type="number" name="price" required value={formData.price} onChange={handleInputChange} className="input-field pl-8" placeholder="4999" />
                 </div>
               </div>
               <div className="relative z-10">
-                <label className="block text-sm font-medium text-zinc-300 mb-2">Compare at Price ($ USD) - Optional</label>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Compare at Price (₹ INR) - Optional</label>
                 <div className="relative text-zinc-400 focus-within:text-zinc-300 transition-colors">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2">$</span>
-                  <input type="number" name="compareAtPrice" value={formData.compareAtPrice} onChange={handleInputChange} className="input-field pl-8" placeholder="89" />
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2">₹</span>
+                  <input type="number" name="compareAtPrice" value={formData.compareAtPrice} onChange={handleInputChange} className="input-field pl-8" placeholder="8999" />
                 </div>
               </div>
               <div>
@@ -254,7 +240,7 @@ export const AddProduct = () => {
           <div className="space-y-4 p-6 rounded-xl bg-surfaceHover/50 border border-cyan-500/30">
             <h3 className="text-lg font-semibold text-cyan-400 border-b border-border pb-2 flex items-center gap-2">
               <BoxIcon size={20} />
-              <span>1. 3D Model File Upload (.glb, .gltf, .fbx, .obj, .stl, .zip)</span>
+              <span>3D Model File Upload (.glb, .gltf, .fbx, .obj, .stl, .zip)</span>
             </h3>
 
             <label className="relative border-2 border-dashed border-cyan-500/40 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-cyan-400 hover:bg-cyan-500/5 transition-all cursor-pointer group min-h-[160px]">
@@ -300,63 +286,9 @@ export const AddProduct = () => {
             </label>
           </div>
 
-          {/* Conditional Option 2: Upload Template Image when 3D file attached */}
-          {(modelFile || formData.category === '3D Models') && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-4 p-6 rounded-xl bg-amber-500/5 border border-amber-500/30">
-              <h3 className="text-lg font-semibold text-amber-400 border-b border-amber-500/20 pb-2 flex items-center gap-2">
-                <Sparkles size={20} />
-                <span>2. Template Image Upload (Product Card Preview for Homepage)</span>
-              </h3>
-              <p className="text-xs text-zinc-400">
-                Upload a template/thumbnail image that will be rendered on the product cards in the homepage & catalog for this 3D product. Supports any image format (PNG, JPG, WEBP, GIF, SVG).
-              </p>
-
-              <label className="relative border-2 border-dashed border-amber-500/40 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-amber-400 hover:bg-amber-500/10 transition-all cursor-pointer group min-h-[160px]">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      setTemplateImage(e.target.files[0]);
-                    }
-                  }}
-                  className="hidden"
-                />
-                {templateImagePreview ? (
-                  <div className="w-full space-y-3 pointer-events-auto">
-                    <div className="relative max-w-xs mx-auto aspect-square rounded-xl overflow-hidden border-2 border-amber-400 shadow-md bg-black/60 group/template">
-                      <img src={templateImagePreview} alt="Template Preview" className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setTemplateImage(null);
-                        }}
-                        className="absolute top-2 right-2 p-1 bg-black/70 hover:bg-red-500 text-white rounded-full transition-colors"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                    <p className="text-xs text-amber-300 font-medium">{templateImage.name}</p>
-                    <p className="text-[10px] text-zinc-400">Click anywhere else to replace template image</p>
-                  </div>
-                ) : (
-                  <>
-                    <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                      <ImageIcon size={24} className="text-amber-400" />
-                    </div>
-                    <p className="text-sm font-bold text-white mb-1">Upload Template Image for Product Card</p>
-                    <p className="text-xs text-zinc-400">Any image format supported (.png, .jpg, .webp, .svg, .gif)</p>
-                  </>
-                )}
-              </label>
-            </motion.div>
-          )}
-
-          {/* Media (Additional Gallery Images & Video) */}
+          {/* Media (Images & Video) */}
           <div className="space-y-4 p-6 rounded-xl bg-surfaceHover/50 border border-border">
-            <h3 className="text-lg font-semibold text-zinc-100 border-b border-border pb-2">Additional Media & Gallery Images</h3>
+            <h3 className="text-lg font-semibold text-zinc-100 border-b border-border pb-2">Product Preview Media</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <label className="relative border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-primary-500/50 hover:bg-primary-500/5 transition-all cursor-pointer group min-h-[180px]">
                 <input type="file" multiple accept="image/*" onChange={(e) => setImages(Array.from(e.target.files))} className="hidden" />
@@ -390,7 +322,7 @@ export const AddProduct = () => {
                     <div className="w-12 h-12 rounded-full bg-surfaceHover border border-border flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
                       <ImageIcon size={24} className="text-zinc-400 group-hover:text-primary-500 transition-colors" />
                     </div>
-                    <p className="text-sm font-semibold text-zinc-100 mb-1">Upload Additional Gallery Images</p>
+                    <p className="text-sm font-semibold text-zinc-100 mb-1">Click to upload Images</p>
                     <p className="text-xs text-zinc-500">PNG, JPG, WEBP (max 10MB)</p>
                   </>
                 )}

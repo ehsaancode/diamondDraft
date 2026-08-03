@@ -62,12 +62,6 @@ const ProductDetails = () => {
         const modelFileUrl = p.glbUrl || p.modelUrl || null;
         const is3DAsset = !!modelFileUrl || p.category === '3D Models';
 
-        const templateImgUrl = p.templateImage ? getImageUrl(p.templateImage) : null;
-        let allImages = p.images ? p.images.map((img) => getImageUrl(img)) : (p.image ? [getImageUrl(p.image)] : []);
-        if (templateImgUrl && !allImages.includes(templateImgUrl)) {
-          allImages = [templateImgUrl, ...allImages];
-        }
-
         const mappedProduct = {
           id: p._id || p.id || id,
           sku: p.sku || p._id || id,
@@ -79,9 +73,8 @@ const ProductDetails = () => {
           rating: 5.0,
           reviews: 0,
           description: p.description,
-          templateImage: templateImgUrl,
-          image: templateImgUrl || (allImages.length > 0 ? allImages[0] : '/images/jewellery_cad_ring.png'),
-          images: allImages,
+          image: p.images && p.images.length > 0 ? getImageUrl(p.images[0]) : p.image || '/images/jewellery_cad_ring.png',
+          images: p.images ? p.images.map((img) => getImageUrl(img)) : (p.image ? [p.image] : []),
           tag: sub,
           status: p.status,
           glbUrl: modelFileUrl ? getImageUrl(modelFileUrl) : null,
@@ -113,9 +106,6 @@ const ProductDetails = () => {
   useEffect(() => {
     if (product) {
       setMainImage(product.image);
-      if (product.glbUrl) {
-        setActiveTab('3d');
-      }
     }
   }, [product]);
 
@@ -168,16 +158,6 @@ const ProductDetails = () => {
           {is3DProduct && (
             <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-xl w-fit mb-2">
               <button
-                onClick={() => setActiveTab('3d')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  activeTab === '3d'
-                    ? 'bg-black text-white shadow-sm'
-                    : 'text-gray-600 hover:text-black'
-                }`}
-              >
-                Interactive 3D View
-              </button>
-              <button
                 onClick={() => setActiveTab('image')}
                 className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   activeTab === 'image'
@@ -186,6 +166,16 @@ const ProductDetails = () => {
                 }`}
               >
                 Media Images ({gallery.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('3d')}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  activeTab === '3d'
+                    ? 'bg-black text-white shadow-sm'
+                    : 'text-gray-600 hover:text-black'
+                }`}
+              >
+                Interactive 3D View
               </button>
             </div>
           )}

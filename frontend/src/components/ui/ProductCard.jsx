@@ -15,7 +15,6 @@ const ProductCard = ({ product, index }) => {
   const formats = product.formats || [];
 
   const productImage =
-    product.templateImage ||
     product.image ||
     (Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : null) ||
     product.thumbnail ||
