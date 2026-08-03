@@ -1,13 +1,15 @@
 import React from 'react';
-import { Heart, ShoppingBag, Eye, Layers, Star, Image as ImageIcon } from 'lucide-react';
+import { Heart, ShoppingBag, Layers, Star, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../store/useCartStore';
+import { useCart } from '../../context/CartContext';
 import { useFavorites } from '../../context/FavoriteContext';
 
 const ProductCard = ({ product, index }) => {
   const navigate = useNavigate();
-  const addToCart = useCartStore((state) => state.addToCart);
+  const addToCartStore = useCartStore((state) => state.addToCart);
+  const cartContext = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const productId = product.id || product._id || 'MD-3001';
@@ -22,6 +24,15 @@ const ProductCard = ({ product, index }) => {
 
   const rating = product.rating !== undefined && product.rating !== null ? Number(product.rating) : 5.0;
   const reviews = product.reviews !== undefined && product.reviews !== null ? Number(product.reviews) : 0;
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    if (addToCartStore) addToCartStore(product);
+    if (cartContext && cartContext.addToCart) {
+      cartContext.addToCart(product, formats[0] || 'STL');
+      if (cartContext.setIsCartOpen) cartContext.setIsCartOpen(true);
+    }
+  };
 
   return (
     <motion.div
@@ -112,25 +123,14 @@ const ProductCard = ({ product, index }) => {
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCart(product);
-              }}
-              title="Add to Cart"
-              className="p-2 md:p-2.5 rounded-sm bg-black hover:bg-gray-800 text-white transition-colors shadow-xs"
-            >
-              <ShoppingBag className="w-4 h-4" />
-            </button>
-
-            <div
-              title="View Product Details"
-              className="p-2 md:p-2.5 rounded-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
-            >
-              <Eye className="w-4 h-4" />
-            </div>
-          </div>
+          <button
+            onClick={handleAddToCart}
+            title="Add to Cart"
+            className="px-3 py-2 rounded-sm bg-black hover:bg-gray-800 text-white transition-all shadow-xs flex items-center gap-1.5 font-bold text-xs"
+          >
+            <ShoppingBag className="w-4 h-4" />
+            <span>Add</span>
+          </button>
         </div>
       </div>
     </motion.div>
