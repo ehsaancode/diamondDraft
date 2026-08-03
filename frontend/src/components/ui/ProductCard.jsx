@@ -126,10 +126,9 @@ const ProductCard = ({ product, index }) => {
           <button
             onClick={handleAddToCart}
             title="Add to Cart"
-            className="px-3 py-2 rounded-sm bg-black hover:bg-gray-800 text-white transition-all shadow-xs flex items-center gap-1.5 font-bold text-xs"
+            className="p-2 md:p-2.5 rounded-sm bg-black hover:bg-gray-800 text-white transition-all shadow-xs flex items-center justify-center cursor-pointer"
           >
             <ShoppingBag className="w-4 h-4" />
-            <span>Add</span>
           </button>
         </div>
       </div>
