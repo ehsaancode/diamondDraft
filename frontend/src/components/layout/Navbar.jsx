@@ -35,7 +35,7 @@ const Navbar = () => {
             <Menu size={24} />
           </button>
 
-          <Link to="/" className="text-2xl font-serif font-bold tracking-tight text-gray-900 cursor-pointer hover:opacity-80 transition-opacity">
+          <Link to="/" className="text-2xl font-serif font-semibold tracking-wide cursor-pointer hover:opacity-80 transition-opacity">
             Gwel
           </Link>
 
@@ -137,7 +137,7 @@ const Navbar = () => {
               className="fixed top-0 left-0 h-full w-4/5 max-w-sm bg-white z-[70] shadow-2xl flex flex-col md:hidden"
             >
               <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                <span className="text-xl font-serif font-bold text-gray-900">Gwel</span>
+                <span className="text-xl font-serif font-bold">Menu</span>
                 <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                   <X size={24} className="text-gray-900" />
                 </button>

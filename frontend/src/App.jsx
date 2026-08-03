@@ -25,8 +25,8 @@ const AppContent = () => {
 
   return (
     <div className="antialiased text-gray-900 min-h-screen bg-[#fafafa] flex flex-col">
-      {!isMobile && <Navbar />}
-      {!isMobile && <CartDrawer />}
+      <Navbar />
+      <CartDrawer />
       <div className="flex-1 w-full relative">
         <Routes>
           <Route path="/" element={<Home />} />
