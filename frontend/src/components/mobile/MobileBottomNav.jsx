@@ -6,7 +6,7 @@ import { useFavorites } from '../../context/FavoriteContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MobileBottomNav = () => {
-  const { setIsCartOpen, cartCount, activeProduct, addToCart, removeFromCart, cartItems } = useCart();
+  const { isCartOpen, setIsCartOpen, cartCount, activeProduct, addToCart, removeFromCart, cartItems } = useCart();
   const { favorites } = useFavorites();
   const navigate = useNavigate();
   const [isJustRemoved, setIsJustRemoved] = useState(false);
@@ -16,6 +16,11 @@ const MobileBottomNav = () => {
   useEffect(() => {
     setIsJustRemoved(false);
   }, [activeProduct]);
+
+  // Smoothly hide dock when cart overlay is open
+  if (isCartOpen) {
+    return null;
+  }
 
   const isAlreadyInCart = activeProduct && cartItems.some(item => 
     item.id === activeProduct.product.id && item.size === activeProduct.selectedFormat
@@ -38,6 +43,9 @@ const MobileBottomNav = () => {
   return (
     <motion.div 
       layout
+      initial={{ y: 50, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 50, opacity: 0 }}
       transition={{ type: 'spring', stiffness: 350, damping: 30 }}
       className={`fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] bg-white border border-gray-100/80 shadow-[0_16px_36px_rgba(0,0,0,0.12)] rounded-[40px] z-50 flex items-center transition-all ${
         activeProduct ? 'p-2' : 'px-6 py-4 justify-between'
