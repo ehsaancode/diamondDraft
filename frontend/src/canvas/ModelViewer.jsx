@@ -195,8 +195,15 @@ export default function ModelViewer({ glbUrl, formats = [], className = 'h-[450p
       }`}
     >
       <Canvas
+        eventSource={containerRef}
+        eventPrefix="client"
         shadows={{ type: THREE.PCFShadowMap }}
-        gl={{ preserveDrawingBuffer: true, powerPreference: 'high-performance' }}
+        gl={{ preserveDrawingBuffer: true, powerPreference: 'high-performance', antialias: true, failIfMajorPerformanceCaveat: false }}
+        onCreated={({ gl }) => {
+          if (gl && gl.domElement) {
+            gl.domElement.addEventListener('webglcontextlost', (e) => e.preventDefault(), false);
+          }
+        }}
         camera={{ position: [0, 0, 5], fov: 45 }}
       >
         <color attach="background" args={['#090d16']} />
