@@ -17,7 +17,6 @@ const MobileBottomNav = () => {
     setIsJustRemoved(false);
   }, [activeProduct]);
 
-  // Smoothly hide dock when cart overlay is open
   if (isCartOpen) {
     return null;
   }
@@ -91,7 +90,7 @@ const MobileBottomNav = () => {
                     animate={{ scale: 1 }}
                     className="flex items-center gap-1.5"
                   >
-                    <Check size={14} strokeWidth={3} />
+                    <Check size={14} strokeWidth={3} className="animate-bounce" />
                     <span>Added</span>
                   </motion.div>
                 ) : (
@@ -119,28 +118,45 @@ const MobileBottomNav = () => {
             className="flex items-center justify-between w-full"
           >
             <NavLink to="/" className={({ isActive }) => `p-2 rounded-full transition-all duration-300 ${isActive ? 'bg-black text-white' : 'text-gray-400'}`}>
-              {({ isActive }) => <Home size={22} strokeWidth={isActive ? 2.5 : 2} />}
+              {({ isActive }) => (
+                <motion.div whileHover={{ scale: 1.25 }} whileTap={{ scale: 0.85 }}>
+                  <Home size={22} strokeWidth={isActive ? 2.5 : 2} />
+                </motion.div>
+              )}
             </NavLink>
+
             <NavLink to="/search" className={({ isActive }) => `p-2 rounded-full transition-all duration-300 ${isActive ? 'bg-black text-white' : 'text-gray-400'}`}>
-              {({ isActive }) => <Search size={22} strokeWidth={isActive ? 2.5 : 2} />}
+              {({ isActive }) => (
+                <motion.div whileHover={{ scale: 1.25, rotate: 15 }} whileTap={{ scale: 0.85 }}>
+                  <Search size={22} strokeWidth={isActive ? 2.5 : 2} />
+                </motion.div>
+              )}
             </NavLink>
 
             {/* Wishlist Heart Button in Mobile Bottom Dock */}
             <NavLink to="/favorites" className={({ isActive }) => `p-2 rounded-full transition-all duration-300 relative ${isActive ? 'bg-black text-white' : 'text-gray-400'}`}>
               {({ isActive }) => (
-                <>
+                <motion.div whileHover={{ scale: 1.25, rotate: -10 }} whileTap={{ scale: 0.85 }}>
                   <Heart size={22} strokeWidth={isActive ? 2.5 : 2} className={isActive ? 'fill-white' : ''} />
                   {favoriteCount > 0 && (
-                    <span className={`absolute top-1 right-1 text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center border shadow-xs ${isActive ? 'bg-white text-black border-black' : 'bg-red-500 text-white border-white'}`}>
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className={`absolute top-1 right-1 text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center border shadow-xs ${isActive ? 'bg-white text-black border-black' : 'bg-red-500 text-white border-white'}`}
+                    >
                       {favoriteCount}
-                    </span>
+                    </motion.span>
                   )}
-                </>
+                </motion.div>
               )}
             </NavLink>
 
             <NavLink to="/profile" className={({ isActive }) => `p-2 rounded-full transition-all duration-300 ${isActive ? 'bg-black text-white' : 'text-gray-400'}`}>
-              {({ isActive }) => <User size={22} strokeWidth={isActive ? 2.5 : 2} />}
+              {({ isActive }) => (
+                <motion.div whileHover={{ scale: 1.25 }} whileTap={{ scale: 0.85 }}>
+                  <User size={22} strokeWidth={isActive ? 2.5 : 2} />
+                </motion.div>
+              )}
             </NavLink>
           </motion.div>
         )}

@@ -81,69 +81,91 @@ const Navbar = () => {
 
         {/* Right Actions Container */}
         <div className="flex items-center gap-3">
-          {/* Mobile View ONLY: Functioning Cart ShoppingBag Button */}
-          <button
+          {/* Mobile View ONLY: Animated ShoppingBag Button */}
+          <motion.button
+            whileHover={{ scale: 1.15, rotate: -5 }}
+            whileTap={{ scale: 0.88 }}
             onClick={() => setIsCartOpen(true)}
             title="Shopping Cart"
             className="md:hidden relative p-2 text-gray-800 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
           >
             <ShoppingBag size={22} className="text-gray-800" strokeWidth={1.5} />
             {cartCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-0.5 -right-0.5 bg-black text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow-xs"
+              >
                 {cartCount}
-              </span>
+              </motion.span>
             )}
-          </button>
+          </motion.button>
 
           {/* Desktop View ONLY: Full Cart, Search, Wishlist & Profile Header Actions */}
           <div className="hidden md:flex items-center gap-3">
-            {/* Wishlist Icon */}
-            <button
+            {/* Wishlist Animated Icon */}
+            <motion.button
+              whileHover={{ scale: 1.18, rotate: 6 }}
+              whileTap={{ scale: 0.85 }}
               onClick={() => navigate('/favorites')}
               title="Wishlist"
               className="relative p-2 text-gray-800 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
             >
               <Heart size={20} className={favoriteCount > 0 ? 'text-red-500 fill-red-500' : 'text-gray-800'} strokeWidth={1.5} />
               {favoriteCount > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center"
+                >
                   {favoriteCount}
-                </span>
+                </motion.span>
               )}
-            </button>
+            </motion.button>
 
-            {/* Cart Icon */}
-            <button
+            {/* Cart Animated Icon */}
+            <motion.button
+              whileHover={{ scale: 1.18, rotate: -6 }}
+              whileTap={{ scale: 0.85 }}
               onClick={() => setIsCartOpen(true)}
               title="Shopping Cart"
               className="relative p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
             >
               <ShoppingBag size={20} className="text-gray-800" strokeWidth={1.5} />
               {cartCount > 0 && (
-                <span className="absolute top-0 right-0 bg-black text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute top-0 right-0 bg-black text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center"
+                >
                   {cartCount}
-                </span>
+                </motion.span>
               )}
-            </button>
+            </motion.button>
 
-            {/* Search Icon */}
-            <button
+            {/* Search Animated Icon */}
+            <motion.button
+              whileHover={{ scale: 1.18 }}
+              whileTap={{ scale: 0.85 }}
               onClick={handleSearchClick}
               title="Search"
               className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
             >
               <Search size={20} className="text-gray-800" strokeWidth={1.5} />
-            </button>
+            </motion.button>
 
             {/* User Profile */}
             {user ? (
               <div className="relative">
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.88 }}
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer flex items-center justify-center"
                 >
                   <User size={20} className="text-gray-800" strokeWidth={1.5} />
-                </button>
+                </motion.button>
                 <AnimatePresence>
                   {isDropdownOpen && (
                     <motion.div
