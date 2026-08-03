@@ -9,7 +9,7 @@ const BestSelling = () => {
   return (
     <section className="px-8 py-16 max-w-7xl mx-auto w-full">
       <div className="flex justify-between items-end mb-10">
-        <h2 className="text-4xl font-serif text-black">Top Requested CADs</h2>
+        <h2 className="text-xl font-serif text-black">Top Requested</h2>
         <Link to="/shop" className="text-sm font-medium text-gray-500 hover:text-black transition-colors uppercase tracking-wider mb-1">
           View all
         </Link>
