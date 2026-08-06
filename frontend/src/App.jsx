@@ -21,7 +21,7 @@ const AppContent = () => {
   const isMobile = useMobile();
   const location = useLocation();
   const isProductPage = location.pathname.startsWith('/product/');
-  const isCartPage = location.pathname === '/cart';
+  const isLoginPage = location.pathname === '/login';
 
   return (
     <div className="antialiased text-gray-900 min-h-screen bg-[#fafafa] flex flex-col">
@@ -43,7 +43,7 @@ const AppContent = () => {
         </Routes>
       </div>
       {isMobile && <MobileBottomNav />}
-      {!isMobile && <Footer />}
+      {!isMobile && !isLoginPage && <Footer />}
     </div>
   );
 };
