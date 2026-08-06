@@ -23,7 +23,7 @@ const Contact = () => {
 
   return (
     <div className="w-full bg-[#FAFAFA] min-h-screen pb-20">
-      
+
       {/* Header Section */}
       <section className="pt-20 pb-12 px-8 max-w-7xl mx-auto text-center">
         <motion.div
@@ -33,7 +33,7 @@ const Contact = () => {
         >
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-6">Get in Touch</p>
           <h1 className="text-5xl md:text-7xl font-serif text-black mb-8 leading-tight">
-            Start Your <br/>Design Journey
+            Start Your <br />Design Journey
           </h1>
           <p className="max-w-xl mx-auto text-gray-500 leading-relaxed text-sm md:text-base">
             Whether you need a custom alteration to an existing model, or want to architect an entirely new piece from a sketch, our digital artisans are ready to bring your vision into the matrix.
@@ -44,16 +44,16 @@ const Contact = () => {
       {/* Content Grid */}
       <section className="px-8 max-w-7xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
-          
+
           {/* Left Column - Contact Info */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-col justify-center"
           >
             <h2 className="text-3xl font-serif text-black mb-10">Studio Information</h2>
-            
+
             <div className="space-y-8">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
@@ -73,25 +73,13 @@ const Contact = () => {
                 <div>
                   <h4 className="text-sm font-bold uppercase tracking-wider text-black mb-1">Headquarters</h4>
                   <p className="text-gray-500 text-sm leading-relaxed">
-                    123 Innovation Drive<br/>
-                    Digital Arts District<br/>
-                    New York, NY 10001
+                    Gwel designs<br />
+                    Kolkata, West Bengal
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
-                  <Clock className="text-gray-900" size={18} />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold uppercase tracking-wider text-black mb-1">Operating Hours</h4>
-                  <p className="text-gray-500 text-sm leading-relaxed">
-                    Monday – Friday: 9:00 AM - 6:00 PM (EST)<br/>
-                    Saturday & Sunday: Closed
-                  </p>
-                </div>
-              </div>
+
             </div>
 
             <div className="mt-16 p-8 bg-black text-white">
@@ -106,47 +94,47 @@ const Contact = () => {
           </motion.div>
 
           {/* Right Column - Form */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="bg-white p-8 md:p-12 shadow-sm border border-gray-100 rounded-sm"
           >
             <h2 className="text-2xl font-serif text-black mb-8">Send a Request</h2>
-            
+
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-              
+
               <div className="flex flex-col gap-2">
                 <label htmlFor="name" className="text-xs font-bold uppercase tracking-widest text-gray-500">Full Name</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  placeholder="Jane Doe"
+                  placeholder="Your name"
                   className="border-b border-gray-300 py-3 text-sm focus:outline-none focus:border-black transition-colors bg-transparent"
                 />
               </div>
 
               <div className="flex flex-col gap-2">
                 <label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-gray-500">Email Address</label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  placeholder="jane@example.com"
+                  placeholder="yourname@example.com"
                   className="border-b border-gray-300 py-3 text-sm focus:outline-none focus:border-black transition-colors bg-transparent"
                 />
               </div>
 
               <div className="flex flex-col gap-2">
                 <label htmlFor="service" className="text-xs font-bold uppercase tracking-widest text-gray-500">Service Required</label>
-                <select 
+                <select
                   id="service"
                   name="service"
                   value={formData.service}
@@ -165,7 +153,7 @@ const Contact = () => {
 
               <div className="flex flex-col gap-2">
                 <label htmlFor="message" className="text-xs font-bold uppercase tracking-widest text-gray-500">Project Details</label>
-                <textarea 
+                <textarea
                   id="message"
                   name="message"
                   value={formData.message}
@@ -177,14 +165,14 @@ const Contact = () => {
                 />
               </div>
 
-              <button 
+              <button
                 type="submit"
                 className="mt-4 w-full bg-black text-white p-4 text-sm font-semibold tracking-widest uppercase hover:bg-gray-800 transition-colors flex items-center justify-center gap-3 group"
               >
                 Submit Request <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </form>
-            
+
             <p className="text-[10px] text-gray-400 mt-6 text-center uppercase tracking-widest">
               We typically reply within 24 hours.
             </p>

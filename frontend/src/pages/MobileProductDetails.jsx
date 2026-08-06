@@ -47,34 +47,9 @@ const MobileProductDetails = ({ product }) => {
   const [selectedFormat, setSelectedFormat] = useState(formats[0]);
   const [isWebAROpen, setIsWebAROpen] = useState(false);
   const [isFormatGuideOpen, setIsFormatGuideOpen] = useState(false);
-  const [signedDownload, setSignedDownload] = useState(null);
-  const [isClaimingSignedUrl, setIsClaimingSignedUrl] = useState(false);
 
   const modelIdDisplay = product?.sku || product?.id || product?._id || 'MD-3001';
   const isFav = isFavorite(modelIdDisplay);
-
-  const handleClaimSignedDownloadUrl = async () => {
-    setIsClaimingSignedUrl(true);
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${apiUrl}/api/vault/signed-download`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId: product.id, format: selectedFormat }),
-      });
-      const data = await res.json();
-      setSignedDownload(data);
-    } catch (e) {
-      setSignedDownload({
-        downloadUrl: product?.glbUrl || '#',
-        expiresInSeconds: 900,
-        format: selectedFormat,
-        productName: product?.name || '3D Asset',
-      });
-    } finally {
-      setIsClaimingSignedUrl(false);
-    }
-  };
 
   return (
     <div className="bg-[#f8f9fa] min-h-screen pb-32 font-sans">
@@ -274,43 +249,6 @@ const MobileProductDetails = ({ product }) => {
             ))}
           </div>
         </div>
-
-        {/* Temporal Signed Download Button if 3D Asset */}
-        {is3DProduct && (
-          <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-3 shadow-xs">
-            <button
-              onClick={handleClaimSignedDownloadUrl}
-              disabled={isClaimingSignedUrl}
-              className="w-full py-3 bg-gray-900 hover:bg-black text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-xs"
-            >
-              <Download className="w-4 h-4 text-gray-300" />
-              <span>
-                {isClaimingSignedUrl ? 'Generating Signed Token...' : 'Generate Temporal Download Link'}
-              </span>
-            </button>
-
-            {signedDownload && (
-              <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs space-y-2">
-                <div className="flex items-center justify-between text-emerald-700 font-bold">
-                  <span className="flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Temporal Link Ready
-                  </span>
-                  <span className="text-[10px] font-mono text-gray-500 flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> 15 Mins
-                  </span>
-                </div>
-                <a
-                  href={signedDownload.downloadUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-center py-2 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors"
-                >
-                  Download {selectedFormat} File
-                </a>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Description Box */}
         <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-2 shadow-xs">
