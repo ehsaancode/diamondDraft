@@ -20,12 +20,12 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import CanvasWrapper from '../canvas/CanvasWrapper';
 import WebARModal from '../components/WebARModal';
-import { useCartStore } from '../store/useCartStore';
+import { useCart } from '../context/CartContext';
 import { useFavorites } from '../context/FavoriteContext';
 
 const MobileProductDetails = ({ product }) => {
   const navigate = useNavigate();
-  const addToCart = useCartStore((state) => state.addToCart);
+  const { addToCart, setIsCartOpen } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const is3DProduct = product?.is3D || !!product?.glbUrl;
@@ -325,8 +325,11 @@ const MobileProductDetails = ({ product }) => {
       {/* Sticky Bottom Actions Bar */}
       <div className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 p-4 flex items-center gap-3 shadow-lg">
         <button
-          onClick={() => addToCart(product)}
-          className="flex-1 py-3.5 bg-black hover:bg-gray-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md flex items-center justify-center gap-2"
+          onClick={() => {
+            addToCart(product, selectedFormat);
+            setIsCartOpen(true);
+          }}
+          className="flex-1 py-3.5 bg-black hover:bg-gray-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer"
         >
           <ShoppingBag className="w-4 h-4" />
           <span>Add to Cart</span>

@@ -52,7 +52,7 @@ export function Orders() {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const res = await axios.put(`${apiUrl}/api/orders/${orderId}/status`, { status: newStatus });
-      
+
       setOrders((prev) =>
         prev.map((o) => (o.id === orderId || o.orderId === orderId ? { ...o, status: newStatus } : o))
       );
@@ -105,7 +105,7 @@ export function Orders() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">CAD Design Orders</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight">CAD Design Orders</h1>
           <p className="text-xs text-gray-500 mt-1">
             Track customer CAD design requests, inspect item specifications, and manage order fulfillment.
           </p>
@@ -123,11 +123,10 @@ export function Orders() {
       {/* Notification Banner */}
       {notification && (
         <div
-          className={`p-4 rounded-2xl border flex items-center justify-between text-xs font-medium ${
-            notification.type === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              : 'bg-red-50 border-red-200 text-red-800'
-          }`}
+          className={`p-4 rounded-2xl border flex items-center justify-between text-xs font-medium ${notification.type === 'success'
+            ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+            : 'bg-red-50 border-red-200 text-red-800'
+            }`}
         >
           <span>{notification.message}</span>
           <button onClick={() => setNotification(null)} className="font-bold underline cursor-pointer">
@@ -198,11 +197,10 @@ export function Orders() {
             <button
               key={status}
               onClick={() => setSelectedStatus(status)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all border cursor-pointer ${
-                selectedStatus === status
-                  ? 'bg-black text-white border-black shadow-xs'
-                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-              }`}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all border cursor-pointer ${selectedStatus === status
+                ? 'bg-black text-white border-black shadow-xs'
+                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                }`}
             >
               {status}
             </button>

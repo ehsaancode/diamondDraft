@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import CanvasWrapper from '../canvas/CanvasWrapper';
 import WebARModal from '../components/WebARModal';
-import { useCartStore } from '../store/useCartStore';
+import { useCart } from '../context/CartContext';
 import { useFavorites } from '../context/FavoriteContext';
 import { useMobile } from '../hooks/useMobile';
 import MobileProductDetails from './MobileProductDetails';
@@ -28,7 +28,7 @@ const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const addToCart = useCartStore((state) => state.addToCart);
+  const { addToCart, setIsCartOpen } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
   const isMobile = useMobile();
 
@@ -367,7 +367,10 @@ const ProductDetails = () => {
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
-              onClick={() => addToCart(activeProduct)}
+              onClick={() => {
+                addToCart(activeProduct, selectedFormat);
+                setIsCartOpen(true);
+              }}
               className="flex-1 cursor-pointer py-4 px-6 bg-black hover:bg-gray-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
             >
               <ShoppingBag size={18} />

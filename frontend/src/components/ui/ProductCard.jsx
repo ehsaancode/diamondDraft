@@ -2,14 +2,12 @@ import React from 'react';
 import { Heart, ShoppingBag, Layers, Star, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useCartStore } from '../../store/useCartStore';
 import { useCart } from '../../context/CartContext';
 import { useFavorites } from '../../context/FavoriteContext';
 
 const ProductCard = ({ product, index }) => {
   const navigate = useNavigate();
-  const addToCartStore = useCartStore((state) => state.addToCart);
-  const cartContext = useCart();
+  const { addToCart, setIsCartOpen } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const productId = product.id || product._id || 'MD-3001';
@@ -27,11 +25,8 @@ const ProductCard = ({ product, index }) => {
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-    if (addToCartStore) addToCartStore(product);
-    if (cartContext && cartContext.addToCart) {
-      cartContext.addToCart(product, formats[0] || 'STL');
-      if (cartContext.setIsCartOpen) cartContext.setIsCartOpen(true);
-    }
+    addToCart(product, formats[0] || 'STL');
+    setIsCartOpen(true);
   };
 
   return (
