@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
+  ShoppingBag,
   Package, 
   PlusCircle, 
   Settings, 
@@ -27,6 +28,7 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
 
   const navItems = [
     { icon: <LayoutDashboard size={20} />, label: "Dashboard", to: "/" },
+    { icon: <ShoppingBag size={20} />, label: "Orders", to: "/orders" },
     { icon: <Package size={20} />, label: "Products", to: "/products" },
     { icon: <PlusCircle size={20} />, label: "Add Product", to: "/add-product" },
     { icon: <Settings size={20} />, label: "Settings", to: "/settings" },

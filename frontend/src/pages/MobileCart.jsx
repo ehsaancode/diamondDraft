@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Trash2, Plus, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import CheckoutModal from '../components/cart/CheckoutModal';
 
 const MobileCart = () => {
   const navigate = useNavigate();
   const { cartItems, removeFromCart, cartTotal, cartCount } = useCart();
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   return (
     <div className="bg-[#f8f9fa] min-h-screen pb-48 font-sans">
@@ -117,7 +119,10 @@ const MobileCart = () => {
 
             {/* Checkout Button */}
             <div className="mt-2 pb-16">
-              <button className="w-full h-14 bg-black text-white rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform group cursor-pointer">
+              <button
+                onClick={() => setIsCheckoutOpen(true)}
+                className="w-full h-14 bg-black text-white rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md active:scale-95 transition-transform group cursor-pointer"
+              >
                 <span>Submit CAD Request</span>
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
@@ -125,6 +130,8 @@ const MobileCart = () => {
           </div>
         )}
       </main>
+
+      <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />
     </div>
   );
 };

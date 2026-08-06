@@ -14,6 +14,7 @@ import { Dashboard } from './pages/Dashboard';
 import { AddProduct } from './pages/AddProduct';
 import { EditProduct } from './pages/EditProduct';
 import { Products } from './pages/Products';
+import { Orders } from './pages/Orders';
 import { SettingsPage } from './pages/SettingsPage';
 import { Login } from './pages/Login';
 
@@ -28,6 +29,7 @@ const AdminLayout = () => {
         <main className="flex-1 p-4 md:p-6 lg:p-10 relative z-0">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/orders" element={<Orders />} />
             <Route path="/add-product" element={<AddProduct />} />
             <Route path="/edit-product/:id" element={<EditProduct />} />
             <Route path="/products" element={<Products />} />
