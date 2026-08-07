@@ -2,15 +2,20 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { Search, ArrowRight, Layers, ShieldCheck, Box, CheckCircle2 } from 'lucide-react';
+import { useProducts } from '../../hooks/useProducts';
+import SearchSuggestionsDropdown from '../search/SearchSuggestionsDropdown';
 
 const Hero = () => {
   const navigate = useNavigate();
+  const { products } = useProducts();
   const [searchTerm, setSearchTerm] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      navigate(`/shop`, { state: { focusSearch: true, query: searchTerm } });
+      navigate(`/shop`, { state: { focusSearch: true, query: searchTerm.trim() } });
+      setShowSuggestions(false);
     }
   };
 
@@ -40,23 +45,42 @@ const Hero = () => {
             Browse production-ready 3D printing STL files, Rhinoceros 3DM designs, and WebGL inspectable models for master jewelers and manufacturers.
           </p>
 
-          {/* Practical Search Input */}
-          <form onSubmit={handleSearchSubmit} className="w-full max-w-xl relative">
-            <input
-              type="text"
-              placeholder="Search by ring size, metal, CAD format (.stl, .3dm)..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full py-4 pl-5 pr-32 bg-white border border-gray-300 rounded-2xl shadow-sm text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
-            />
-            <button
-              type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-black hover:bg-gray-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5"
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span>Search</span>
-            </button>
-          </form>
+          {/* Practical Search Input with Live Suggestions */}
+          <div className="w-full max-w-xl relative text-left">
+            <form onSubmit={handleSearchSubmit} className="w-full relative">
+              <input
+                type="text"
+                placeholder="Search by ring size, metal, CAD format (.stl, .3dm)..."
+                value={searchTerm}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                className="w-full py-4 pl-5 pr-32 bg-white border border-gray-300 rounded-2xl shadow-sm text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-black hover:bg-gray-800 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <Search className="w-3.5 h-3.5" />
+                <span>Search</span>
+              </button>
+            </form>
+
+            {showSuggestions && searchTerm && (
+              <SearchSuggestionsDropdown
+                query={searchTerm}
+                products={products}
+                onSelectSuggestion={(selected) => {
+                  setSearchTerm(selected);
+                  navigate('/shop', { state: { query: selected } });
+                }}
+                onClose={() => setShowSuggestions(false)}
+              />
+            )}
+          </div>
 
           {/* Practical Category Shortcuts */}
           <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
