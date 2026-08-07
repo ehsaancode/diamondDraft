@@ -32,7 +32,53 @@ const ProductDetails = () => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const isMobile = useMobile();
 
-  const [product, setProduct] = useState(location.state || null);
+  const normalizeProductData = (data) => {
+    if (!data) return null;
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const getAssetUrl = (url) => {
+      if (!url) return null;
+      if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+        return url;
+      }
+      const cleanPath = url.startsWith('/') ? url : `/${url}`;
+      return `${apiUrl}${cleanPath}`;
+    };
+
+    const modelFileUrl = data.glbUrl || data.modelUrl || null;
+    const is3DAsset = !!modelFileUrl || data.category === '3D Models';
+
+    return {
+      ...data,
+      id: data._id || data.id,
+      sku: data.sku || data._id || data.id,
+      name: data.name || 'CAD Model',
+      brand: data.category || 'Jewelry',
+      category: data.category || 'Jewelry',
+      price: Number(data.price) || 0,
+      rating: data.rating !== undefined ? Number(data.rating) : 5.0,
+      reviews: data.reviews !== undefined ? Number(data.reviews) : 0,
+      description: data.description || '',
+      image:
+        data.images && data.images.length > 0
+          ? getAssetUrl(data.images[0])
+          : data.image
+          ? getAssetUrl(data.image)
+          : null,
+      images: data.images
+        ? data.images.map((img) => getAssetUrl(img))
+        : data.image
+        ? [getAssetUrl(data.image)]
+        : [],
+      glbUrl: modelFileUrl ? getAssetUrl(modelFileUrl) : null,
+      is3D: is3DAsset,
+      formats: data.formats || (is3DAsset ? ['STL', '3DM', 'OBJ', 'STEP'] : ['STL', '3DM']),
+      polyCount: Number(data.polyCount) || (is3DAsset ? 45000 : 0),
+      vertexCount: Number(data.vertexCount) || (is3DAsset ? 52000 : 0),
+      license: data.license || 'Royalty-Free'
+    };
+  };
+
+  const [product, setProduct] = useState(location.state ? normalizeProductData(location.state) : null);
   const [loading, setLoading] = useState(!location.state);
   const [selectedFormat, setSelectedFormat] = useState('STL');
   const [isFormatGuideOpen, setIsFormatGuideOpen] = useState(false);
@@ -41,7 +87,7 @@ const ProductDetails = () => {
 
   useEffect(() => {
     if (location.state && (location.state.id === id || location.state._id === id)) {
-      setProduct(location.state);
+      setProduct(normalizeProductData(location.state));
       setLoading(false);
       return;
     }
@@ -53,35 +99,7 @@ const ProductDetails = () => {
         const res = await fetch(`${apiUrl}/api/products/${id}`);
         if (!res.ok) throw new Error('Failed to fetch product details');
         const data = await res.json();
-
-        const getImageUrl = (url) => (url?.startsWith('http') ? url : `${apiUrl}${url}`);
-        const modelFileUrl = data.glbUrl || data.modelUrl || null;
-        const is3DAsset = !!modelFileUrl || data.category === '3D Models';
-
-        const mappedProduct = {
-          id: data._id || data.id,
-          sku: data.sku || data._id || data.id,
-          name: data.name,
-          brand: data.category || 'Jewelry',
-          category: data.category || 'Jewelry',
-          price: Number(data.price) || 0,
-          rating: data.rating !== undefined ? Number(data.rating) : 5.0,
-          reviews: data.reviews !== undefined ? Number(data.reviews) : 0,
-          description: data.description || '',
-          image:
-            data.images && data.images.length > 0
-              ? getImageUrl(data.images[0])
-              : data.image || null,
-          images: data.images ? data.images.map((img) => getImageUrl(img)) : (data.image ? [data.image] : []),
-          glbUrl: modelFileUrl ? getImageUrl(modelFileUrl) : null,
-          is3D: is3DAsset,
-          formats: data.formats || (is3DAsset ? ['.FBX', '.OBJ', '.STL', '.GLB'] : ['STL', '3DM', 'OBJ']),
-          polyCount: Number(data.polyCount) || (is3DAsset ? 45000 : 0),
-          vertexCount: Number(data.vertexCount) || (is3DAsset ? 52000 : 0),
-          license: data.license || 'Royalty-Free'
-        };
-
-        setProduct(mappedProduct);
+        setProduct(normalizeProductData(data));
       } catch (err) {
         console.error('Error fetching product details:', err);
         setProduct(null);

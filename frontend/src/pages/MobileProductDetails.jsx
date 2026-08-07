@@ -28,7 +28,18 @@ const MobileProductDetails = ({ product }) => {
   const { addToCart, setIsCartOpen } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  const is3DProduct = product?.is3D || !!product?.glbUrl;
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const getAssetUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    const cleanPath = url.startsWith('/') ? url : `/${url}`;
+    return `${apiUrl}${cleanPath}`;
+  };
+
+  const resolvedGlbUrl = getAssetUrl(product?.glbUrl || product?.modelUrl);
+  const is3DProduct = product?.is3D || !!resolvedGlbUrl;
   const gallery =
     product?.images && product?.images.length > 0
       ? product.images
@@ -106,7 +117,7 @@ const MobileProductDetails = ({ product }) => {
           <div className="space-y-3">
             <div className="relative rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-slate-950">
               <CanvasWrapper
-                glbUrl={product?.glbUrl}
+                glbUrl={resolvedGlbUrl}
                 formats={product?.formats}
                 modelType={product?.modelType || 'character'}
                 className="h-[360px] w-full"

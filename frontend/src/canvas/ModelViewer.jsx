@@ -56,24 +56,127 @@ class CanvasErrorBoundary extends React.Component {
   }
 }
 
-// STLLoader Component
-function LoadedSTLModel({ url }) {
+// Safe Environment Wrapper with HDRI CDN Fallback
+function SafeEnvironment({ preset = 'city' }) {
+  const [hasEnvError, setHasEnvError] = useState(false);
+
+  if (hasEnvError) {
+    return (
+      <>
+        <ambientLight intensity={1.2} />
+        <directionalLight position={[10, 10, 10]} intensity={1.5} castShadow />
+        <directionalLight position={[-10, -10, -10]} intensity={0.5} />
+      </>
+    );
+  }
+
+  return (
+    <CanvasErrorBoundary>
+      <Suspense fallback={<ambientLight intensity={1.2} />}>
+        <Environment preset={preset === 'studio' ? 'city' : preset} />
+      </Suspense>
+    </CanvasErrorBoundary>
+  );
+}
+
+// 100% Resilient 3D Model Loader Hook & Component
+function ResilientModelRenderer({ url, formats = [] }) {
   const meshRef = useRef();
-  const geometry = useLoader(STLLoader, url);
+  const [loadingState, setLoadingState] = useState({ loading: true, error: null, result: null, isGltf: false });
+  const [retryCount, setRetryCount] = useState(0);
   const { wireframe, activePbrChannel, autoRotate } = useViewportStore();
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoadingState({ loading: true, error: null, result: null, isGltf: false });
+
+    const loadModelWithRetry = async () => {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      let targetUrl = url;
+      if (targetUrl && !targetUrl.startsWith('http://') && !targetUrl.startsWith('https://') && !targetUrl.startsWith('data:')) {
+        const cleanPath = targetUrl.startsWith('/') ? targetUrl : `/${targetUrl}`;
+        targetUrl = `${apiUrl}${cleanPath}`;
+      }
+
+      let attempt = 0;
+      const maxRetries = 3;
+
+      while (attempt < maxRetries) {
+        try {
+          attempt++;
+          // Fetch raw array buffer
+          const res = await fetch(targetUrl);
+          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+          const buffer = await res.arrayBuffer();
+
+          if (!isMounted) return;
+
+          // Magic byte check for GLTF / GLB binary (0x46546C67 -> "glTF")
+          const dataView = new DataView(buffer);
+          const isGltfMagic = buffer.byteLength >= 4 && dataView.getUint32(0, true) === 0x46546C67;
+          const urlLower = String(targetUrl).toLowerCase();
+          const isGltfExt = urlLower.endsWith('.glb') || urlLower.endsWith('.gltf');
+          const isGltf = isGltfMagic || isGltfExt;
+
+          if (isGltf) {
+            const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
+            const loader = new GLTFLoader();
+            const gltf = await new Promise((resolve, reject) => {
+              loader.parse(buffer, '', resolve, reject);
+            });
+            if (isMounted) {
+              setLoadingState({ loading: false, error: null, result: gltf.scene, isGltf: true });
+            }
+          } else {
+            const stlLoader = new STLLoader();
+            const geometry = stlLoader.parse(buffer);
+            geometry.computeVertexNormals();
+            geometry.center();
+
+            // Normalize geometry scale to fit comfortably in viewport
+            geometry.computeBoundingSphere();
+            const radius = geometry.boundingSphere ? geometry.boundingSphere.radius : 1;
+            if (radius > 0) {
+              const targetRadius = 1.8;
+              const scale = targetRadius / radius;
+              geometry.scale(scale, scale, scale);
+            }
+
+            if (isMounted) {
+              setLoadingState({ loading: false, error: null, result: geometry, isGltf: false });
+            }
+          }
+          return;
+        } catch (err) {
+          console.warn(`3D Model load attempt ${attempt} failed:`, err);
+          if (attempt >= maxRetries) {
+            if (isMounted) {
+              setLoadingState({ loading: false, error: err.message || 'Failed to load 3D file', result: null, isGltf: false });
+            }
+          } else {
+            // Exponential backoff delay
+            await new Promise((r) => setTimeout(r, attempt * 600));
+          }
+        }
+      }
+    };
+
+    if (url) {
+      loadModelWithRetry();
+    } else {
+      setLoadingState({ loading: false, error: 'No 3D URL provided', result: null, isGltf: false });
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [url, retryCount]);
 
   useFrame((_, delta) => {
     if (autoRotate && meshRef.current) {
       meshRef.current.rotation.y += delta * 0.5;
     }
   });
-
-  useEffect(() => {
-    if (geometry) {
-      geometry.computeVertexNormals();
-      geometry.center();
-    }
-  }, [geometry]);
 
   const materialProps = useMemo(() => {
     if (wireframe) {
@@ -95,67 +198,46 @@ function LoadedSTLModel({ url }) {
     }
   }, [activePbrChannel, wireframe]);
 
-  return (
-    <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow>
-      <meshStandardMaterial {...materialProps} envMapIntensity={1.5} />
-    </mesh>
-  );
-}
-
-// GLTF / GLB Loader Component
-function LoadedGLTFModel({ url }) {
-  const meshRef = useRef();
-  const { scene } = useGLTF(url);
-  const { wireframe, activePbrChannel, autoRotate } = useViewportStore();
-
-  useFrame((_, delta) => {
-    if (autoRotate && meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.5;
-    }
-  });
-
-  useEffect(() => {
-    if (!scene) return;
-    scene.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-        if (wireframe) {
-          child.material.wireframe = true;
-        } else {
-          child.material.wireframe = false;
-        }
-      }
-    });
-  }, [scene, activePbrChannel, wireframe]);
-
-  return (
-    <group ref={meshRef}>
-      <primitive object={scene} />
-    </group>
-  );
-}
-
-// Smart 3D Model Loader Handler
-function Smart3DModelLoader({ glbUrl, formats = [] }) {
-  if (!glbUrl) {
-    return <CanvasErrorNotice message="No 3D asset file available" />;
+  if (loadingState.loading) {
+    return <Canvas3DLoader />;
   }
 
-  const urlLower = String(glbUrl).toLowerCase();
-  const formatsLower = (formats || []).map((f) => String(f).toLowerCase());
-  const isStl =
-    urlLower.includes('.stl') ||
-    formatsLower.some((f) => f.includes('stl')) ||
-    (!urlLower.includes('.glb') && !urlLower.includes('.gltf'));
+  if (loadingState.error) {
+    return (
+      <Html center className="pointer-events-auto">
+        <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-slate-900/95 border border-red-500/40 backdrop-blur-md text-white shadow-2xl max-w-[280px] text-center space-y-3">
+          <AlertCircle className="w-8 h-8 text-red-400" />
+          <span className="text-xs font-mono text-slate-200 font-medium">
+            Unable to render 3D model geometry
+          </span>
+          <button
+            onClick={() => setRetryCount((c) => c + 1)}
+            className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs font-mono rounded-xl transition-all shadow-md cursor-pointer uppercase tracking-wider"
+          >
+            Retry Loading 3D Model
+          </button>
+        </div>
+      </Html>
+    );
+  }
 
-  return (
-    <CanvasErrorBoundary>
-      <Suspense fallback={<Canvas3DLoader />}>
-        {isStl ? <LoadedSTLModel url={glbUrl} /> : <LoadedGLTFModel url={glbUrl} />}
-      </Suspense>
-    </CanvasErrorBoundary>
-  );
+  if (loadingState.isGltf && loadingState.result) {
+    return (
+      <group ref={meshRef}>
+        <primitive object={loadingState.result} />
+      </group>
+    );
+  }
+
+  if (!loadingState.isGltf && loadingState.result) {
+    return (
+      <mesh ref={meshRef} geometry={loadingState.result} castShadow receiveShadow>
+        <meshStandardMaterial {...materialProps} envMapIntensity={1.5} />
+      </mesh>
+    );
+  }
+
+  return null;
 }
 
 export default function ModelViewer({ glbUrl, formats = [], className = 'h-[450px] w-full' }) {
@@ -213,10 +295,10 @@ export default function ModelViewer({ glbUrl, formats = [], className = 'h-[450p
         <pointLight position={[-10, -10, -10]} intensity={0.5} />
 
         <Center>
-          <Smart3DModelLoader glbUrl={glbUrl} formats={formats} />
+          <ResilientModelRenderer url={glbUrl} formats={formats} />
         </Center>
 
-        <Environment preset={environment === 'studio' ? 'city' : environment} />
+        <SafeEnvironment preset={environment} />
         <OrbitControls
           makeDefault
           enablePan={true}
