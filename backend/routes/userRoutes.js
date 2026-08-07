@@ -1,10 +1,13 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { admin, db } from '../config/firebase.js';
+import { db } from '../config/firebase.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+// Fallback in-memory user store if Firestore is unavailable
+let localUsers = [];
 
 // Helper to generate JWT token
 const generateToken = (id, email, name) => {
@@ -32,49 +35,66 @@ router.post('/register', async (req, res) => {
 
     const emailLower = email.toLowerCase().trim();
 
-    // Check if Firebase is initialized correctly
-    if (!db) {
-      return res.status(500).json({ error: 'Database service is currently unavailable.' });
-    }
-
-    // Check if user already exists
-    const userSnapshot = await db
-      .collection('users')
-      .where('email', '==', emailLower)
-      .limit(1)
-      .get();
-
-    if (!userSnapshot.empty) {
-      return res.status(400).json({ error: 'User already exists with this email' });
-    }
-
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Save user to Firestore
-    const newUser = {
-      name: name.trim(),
-      email: emailLower,
-      password: hashedPassword,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    };
+    const nowIso = new Date().toISOString();
+    let userId = null;
+    let userName = name.trim();
 
-    const docRef = await db.collection('users').add(newUser);
+    if (db) {
+      // Check if user already exists in Firestore
+      const userSnapshot = await db
+        .collection('users')
+        .where('email', '==', emailLower)
+        .limit(1)
+        .get();
+
+      if (!userSnapshot.empty) {
+        return res.status(400).json({ error: 'User already exists with this email' });
+      }
+
+      const newUser = {
+        name: userName,
+        email: emailLower,
+        password: hashedPassword,
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      };
+
+      const docRef = await db.collection('users').add(newUser);
+      userId = docRef.id;
+    } else {
+      // Check local users store
+      const existing = localUsers.find((u) => u.email === emailLower);
+      if (existing) {
+        return res.status(400).json({ error: 'User already exists with this email' });
+      }
+
+      userId = `USR-${Date.now()}`;
+      const newUser = {
+        id: userId,
+        name: userName,
+        email: emailLower,
+        password: hashedPassword,
+        createdAt: nowIso,
+      };
+      localUsers.push(newUser);
+    }
 
     // Generate JWT token
-    const token = generateToken(docRef.id, emailLower, newUser.name);
+    const token = generateToken(userId, emailLower, userName);
 
     res.status(201).json({
-      id: docRef.id,
-      name: newUser.name,
+      id: userId,
+      name: userName,
       email: emailLower,
       token,
     });
   } catch (err) {
     console.error('Error during registration:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message || 'Registration failed' });
   }
 });
 
@@ -90,45 +110,51 @@ router.post('/login', async (req, res) => {
     }
 
     const emailLower = email.toLowerCase().trim();
+    let userDocData = null;
+    let userId = null;
 
-    // Check if Firebase is initialized correctly
-    if (!db) {
-      return res.status(500).json({ error: 'Database service is currently unavailable.' });
+    if (db) {
+      const userSnapshot = await db
+        .collection('users')
+        .where('email', '==', emailLower)
+        .limit(1)
+        .get();
+
+      if (userSnapshot.empty) {
+        return res.status(401).json({ error: 'Invalid email or password' });
+      }
+
+      const doc = userSnapshot.docs[0];
+      userDocData = doc.data();
+      userId = doc.id;
+    } else {
+      const found = localUsers.find((u) => u.email === emailLower);
+      if (!found) {
+        return res.status(401).json({ error: 'Invalid email or password' });
+      }
+      userDocData = found;
+      userId = found.id;
     }
-
-    // Fetch user from Firestore
-    const userSnapshot = await db
-      .collection('users')
-      .where('email', '==', emailLower)
-      .limit(1)
-      .get();
-
-    if (userSnapshot.empty) {
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
-
-    const userDoc = userSnapshot.docs[0];
-    const userData = userDoc.data();
 
     // Verify password
-    const isMatch = await bcrypt.compare(password, userData.password);
+    const isMatch = await bcrypt.compare(password, userDocData.password);
 
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     // Generate JWT token
-    const token = generateToken(userDoc.id, emailLower, userData.name);
+    const token = generateToken(userId, emailLower, userDocData.name);
 
     res.status(200).json({
-      id: userDoc.id,
-      name: userData.name,
+      id: userId,
+      name: userDocData.name,
       email: emailLower,
       token,
     });
   } catch (err) {
     console.error('Error during login:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message || 'Login failed' });
   }
 });
 
@@ -137,27 +163,40 @@ router.post('/login', async (req, res) => {
 // @access  Private
 router.get('/profile', protect, async (req, res) => {
   try {
-    if (!db) {
-      return res.status(500).json({ error: 'Database service is currently unavailable.' });
+    const userId = req.user.id;
+
+    if (db) {
+      const userDoc = await db.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        return res.status(200).json({
+          id: userDoc.id,
+          name: userData.name,
+          email: userData.email,
+          createdAt: userData.createdAt,
+        });
+      }
     }
 
-    const userDoc = await db.collection('users').doc(req.user.id).get();
-
-    if (!userDoc.exists) {
-      return res.status(404).json({ error: 'User profile not found' });
+    const foundLocal = localUsers.find((u) => u.id === userId || u.email === req.user.email);
+    if (foundLocal) {
+      return res.status(200).json({
+        id: foundLocal.id,
+        name: foundLocal.name,
+        email: foundLocal.email,
+        createdAt: foundLocal.createdAt,
+      });
     }
 
-    const userData = userDoc.data();
-
-    res.status(200).json({
-      id: userDoc.id,
-      name: userData.name,
-      email: userData.email,
-      createdAt: userData.createdAt,
+    // Default payload if decoded from JWT token
+    return res.status(200).json({
+      id: req.user.id,
+      name: req.user.name || 'Gwel Customer',
+      email: req.user.email,
     });
   } catch (err) {
     console.error('Error fetching user profile:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message || 'Failed to fetch profile' });
   }
 });
 
