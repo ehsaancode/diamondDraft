@@ -7,7 +7,7 @@ import BestSelling from '../components/home/BestSelling';
 
 const MobileHome = () => {
   return (
-    <div className="w-full min-h-screen bg-[#fafafa] text-gray-900 pb-32 overflow-x-hidden">
+    <div className="w-full min-h-screen bg-[#fafafa] text-gray-900 pb-8 overflow-x-hidden">
       <Hero />
       <Explore3DModels />
       <YouMayAlsoLike />

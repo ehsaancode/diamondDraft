@@ -63,7 +63,7 @@ const MobileProductDetails = ({ product }) => {
   const isFav = isFavorite(modelIdDisplay);
 
   return (
-    <div className="bg-[#f8f9fa] min-h-screen pb-32 font-sans">
+    <div className="bg-[#f8f9fa] min-h-screen pb-8 font-sans">
       {/* Fixed Top Header */}
       <div className="fixed top-0 inset-x-0 z-40 p-4 flex items-center justify-between bg-white/90 backdrop-blur-md border-b border-gray-100/80 shadow-xs">
         <button

@@ -28,7 +28,7 @@ const MobileSearch = () => {
   };
 
   return (
-    <div className="bg-white min-h-screen pb-32 font-sans">
+    <div className="bg-white min-h-screen pb-8 font-sans">
       <div className="p-4 flex flex-col gap-4 sticky top-0 bg-white/95 backdrop-blur-md z-30 border-b border-gray-100">
         <div className="flex items-center gap-3">
           <button

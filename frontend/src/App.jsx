@@ -11,8 +11,6 @@ import MobileSearch from './pages/MobileSearch';
 import MobileFavorites from './pages/MobileFavorites';
 import MobileCart from './pages/MobileCart';
 import MobileProfile from './pages/MobileProfile';
-import MobileBottomNav from './components/mobile/MobileBottomNav';
-
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
@@ -42,8 +40,7 @@ const AppContent = () => {
           <Route path="/login" element={<Auth />} />
         </Routes>
       </div>
-      {isMobile && <MobileBottomNav />}
-      {!isMobile && !isLoginPage && <Footer />}
+      {!isLoginPage && <Footer />}
     </div>
   );
 };
