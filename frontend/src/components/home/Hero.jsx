@@ -28,11 +28,7 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          {/* Subtle Category Pill */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-semibold text-gray-700 shadow-xs">
-            <Box className="w-3.5 h-3.5 text-gray-900" />
-            <span>Production-Ready Fine Jewelry CAD & 3D Assets</span>
-          </div>
+
 
           {/* Hero Title */}
           <h1 className="hidden md:block text-4xl sm:text-5xl md:text-6xl font-serif font-extrabold text-gray-900 tracking-tight leading-tight">
