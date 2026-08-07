@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -7,12 +7,14 @@ import { useProducts } from '../hooks/useProducts';
 import { useSearch } from '../hooks/useSearch';
 import { useMobile } from '../hooks/useMobile';
 import MobileShop from './MobileShop';
+import SearchSuggestionsDropdown from '../components/search/SearchSuggestionsDropdown';
 
 const Shop = () => {
   const isMobile = useMobile();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { products, loading } = useProducts();
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const queryCategory = searchParams.get('category') || location.state?.category || 'All';
   const querySubcategory = searchParams.get('subcategory') || location.state?.subcategory || 'All';
@@ -84,7 +86,7 @@ const Shop = () => {
       <div className="flex flex-col md:flex-row gap-8 items-start">
         {/* Desktop Sidebar Filters Panel */}
         <aside className="hidden md:flex w-64 flex-col gap-8 shrink-0 sticky top-24 bg-white border border-gray-200 p-6 rounded-3xl shadow-xs">
-          <div>
+          <div className="relative">
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 pb-2 border-b border-gray-100">
               Search Products
             </h3>
@@ -93,9 +95,22 @@ const Shop = () => {
               type="text"
               placeholder="Search by name, SKU, format..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setShowSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowSuggestions(true);
+              }}
               className="w-full text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-gray-900 focus:outline-none focus:border-black focus:bg-white transition-colors font-medium"
             />
+            {showSuggestions && searchQuery && (
+              <SearchSuggestionsDropdown
+                query={searchQuery}
+                products={products}
+                onSelectSuggestion={(selected) => setSearchQuery(selected)}
+                onClose={() => setShowSuggestions(false)}
+              />
+            )}
           </div>
 
           <div>

@@ -5,12 +5,17 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useFavorites } from '../../context/FavoriteContext';
+import { useProducts } from '../../hooks/useProducts';
+import SearchSuggestionsDropdown from '../search/SearchSuggestionsDropdown';
 
 const Navbar = () => {
   const { cartCount, setIsCartOpen } = useCart();
   const { favorites } = useFavorites();
   const { user, logout } = useAuth();
+  const { products } = useProducts();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [navQuery, setNavQuery] = useState('');
+  const [showNavSuggestions, setShowNavSuggestions] = useState(false);
   const navigate = useNavigate();
 
   const favoriteCount = Array.isArray(favorites) ? favorites.length : 0;
@@ -143,16 +148,43 @@ const Navbar = () => {
               )}
             </motion.button>
 
-            {/* Search Animated Icon */}
-            <motion.button
-              whileHover={{ scale: 1.18 }}
-              whileTap={{ scale: 0.85 }}
-              onClick={handleSearchClick}
-              title="Search"
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
-            >
-              <Search size={20} className="text-gray-800" strokeWidth={1.5} />
-            </motion.button>
+            {/* Desktop Search Bar with Live Suggestions Dropdown */}
+            <div className="relative">
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  placeholder="Search CAD models..."
+                  value={navQuery}
+                  onFocus={() => setShowNavSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowNavSuggestions(false), 200)}
+                  onChange={(e) => {
+                    setNavQuery(e.target.value);
+                    setShowNavSuggestions(true);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && navQuery.trim()) {
+                      navigate('/shop', { state: { query: navQuery.trim() } });
+                      setShowNavSuggestions(false);
+                    }
+                  }}
+                  className="w-48 lg:w-64 pl-8 pr-3 py-1.5 bg-gray-100/80 hover:bg-gray-100 focus:bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-900 focus:outline-none focus:border-black transition-all"
+                />
+                <Search size={14} className="absolute left-2.5 text-gray-400 pointer-events-none" />
+              </div>
+
+              {showNavSuggestions && navQuery && (
+                <SearchSuggestionsDropdown
+                  query={navQuery}
+                  products={products}
+                  onSelectSuggestion={(selected) => {
+                    setNavQuery(selected);
+                    navigate('/shop', { state: { query: selected } });
+                  }}
+                  onClose={() => setShowNavSuggestions(false)}
+                  className="w-72 right-0 left-auto"
+                />
+              )}
+            </div>
 
             {/* User Profile */}
             {user ? (
