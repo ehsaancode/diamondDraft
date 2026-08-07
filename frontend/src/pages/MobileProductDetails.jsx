@@ -63,7 +63,7 @@ const MobileProductDetails = ({ product }) => {
   const isFav = isFavorite(modelIdDisplay);
 
   return (
-    <div className="bg-[#f8f9fa] min-h-screen pb-8 font-sans">
+    <div className="bg-[#f8f9fa] min-h-screen pb-36 font-sans">
       {/* Fixed Top Header */}
       <div className="fixed top-0 inset-x-0 z-40 p-4 flex items-center justify-between bg-white/90 backdrop-blur-md border-b border-gray-100/80 shadow-xs">
         <button
@@ -85,7 +85,7 @@ const MobileProductDetails = ({ product }) => {
         </button>
       </div>
 
-      <main className="pt-20 px-4 flex flex-col gap-6">
+      <main className="pt-20 px-4 flex flex-col gap-6 pb-28">
         {/* View Toggle Tabs if 3D asset exists */}
         {is3DProduct && (
           <div className="flex items-center justify-center gap-2 bg-gray-200/60 p-1 rounded-xl w-full">
