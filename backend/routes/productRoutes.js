@@ -327,9 +327,58 @@ router.delete('/:id', async (req, res) => {
       await deleteFile(product.glbUrl);
     }
 
-    await docRef.delete();
-    res.status(200).json({ message: 'Product deleted successfully' });
+// POST: Submit customer product review
+router.post('/:id/reviews', async (req, res) => {
+  try {
+    const { name, rating, comment } = req.body;
+    if (!name || !rating || !comment) {
+      return res.status(400).json({ error: 'Name, rating, and comment are required.' });
+    }
+
+    if (!db) {
+      return res.status(500).json({ error: 'Database service is currently unavailable.' });
+    }
+
+    const docRef = db.collection('products').doc(req.params.id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).json({ error: 'Product not found' });
+
+    const product = doc.data();
+    const existingReviews = product.reviewsList || [];
+    const currentCount = Number(product.reviews || existingReviews.length || 0);
+    const currentRating = Number(product.rating || 5.0);
+
+    const newRatingNum = Number(rating);
+    const newCount = currentCount + 1;
+    const newAvgRating = Number(((currentRating * currentCount + newRatingNum) / newCount).toFixed(1));
+
+    const newReview = {
+      id: Date.now().toString(),
+      name: name.trim(),
+      rating: newRatingNum,
+      comment: comment.trim(),
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedReviews = [newReview, ...existingReviews];
+
+    await docRef.set(
+      {
+        rating: newAvgRating,
+        reviews: newCount,
+        reviewsList: updatedReviews
+      },
+      { merge: true }
+    );
+
+    res.status(201).json({
+      message: 'Review submitted successfully',
+      rating: newAvgRating,
+      reviewsCount: newCount,
+      review: newReview
+    });
   } catch (err) {
+    console.error('Error submitting product review:', err);
     res.status(500).json({ error: err.message });
   }
 });

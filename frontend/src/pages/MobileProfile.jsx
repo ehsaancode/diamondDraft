@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Heart, 
   Package, 
@@ -10,7 +10,12 @@ import {
   CreditCard,
   User,
   ShieldCheck,
-  Bell
+  Bell,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  Download,
+  ShoppingBag
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useFavorites } from '../context/FavoriteContext';
@@ -20,49 +25,49 @@ const MobileProfile = () => {
   const navigate = useNavigate();
   const { favoritesCount } = useFavorites();
   const { user, loading, logout } = useAuth();
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [activeTab, setActiveTab] = useState('menu'); // 'menu' or 'orders'
+
+  useEffect(() => {
+    if (user?.email) {
+      const fetchUserOrders = async () => {
+        setLoadingOrders(true);
+        try {
+          const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+          const res = await fetch(`${apiUrl}/api/orders/user/${user.email}`);
+          if (res.ok) {
+            const data = await res.json();
+            setOrders(Array.isArray(data) ? data : []);
+          }
+        } catch (err) {
+          console.error('Error loading user orders:', err);
+        } finally {
+          setLoadingOrders(false);
+        }
+      };
+
+      fetchUserOrders();
+    }
+  }, [user]);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
-  const menuItems = [
-    { 
-      id: 'favorites', 
-      label: 'My Favorites', 
-      icon: <Heart size={20} className="text-red-500" />, 
-      count: favoritesCount,
-      path: '/favorites',
-      color: 'bg-red-50'
-    },
-    { 
-      id: 'orders', 
-      label: 'Order History', 
-      icon: <Package size={20} className="text-blue-500" />, 
-      path: '/orders',
-      color: 'bg-blue-50'
-    },
-    { 
-      id: 'payments', 
-      label: 'Payments', 
-      icon: <CreditCard size={20} className="text-emerald-500" />, 
-      path: '/payments',
-      color: 'bg-emerald-50'
-    },
-    { 
-      id: 'notifications', 
-      label: 'Notifications', 
-      icon: <Bell size={20} className="text-yellow-500" />, 
-      path: '/notifications',
-      color: 'bg-yellow-50'
-    },
-  ];
-
-  const supportItems = [
-    { id: 'settings', label: 'Account Settings', icon: <Settings size={20} className="text-gray-500" />, path: '/settings' },
-    { id: 'privacy', label: 'Privacy & Security', icon: <ShieldCheck size={20} className="text-gray-500" />, path: '/privacy' },
-    { id: 'help', label: 'Help & Support', icon: <HelpCircle size={20} className="text-gray-500" />, path: '/help' },
-  ];
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'Completed':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'Processing':
+        return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'Cancelled':
+        return 'bg-red-50 text-red-700 border-red-200';
+      default:
+        return 'bg-amber-50 text-amber-700 border-amber-200';
+    }
+  };
 
   if (loading) {
     return (
@@ -97,82 +102,144 @@ const MobileProfile = () => {
   return (
     <div className="bg-[#f8f9fa] min-h-screen pb-32">
       {/* Profile Header */}
-      <div className="bg-white px-6 pt-16 pb-8 rounded-b-[48px] shadow-sm flex flex-col items-center gap-4 text-center">
+      <div className="bg-white px-6 pt-12 pb-8 rounded-b-[40px] shadow-xs flex flex-col items-center gap-4 text-center border-b border-gray-100">
         <div className="relative">
-          <div className="w-28 h-28 bg-gray-100 rounded-full border-4 border-white shadow-xl flex items-center justify-center overflow-hidden">
-             <User size={56} className="text-gray-300" />
+          <div className="w-24 h-24 bg-gray-100 rounded-full border-4 border-white shadow-md flex items-center justify-center overflow-hidden">
+            <User size={48} className="text-gray-400" />
           </div>
-          <button className="absolute bottom-0 right-0 w-9 h-9 bg-black text-white rounded-full border-2 border-white flex items-center justify-center shadow-lg">
-             <Settings size={16} />
-          </button>
-        </div>
-        
-        <div>
-          <h2 className="text-2xl font-black text-gray-900">{user.name}</h2>
-          <p className="text-sm text-gray-400 font-medium">{user.email}</p>
         </div>
 
-        <div className="flex gap-3 mt-2">
-           <span className="px-4 py-1.5 bg-green-100 text-green-700 text-[10px] font-black uppercase tracking-widest rounded-full">Pro Member</span>
-           <span className="px-4 py-1.5 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-full">
-             ID: #{user.id ? user.id.substring(0, 6).toUpperCase() : 'USER'}
-           </span>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">{user.name}</h2>
+          <p className="text-xs text-gray-500 font-medium">{user.email}</p>
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveTab('menu')}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'menu' ? 'bg-black text-white shadow-xs' : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            Account Overview
+          </button>
+          <button
+            onClick={() => setActiveTab('orders')}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+              activeTab === 'orders' ? 'bg-black text-white shadow-xs' : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            <span>My CAD Orders</span>
+            {orders.length > 0 && (
+              <span className="w-4 h-4 bg-cyan-500 text-slate-950 text-[10px] font-black rounded-full flex items-center justify-center">
+                {orders.length}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
-      <main className="px-4 py-8 flex flex-col gap-8 max-w-lg mx-auto">
-        {/* Main Menu */}
-        <div className="grid grid-cols-1 gap-3">
-           {menuItems.map((item) => (
-              <motion.button
-                key={item.id}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => navigate(item.path)}
-                className="bg-white p-5 rounded-[24px] flex items-center justify-between shadow-sm border border-gray-50 group cursor-pointer"
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 ${item.color} rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110`}>
-                     {item.label === 'My Favorites' ? <Heart size={22} className="text-red-500" fill={favoritesCount > 0 ? "currentColor" : "none"} /> : item.icon}
+      <main className="px-4 py-6 max-w-lg mx-auto space-y-6">
+        {activeTab === 'orders' ? (
+          /* Orders History Tab View */
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">CAD Request History</h3>
+            {loadingOrders ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="h-28 bg-gray-200/60 rounded-2xl animate-pulse" />
+                ))}
+              </div>
+            ) : orders.length > 0 ? (
+              orders.map((ord) => (
+                <div key={ord.id} className="bg-white rounded-2xl p-4 border border-gray-200 shadow-xs space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-mono font-bold text-xs text-gray-900">{ord.orderId || ord.id}</span>
+                      <p className="text-[10px] text-gray-400 font-mono">
+                        {ord.createdAt ? new Date(ord.createdAt).toLocaleDateString() : 'Recent'}
+                      </p>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md border ${getStatusBadge(ord.status)}`}>
+                      {ord.status}
+                    </span>
                   </div>
-                  <div className="text-left">
-                    <h3 className="text-sm font-bold text-gray-900">{item.label}</h3>
-                    {item.count !== undefined && (
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">{item.count} items</p>
-                    )}
+
+                  <div className="space-y-1.5 border-t border-b border-gray-100 py-2.5">
+                    {ord.items?.map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-xs">
+                        <span className="font-medium text-gray-800 line-clamp-1">{item.name}</span>
+                        <span className="font-mono text-gray-500 text-[10px]">₹{Number(item.price || 0).toLocaleString('en-IN')}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 font-medium">Total CAD Estimate</span>
+                    <span className="font-extrabold text-gray-900 text-sm">₹{Number(ord.totalAmount || 0).toLocaleString('en-IN')}</span>
                   </div>
                 </div>
-                <ChevronRight size={18} className="text-gray-300" />
-              </motion.button>
-           ))}
-        </div>
-
-        {/* Support & Settings */}
-        <div className="bg-white rounded-[32px] p-2 shadow-sm border border-gray-50">
-           {supportItems.map((item, idx) => (
-              <React.Fragment key={item.id}>
-                <button 
-                  onClick={() => navigate(item.path)}
-                  className="w-full p-5 flex items-center justify-between group cursor-pointer"
+              ))
+            ) : (
+              <div className="py-12 text-center bg-white rounded-2xl border border-gray-200 p-6 space-y-3">
+                <ShoppingBag className="w-10 h-10 mx-auto text-gray-300" />
+                <p className="text-xs font-medium text-gray-600">No CAD orders placed yet.</p>
+                <button
+                  onClick={() => navigate('/shop')}
+                  className="px-6 py-2 bg-black text-white text-xs font-bold rounded-xl shadow-xs"
                 >
-                  <div className="flex items-center gap-4 text-gray-600">
-                     {item.icon}
-                     <span className="text-sm font-semibold">{item.label}</span>
-                  </div>
-                  <ChevronRight size={18} className="text-gray-300" />
+                  Explore Catalog
                 </button>
-                {idx < supportItems.length - 1 && <div className="h-px bg-gray-50 mx-4" />}
-              </React.Fragment>
-           ))}
-        </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Main Menu Tab View */
+          <>
+            <div className="grid grid-cols-1 gap-3">
+              <button
+                onClick={() => navigate('/favorites')}
+                className="bg-white p-4 rounded-2xl flex items-center justify-between shadow-xs border border-gray-200 group cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-500">
+                    <Heart size={18} fill={favoritesCount > 0 ? 'currentColor' : 'none'} />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-xs font-bold text-gray-900">My Favorites</h3>
+                    <p className="text-[10px] text-gray-400 font-semibold">{favoritesCount} items saved</p>
+                  </div>
+                </div>
+                <ChevronRight size={16} className="text-gray-300" />
+              </button>
 
-        {/* Logout */}
-        <button 
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-3 py-5 text-red-500 font-bold text-sm bg-white rounded-[24px] shadow-sm border border-gray-50 active:scale-95 transition-transform backdrop-blur-sm cursor-pointer"
-        >
-           <LogOut size={20} />
-           Sign Out
-        </button>
+              <button
+                onClick={() => setActiveTab('orders')}
+                className="bg-white p-4 rounded-2xl flex items-center justify-between shadow-xs border border-gray-200 group cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500">
+                    <Package size={18} />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-xs font-bold text-gray-900">CAD Order History</h3>
+                    <p className="text-[10px] text-gray-400 font-semibold">{orders.length} requests placed</p>
+                  </div>
+                </div>
+                <ChevronRight size={16} className="text-gray-300" />
+              </button>
+            </div>
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 py-4 text-red-600 font-bold text-xs bg-white rounded-2xl shadow-xs border border-red-100 active:scale-95 transition-transform cursor-pointer"
+            >
+              <LogOut size={16} />
+              Sign Out
+            </button>
+          </>
+        )}
       </main>
     </div>
   );

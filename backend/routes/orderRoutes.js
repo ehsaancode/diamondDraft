@@ -90,6 +90,36 @@ router.get('/', async (req, res) => {
   }
 });
 
+// @desc    Get orders by customer email
+// @route   GET /api/orders/user/:email
+// @access  Public
+router.get('/user/:email', async (req, res) => {
+  try {
+    const emailLower = req.params.email.toLowerCase().trim();
+    let userOrders = [];
+
+    if (db) {
+      const snapshot = await db
+        .collection('orders')
+        .where('customerEmail', '==', emailLower)
+        .get();
+      snapshot.forEach((doc) => {
+        userOrders.push({ id: doc.id, ...doc.data() });
+      });
+      userOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else {
+      userOrders = localOrders.filter(
+        (o) => o.customerEmail && o.customerEmail.toLowerCase() === emailLower
+      );
+    }
+
+    res.status(200).json(userOrders);
+  } catch (err) {
+    console.error('Error fetching user orders:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // @desc    Get order by ID
 // @route   GET /api/orders/:id
 // @access  Public

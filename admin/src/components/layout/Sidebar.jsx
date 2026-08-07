@@ -6,6 +6,7 @@ import {
   ShoppingBag,
   Package, 
   PlusCircle, 
+  Users,
   Settings, 
   LogOut,
   X
@@ -29,6 +30,7 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
   const navItems = [
     { icon: <LayoutDashboard size={20} />, label: "Dashboard", to: "/" },
     { icon: <ShoppingBag size={20} />, label: "Orders", to: "/orders" },
+    { icon: <Users size={20} />, label: "Customers", to: "/customers" },
     { icon: <Package size={20} />, label: "Products", to: "/products" },
     { icon: <PlusCircle size={20} />, label: "Add Product", to: "/add-product" },
     { icon: <Settings size={20} />, label: "Settings", to: "/settings" },

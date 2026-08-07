@@ -15,6 +15,7 @@ import { AddProduct } from './pages/AddProduct';
 import { EditProduct } from './pages/EditProduct';
 import { Products } from './pages/Products';
 import { Orders } from './pages/Orders';
+import { Customers } from './pages/Customers';
 import { SettingsPage } from './pages/SettingsPage';
 import { Login } from './pages/Login';
 
@@ -30,6 +31,7 @@ const AdminLayout = () => {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/orders" element={<Orders />} />
+            <Route path="/customers" element={<Customers />} />
             <Route path="/add-product" element={<AddProduct />} />
             <Route path="/edit-product/:id" element={<EditProduct />} />
             <Route path="/products" element={<Products />} />
