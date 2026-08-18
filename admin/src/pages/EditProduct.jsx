@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Image as ImageIcon, Video as VideoIcon, Box as BoxIcon, X, FileCheck } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -33,7 +33,7 @@ export const EditProduct = () => {
     vertexCount: '52000',
     license: 'Royalty-Free'
   });
-  const [selectedFormats, setSelectedFormats] = useState(['.FBX', '.OBJ', '.STL', '.GLB']);
+  const [selectedFormats, setSelectedFormats] = useState(['.GLB', '.GLTF', '.JSON', '.FBX', '.OBJ', '.STL']);
   const [images, setImages] = useState([]);
   const [video, setVideo] = useState(null);
   const [modelFile, setModelFile] = useState(null);
@@ -44,6 +44,9 @@ export const EditProduct = () => {
 
   const [imagePreviews, setImagePreviews] = useState([]);
   const [videoPreview, setVideoPreview] = useState(null);
+
+  const imageInputRef = useRef(null);
+  const [isDraggingImages, setIsDraggingImages] = useState(false);
 
   useEffect(() => {
     if (images.length === 0) {
@@ -97,7 +100,7 @@ export const EditProduct = () => {
           vertexCount: data.vertexCount || '52000',
           license: data.license || 'Royalty-Free'
         });
-        setSelectedFormats(data.formats || ['.FBX', '.OBJ', '.STL', '.GLB']);
+        setSelectedFormats(data.formats || ['.GLB', '.GLTF', '.JSON', '.FBX', '.OBJ', '.STL']);
         setExistingImages(data.images || []);
         setExistingVideo(data.video || null);
         setExistingGlbUrl(data.glbUrl || data.modelUrl || null);
@@ -161,7 +164,7 @@ export const EditProduct = () => {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="max-w-4xl mx-auto space-y-8">
       <div>
         <h2 className="text-3xl font-bold font-grotesk tracking-tight">Edit 3D Product</h2>
-        <p className="text-zinc-400 mt-1">Update 3D model files, specifications, and pricing.</p>
+        <p className="text-zinc-400 mt-1">Update 3D model files (.glb, .gltf, .json, .fbx, .obj, .stl, .zip), specifications, and pricing.</p>
       </div>
 
       <div className="glass-panel p-6 md:p-8">
@@ -256,7 +259,7 @@ export const EditProduct = () => {
               <div className="pt-2">
                 <label className="block text-sm font-medium text-zinc-300 mb-2">Included Formats</label>
                 <div className="flex flex-wrap gap-4 mt-2 bg-black/20 p-3 rounded-lg border border-border/40">
-                  {['.FBX', '.OBJ', '.STL', '.GLB', '.BLEND', '.3DM'].map(fmt => (
+                  {['.GLB', '.GLTF', '.JSON', '.FBX', '.OBJ', '.STL', '.BLEND', '.3DM'].map(fmt => (
                     <label key={fmt} className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer select-none">
                       <input 
                         type="checkbox" 
@@ -282,7 +285,7 @@ export const EditProduct = () => {
           <div className="space-y-4 p-6 rounded-xl bg-surfaceHover/50 border border-cyan-500/30">
             <h3 className="text-lg font-semibold text-cyan-400 border-b border-border pb-2 flex items-center gap-2">
               <BoxIcon size={20} />
-              <span>3D Model File (.glb, .gltf, .fbx, .obj, .stl, .zip)</span>
+              <span>3D Model File (.glb, .gltf, .json, .fbx, .obj, .stl, .zip)</span>
             </h3>
 
             {existingGlbUrl && !modelFile && (
@@ -295,7 +298,7 @@ export const EditProduct = () => {
             <label className="relative border-2 border-dashed border-cyan-500/40 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-cyan-400 hover:bg-cyan-500/5 transition-all cursor-pointer group min-h-[160px]">
               <input
                 type="file"
-                accept=".glb,.gltf,.fbx,.obj,.stl,.zip"
+                accept=".glb,.gltf,.json,.fbx,.obj,.stl,.zip"
                 onChange={(e) => setModelFile(e.target.files[0])}
                 className="hidden"
               />
@@ -329,10 +332,173 @@ export const EditProduct = () => {
                     <BoxIcon size={24} className="text-cyan-400" />
                   </div>
                   <p className="text-sm font-bold text-white mb-1">Upload New 3D Model File</p>
-                  <p className="text-xs text-zinc-400">Supports .GLB, .GLTF, .FBX, .OBJ, .STL, .ZIP</p>
+                  <p className="text-xs text-zinc-400">Supports .GLB, .GLTF, Three.js .JSON, .FBX, .OBJ, .STL, .ZIP</p>
                 </>
               )}
             </label>
+          </div>
+
+          {/* Media (Images & Video) */}
+          <div className="space-y-4 p-6 rounded-xl bg-surfaceHover/50 border border-border">
+            <h3 className="text-lg font-semibold text-zinc-100 border-b border-border pb-2">Product Preview Media (Images & Video)</h3>
+
+            {/* Existing Images */}
+            {existingImages.length > 0 && (
+              <div className="space-y-2 mb-4">
+                <span className="text-xs font-bold text-zinc-300">Existing Uploaded Images ({existingImages.length}):</span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 bg-black/20 rounded-xl border border-border/40 max-h-[220px] overflow-y-auto">
+                  {existingImages.map((img, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-xl border border-border overflow-hidden bg-black/40 group/existing shadow-sm">
+                      <img src={img} alt="Existing product" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setExistingImages(prev => prev.filter((_, i) => i !== idx));
+                        }}
+                        className="absolute top-1 right-1 p-1 bg-black/80 hover:bg-red-500 text-white rounded-full transition-all duration-200 shadow-md cursor-pointer"
+                        title="Delete existing image"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {/* Upload New Images */}
+              <div
+                onClick={() => imageInputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingImages(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingImages(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingImages(false);
+                  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+                    if (droppedFiles.length > 0) {
+                      setImages(prev => [...prev, ...droppedFiles]);
+                    }
+                  }
+                }}
+                className={`relative border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer min-h-[180px] ${
+                  isDraggingImages
+                    ? 'border-primary-500 bg-primary-500/10'
+                    : 'border-border hover:border-primary-500/50 hover:bg-primary-500/5'
+                }`}
+              >
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      const newFiles = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+                      if (newFiles.length > 0) {
+                        setImages(prev => [...prev, ...newFiles]);
+                      }
+                      e.target.value = '';
+                    }
+                  }}
+                  className="hidden"
+                />
+                {imagePreviews.length > 0 ? (
+                  <div className="w-full space-y-4 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                      <span className="text-xs font-bold text-primary-400">
+                        {images.length} New Image{images.length > 1 ? 's' : ''} Queued
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => imageInputRef.current?.click()}
+                        className="text-xs bg-primary-500/20 hover:bg-primary-500/30 text-primary-400 font-semibold px-3 py-1 rounded-lg border border-primary-500/40 cursor-pointer transition-colors"
+                      >
+                        + Add More
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
+                      {imagePreviews.map((preview, idx) => (
+                        <div key={idx} className="relative aspect-square rounded-xl border border-border overflow-hidden bg-black/40 group/item shadow-sm">
+                          <img src={preview} alt="Selected preview" className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setImages(prev => prev.filter((_, i) => i !== idx));
+                            }}
+                            className="absolute top-1 right-1 p-1 bg-black/80 hover:bg-red-500 text-white rounded-full transition-all duration-200 shadow-md cursor-pointer"
+                            title="Remove new image"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center pointer-events-none">
+                    <div className="w-12 h-12 rounded-full bg-surfaceHover border border-border flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                      <ImageIcon size={24} className="text-zinc-400 group-hover:text-primary-500 transition-colors" />
+                    </div>
+                    <p className="text-sm font-semibold text-zinc-100 mb-1">Click or Drag & Drop Images Here</p>
+                    <p className="text-xs text-zinc-500">PNG, JPG, WEBP (Select multiple images)</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Video upload */}
+              <label className="relative border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-accent/50 hover:bg-accent/5 transition-all cursor-pointer group min-h-[180px]">
+                <input type="file" accept="video/mp4" onChange={(e) => setVideo(e.target.files[0])} className="hidden" />
+                {videoPreview || existingVideo ? (
+                  <div className="w-full space-y-3">
+                    <div className="relative w-16 h-16 mx-auto rounded-lg border border-border overflow-hidden bg-black/40 flex items-center justify-center pointer-events-auto group/video">
+                      <VideoIcon size={28} className="text-accent" />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setVideo(null);
+                          setExistingVideo(null);
+                        }}
+                        className="absolute top-1 right-1 p-0.5 bg-black/70 hover:bg-red-500 text-white rounded-full transition-all duration-200 opacity-100 shadow-md"
+                      >
+                        <X size={10} />
+                      </button>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-accent line-clamp-1 max-w-[200px] mx-auto">
+                        {video ? video.name : existingVideo ? existingVideo.split('/').pop() : 'Video Attached'}
+                      </p>
+                      <p className="text-[10px] text-zinc-500">Click to change video</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-12 h-12 rounded-full bg-surfaceHover border border-border flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                      <VideoIcon size={24} className="text-zinc-400 group-hover:text-accent transition-colors" />
+                    </div>
+                    <p className="text-sm font-semibold text-zinc-100 mb-1">Upload 360° Video</p>
+                    <p className="text-xs text-zinc-500">MP4, WEBM (max 50MB)</p>
+                  </>
+                )}
+              </label>
+            </div>
           </div>
 
           <div className="pt-4 flex justify-end gap-4">

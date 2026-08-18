@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft,
+  ChevronRight,
   Share2,
   Heart,
   Star,
@@ -44,7 +45,7 @@ const ProductDetails = () => {
       return `${apiUrl}${cleanPath}`;
     };
 
-    const modelFileUrl = data.glbUrl || data.modelUrl || null;
+    const modelFileUrl = data.glbUrl || data.modelUrl || data.modelFile || data.glb || data.model || null;
     const is3DAsset = !!modelFileUrl || data.category === '3D Models';
 
     return {
@@ -113,13 +114,40 @@ const ProductDetails = () => {
 
   const activeProduct = product;
 
-  const [mainImage, setMainImage] = useState(activeProduct?.image || null);
+  const [mainImageIndex, setMainImageIndex] = useState(0);
 
   useEffect(() => {
     if (product) {
-      setMainImage(product.image);
+      setMainImageIndex(0);
     }
   }, [product]);
+
+  const gallery =
+    activeProduct?.images && activeProduct.images.length > 0
+      ? activeProduct.images
+      : activeProduct?.image
+      ? [activeProduct.image]
+      : [];
+
+  const handlePrevImage = () => {
+    if (gallery.length <= 1) return;
+    setMainImageIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    if (gallery.length <= 1) return;
+    setMainImageIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1));
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (activeTab !== 'image' || gallery.length <= 1) return;
+      if (e.key === 'ArrowLeft') handlePrevImage();
+      if (e.key === 'ArrowRight') handleNextImage();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeTab, gallery.length]);
 
   if (loading) {
     return (
@@ -156,13 +184,6 @@ const ProductDetails = () => {
 
   const isFav = isFavorite(activeProduct.id || activeProduct._id);
   const is3DProduct = activeProduct.is3D || !!activeProduct.glbUrl;
-
-  const gallery =
-    activeProduct.images && activeProduct.images.length > 0
-      ? activeProduct.images
-      : activeProduct.image
-      ? [activeProduct.image]
-      : [];
 
   const formats =
     activeProduct.formats && activeProduct.formats.length > 0
@@ -252,13 +273,13 @@ const ProductDetails = () => {
             <div className="flex flex-col-reverse md:flex-row gap-4">
               {/* Thumbnail List */}
               {gallery.length > 1 && (
-                <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto max-h-[500px] scrollbar-hide shrink-0">
+                <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto max-h-[500px] scrollbar-hide shrink-0 p-1">
                   {gallery.map((img, idx) => (
                     <button
                       key={idx}
-                      onClick={() => setMainImage(img)}
+                      onClick={() => setMainImageIndex(idx)}
                       className={`cursor-pointer w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 transition-all p-1 bg-white shrink-0 ${
-                        mainImage === img ? 'border-black scale-105 shadow-sm' : 'border-gray-200 opacity-70 hover:opacity-100'
+                        mainImageIndex === idx ? 'border-black scale-105 shadow-sm' : 'border-gray-200 opacity-70 hover:opacity-100'
                       }`}
                     >
                       <img src={img} alt="" className="w-full h-full object-cover rounded-lg" />
@@ -267,14 +288,52 @@ const ProductDetails = () => {
                 </div>
               )}
 
-              {/* Main Preview Container */}
-              <div className="flex-1 aspect-square bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden flex items-center justify-center p-6">
-                {mainImage || activeProduct.image ? (
-                  <img
-                    src={mainImage || activeProduct.image}
-                    alt={activeProduct.name}
-                    className="max-h-full max-w-full object-contain"
-                  />
+              {/* Main Preview Container with Next/Previous & Counter */}
+              <div className="relative flex-1 aspect-square bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden flex items-center justify-center p-6 group">
+                {gallery.length > 0 ? (
+                  <>
+                    <AnimatePresence mode="wait">
+                      <motion.img
+                        key={mainImageIndex}
+                        src={gallery[mainImageIndex] || activeProduct.image}
+                        alt={activeProduct.name}
+                        initial={{ opacity: 0, scale: 0.96 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.96 }}
+                        transition={{ duration: 0.25 }}
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    </AnimatePresence>
+
+                    {/* Image Counter Badge */}
+                    {gallery.length > 1 && (
+                      <div className="absolute top-4 left-4 bg-black/75 backdrop-blur-md px-3 py-1 rounded-full text-white text-xs font-mono font-medium shadow-sm">
+                        {mainImageIndex + 1} / {gallery.length}
+                      </div>
+                    )}
+
+                    {/* Previous Button */}
+                    {gallery.length > 1 && (
+                      <button
+                        onClick={handlePrevImage}
+                        aria-label="Previous Image"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 shadow-md border border-gray-200 flex items-center justify-center text-gray-800 hover:bg-black hover:text-white transition-all cursor-pointer opacity-90 md:opacity-0 group-hover:opacity-100"
+                      >
+                        <ChevronLeft size={20} />
+                      </button>
+                    )}
+
+                    {/* Next Button */}
+                    {gallery.length > 1 && (
+                      <button
+                        onClick={handleNextImage}
+                        aria-label="Next Image"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 shadow-md border border-gray-200 flex items-center justify-center text-gray-800 hover:bg-black hover:text-white transition-all cursor-pointer opacity-90 md:opacity-0 group-hover:opacity-100"
+                      >
+                        <ChevronRight size={20} />
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <div className="flex flex-col items-center justify-center p-6 text-center text-gray-400">
                     <ImageIcon className="w-12 h-12 mb-2 text-gray-300" />

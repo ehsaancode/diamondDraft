@@ -18,7 +18,8 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 const uploadFile = async (req, file, folderName) => {
-  const fileExt = path.extname(file.originalname);
+  const fileExt = path.extname(file.originalname).toLowerCase();
+  const is3DModel = folderName === 'models' || ['.glb', '.gltf', '.json', '.fbx', '.obj', '.stl', '.zip'].includes(fileExt);
 
   // Try Cloudinary upload if credentials are provided
   if (process.env.CLOUD_NAME && process.env.API_KEY && process.env.CLOUDINARY_API_SECRET) {
@@ -27,7 +28,7 @@ const uploadFile = async (req, file, folderName) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
             folder: `gwel/${folderName}`,
-            resource_type: 'auto',
+            resource_type: is3DModel ? 'raw' : 'auto',
           },
           (error, result) => {
             if (error) return reject(error);
@@ -58,7 +59,7 @@ const uploadFile = async (req, file, folderName) => {
 router.post(
   '/',
   upload.fields([
-    { name: 'images', maxCount: 5 },
+    { name: 'images', maxCount: 25 },
     { name: 'video', maxCount: 1 },
     { name: 'modelFile', maxCount: 1 }
   ]),
@@ -93,13 +94,13 @@ router.post(
         videoUrl = await uploadFile(req, req.files.video[0], 'videos');
       }
 
-      // Upload 3D Model File (.glb, .gltf, .fbx, .obj, .stl, .zip)
+      // Upload 3D Model File (.glb, .gltf, Three.js .json, .fbx, .obj, .stl, .zip)
       let glbUrl = null;
       if (req.files?.modelFile && req.files.modelFile.length > 0) {
         glbUrl = await uploadFile(req, req.files.modelFile[0], 'models');
       }
 
-      let parsedFormats = ['.blend', '.fbx', '.obj', '.stl', '.glb'];
+      let parsedFormats = ['.glb', '.gltf', '.json', '.fbx', '.obj', '.stl'];
       if (formats) {
         try {
           parsedFormats = typeof formats === 'string' ? JSON.parse(formats) : formats;
@@ -166,7 +167,7 @@ router.get('/:id', async (req, res) => {
 router.put(
   '/:id',
   upload.fields([
-    { name: 'images', maxCount: 5 },
+    { name: 'images', maxCount: 25 },
     { name: 'video', maxCount: 1 },
     { name: 'modelFile', maxCount: 1 }
   ]),

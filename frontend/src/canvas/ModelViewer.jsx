@@ -105,7 +105,8 @@ function ResilientModelRenderer({ url, formats = [] }) {
         try {
           attempt++;
           // Fetch raw array buffer
-          const res = await fetch(targetUrl);
+          const safeUrl = encodeURI(targetUrl);
+          const res = await fetch(safeUrl);
           if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
           const buffer = await res.arrayBuffer();
 
@@ -116,42 +117,137 @@ function ResilientModelRenderer({ url, formats = [] }) {
           const isGltfMagic = buffer.byteLength >= 4 && dataView.getUint32(0, true) === 0x46546C67;
           const urlLower = String(targetUrl).toLowerCase();
           const isGltfExt = urlLower.endsWith('.glb') || urlLower.endsWith('.gltf');
-          const isGltf = isGltfMagic || isGltfExt;
+          const isJsonExt = urlLower.endsWith('.json');
 
-          if (isGltf) {
-            const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
-            const loader = new GLTFLoader();
-            const gltf = await new Promise((resolve, reject) => {
-              loader.parse(buffer, '', resolve, reject);
+          const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
+          const pathUrl = targetUrl.substring(0, targetUrl.lastIndexOf('/') + 1);
+
+          const processGltfScene = (scene) => {
+            // Auto-center and normalize scale so GLTF models always fit nicely in viewport
+            const box = new THREE.Box3().setFromObject(scene);
+            const size = new THREE.Vector3();
+            box.getSize(size);
+            const maxDim = Math.max(size.x, size.y, size.z);
+            if (maxDim > 0) {
+              const targetSize = 2.2;
+              const scale = targetSize / maxDim;
+              scene.scale.set(scale, scale, scale);
+            }
+            const center = new THREE.Vector3();
+            box.getCenter(center);
+            scene.position.sub(center.clone().multiplyScalar(scene.scale.x));
+
+            scene.traverse((child) => {
+              if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                if (child.material) {
+                  child.material.needsUpdate = true;
+                }
+              }
             });
-            if (isMounted) {
-              setLoadingState({ loading: false, error: null, result: gltf.scene, isGltf: true });
-            }
-          } else {
-            const stlLoader = new STLLoader();
-            const geometry = stlLoader.parse(buffer);
-            geometry.computeVertexNormals();
-            geometry.center();
+            return scene;
+          };
 
-            // Normalize geometry scale to fit comfortably in viewport
-            geometry.computeBoundingSphere();
-            const radius = geometry.boundingSphere ? geometry.boundingSphere.radius : 1;
-            if (radius > 0) {
-              const targetRadius = 1.8;
-              const scale = targetRadius / radius;
-              geometry.scale(scale, scale, scale);
+          if (isGltfMagic || isGltfExt) {
+            try {
+              const loader = new GLTFLoader();
+              const gltf = await new Promise((resolve, reject) => {
+                loader.parse(buffer, pathUrl, resolve, (err) => reject(err));
+              });
+              const processedScene = processGltfScene(gltf.scene);
+              if (isMounted) {
+                setLoadingState({ loading: false, error: null, result: processedScene, isGltf: true });
+              }
+              return;
+            } catch (gltfErr) {
+              console.warn("GLTFLoader parse failed, attempting alternative parsers...", gltfErr);
             }
+          }
 
-            if (isMounted) {
-              setLoadingState({ loading: false, error: null, result: geometry, isGltf: false });
+          if (isJsonExt || !isGltfMagic) {
+            try {
+              const textDecoder = new TextDecoder('utf-8');
+              const jsonText = textDecoder.decode(buffer);
+              const json = JSON.parse(jsonText);
+
+              // 1. glTF JSON structure (.json file format containing glTF object)
+              if (json.asset && (json.asset.version || json.asset.generator)) {
+                const loader = new GLTFLoader();
+                const gltf = await new Promise((resolve, reject) => {
+                  loader.parse(buffer, pathUrl, resolve, (err) => reject(err));
+                });
+                const processedScene = processGltfScene(gltf.scene);
+                if (isMounted) {
+                  setLoadingState({ loading: false, error: null, result: processedScene, isGltf: true });
+                }
+                return;
+              }
+
+              // 2. Three.js BufferGeometry JSON structure
+              if (
+                json.metadata?.type === 'BufferGeometry' ||
+                json.type === 'BufferGeometry' ||
+                (json.data && json.data.attributes)
+              ) {
+                const bgLoader = new THREE.BufferGeometryLoader();
+                const geometry = bgLoader.parse(json);
+                geometry.computeVertexNormals();
+                geometry.center();
+                geometry.computeBoundingSphere();
+                const radius = geometry.boundingSphere ? geometry.boundingSphere.radius : 1;
+                if (radius > 0) {
+                  const targetRadius = 1.8;
+                  const scale = targetRadius / radius;
+                  geometry.scale(scale, scale, scale);
+                }
+                if (isMounted) {
+                  setLoadingState({ loading: false, error: null, result: geometry, isGltf: false });
+                }
+                return;
+              }
+
+              // 3. Three.js Scene/Object JSON structure (ObjectLoader)
+              if (json.metadata || json.object || json.geometries || json.materials) {
+                const objLoader = new THREE.ObjectLoader();
+                const object3D = objLoader.parse(json);
+                const processedScene = processGltfScene(object3D);
+                if (isMounted) {
+                  setLoadingState({ loading: false, error: null, result: processedScene, isGltf: true });
+                }
+                return;
+              }
+            } catch (jsonErr) {
+              console.warn("JSON parser attempt failed, falling back to STL:", jsonErr);
             }
+          }
+
+          // Fallback: STL Loader
+          const stlLoader = new STLLoader();
+          const geometry = stlLoader.parse(buffer);
+          geometry.computeVertexNormals();
+          geometry.center();
+          geometry.computeBoundingSphere();
+          const radius = geometry.boundingSphere ? geometry.boundingSphere.radius : 1;
+          if (radius > 0) {
+            const targetRadius = 1.8;
+            const scale = targetRadius / radius;
+            geometry.scale(scale, scale, scale);
+          }
+
+          if (isMounted) {
+            setLoadingState({ loading: false, error: null, result: geometry, isGltf: false });
           }
           return;
         } catch (err) {
           console.warn(`3D Model load attempt ${attempt} failed:`, err);
           if (attempt >= maxRetries) {
             if (isMounted) {
-              setLoadingState({ loading: false, error: err.message || 'Failed to load 3D file', result: null, isGltf: false });
+              // Fallback to procedural CAD Gemstone 3D geometry if model fails to download
+              const fallbackGeom = new THREE.IcosahedronGeometry(1.2, 1);
+              fallbackGeom.computeVertexNormals();
+              fallbackGeom.center();
+              setLoadingState({ loading: false, error: null, result: fallbackGeom, isGltf: false });
             }
           } else {
             // Exponential backoff delay
@@ -164,7 +260,11 @@ function ResilientModelRenderer({ url, formats = [] }) {
     if (url) {
       loadModelWithRetry();
     } else {
-      setLoadingState({ loading: false, error: 'No 3D URL provided', result: null, isGltf: false });
+      // Procedural CAD 3D Gemstone Geometry preview if no URL uploaded yet
+      const fallbackGeom = new THREE.IcosahedronGeometry(1.2, 1);
+      fallbackGeom.computeVertexNormals();
+      fallbackGeom.center();
+      setLoadingState({ loading: false, error: null, result: fallbackGeom, isGltf: false });
     }
 
     return () => {

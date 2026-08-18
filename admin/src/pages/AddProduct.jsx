@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, Image as ImageIcon, Video as VideoIcon, Box as BoxIcon, X, FileCheck } from 'lucide-react';
 import { Check } from '../components/icons/Check';
@@ -29,13 +29,18 @@ export const AddProduct = () => {
     vertexCount: '52000',
     license: 'Royalty-Free'
   });
-  const [selectedFormats, setSelectedFormats] = useState(['.FBX', '.OBJ', '.STL', '.GLB']);
+  const [selectedFormats, setSelectedFormats] = useState(['.GLB', '.GLTF', '.JSON', '.FBX', '.OBJ', '.STL']);
   const [images, setImages] = useState([]);
   const [video, setVideo] = useState(null);
   const [modelFile, setModelFile] = useState(null);
 
   const [imagePreviews, setImagePreviews] = useState([]);
   const [videoPreview, setVideoPreview] = useState(null);
+
+  const imageInputRef = useRef(null);
+  const modelFileInputRef = useRef(null);
+  const videoInputRef = useRef(null);
+  const [isDraggingImages, setIsDraggingImages] = useState(false);
 
   useEffect(() => {
     if (images.length === 0) {
@@ -97,7 +102,7 @@ export const AddProduct = () => {
       setFormData({
         name: '', sku: '', description: '', price: '', compareAtPrice: '', quantity: '1', category: '3D Models', subcategory: 'Hard Surface', polyCount: '45000', vertexCount: '52000', license: 'Royalty-Free'
       });
-      setSelectedFormats(['.FBX', '.OBJ', '.STL', '.GLB']);
+      setSelectedFormats(['.GLB', '.GLTF', '.JSON', '.FBX', '.OBJ', '.STL']);
       setImages([]);
       setVideo(null);
       setModelFile(null);
@@ -119,7 +124,7 @@ export const AddProduct = () => {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="max-w-4xl mx-auto space-y-8">
       <div>
         <h2 className="text-3xl font-bold font-grotesk tracking-tight">Add New 3D Product</h2>
-        <p className="text-zinc-400 mt-1">Upload 3D model files (.glb, .gltf, .fbx, .obj, .stl, .zip), images, and technical specifications.</p>
+        <p className="text-zinc-400 mt-1">Upload 3D model files (.glb, .gltf, .json, .fbx, .obj, .stl, .zip), images, and technical specifications.</p>
       </div>
 
       <div className="glass-panel p-6 md:p-8">
@@ -214,7 +219,7 @@ export const AddProduct = () => {
               <div className="pt-2">
                 <label className="block text-sm font-medium text-zinc-300 mb-2">Included Formats</label>
                 <div className="flex flex-wrap gap-4 mt-2 bg-black/20 p-3 rounded-lg border border-border/40">
-                  {['.FBX', '.OBJ', '.STL', '.GLB', '.BLEND', '.3DM'].map(fmt => (
+                  {['.GLB', '.GLTF', '.JSON', '.FBX', '.OBJ', '.STL', '.BLEND', '.3DM'].map(fmt => (
                     <label key={fmt} className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer select-none">
                       <input 
                         type="checkbox" 
@@ -240,13 +245,13 @@ export const AddProduct = () => {
           <div className="space-y-4 p-6 rounded-xl bg-surfaceHover/50 border border-cyan-500/30">
             <h3 className="text-lg font-semibold text-cyan-400 border-b border-border pb-2 flex items-center gap-2">
               <BoxIcon size={20} />
-              <span>3D Model File Upload (.glb, .gltf, .fbx, .obj, .stl, .zip)</span>
+              <span>3D Model File Upload (.glb, .gltf, .json, .fbx, .obj, .stl, .zip)</span>
             </h3>
 
             <label className="relative border-2 border-dashed border-cyan-500/40 rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-cyan-400 hover:bg-cyan-500/5 transition-all cursor-pointer group min-h-[160px]">
               <input
                 type="file"
-                accept=".glb,.gltf,.fbx,.obj,.stl,.zip"
+                accept=".glb,.gltf,.json,.fbx,.obj,.stl,.zip"
                 onChange={(e) => setModelFile(e.target.files[0])}
                 className="hidden"
               />
@@ -280,7 +285,7 @@ export const AddProduct = () => {
                     <BoxIcon size={24} className="text-cyan-400" />
                   </div>
                   <p className="text-sm font-bold text-white mb-1">Click to upload 3D Model File</p>
-                  <p className="text-xs text-zinc-400">Supports .GLB, .GLTF, .FBX, .OBJ, .STL, .ZIP</p>
+                  <p className="text-xs text-zinc-400">Supports .GLB, .GLTF, Three.js .JSON, .FBX, .OBJ, .STL, .ZIP</p>
                 </>
               )}
             </label>
@@ -290,14 +295,73 @@ export const AddProduct = () => {
           <div className="space-y-4 p-6 rounded-xl bg-surfaceHover/50 border border-border">
             <h3 className="text-lg font-semibold text-zinc-100 border-b border-border pb-2">Product Preview Media</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <label className="relative border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-primary-500/50 hover:bg-primary-500/5 transition-all cursor-pointer group min-h-[180px]">
-                <input type="file" multiple accept="image/*" onChange={(e) => setImages(Array.from(e.target.files))} className="hidden" />
+              <div
+                onClick={() => imageInputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingImages(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingImages(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingImages(false);
+                  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+                    if (droppedFiles.length > 0) {
+                      setImages(prev => [...prev, ...droppedFiles]);
+                    }
+                  }
+                }}
+                className={`relative border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer min-h-[180px] ${
+                  isDraggingImages
+                    ? 'border-primary-500 bg-primary-500/10'
+                    : 'border-border hover:border-primary-500/50 hover:bg-primary-500/5'
+                }`}
+              >
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      const newFiles = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+                      if (newFiles.length > 0) {
+                        setImages(prev => [...prev, ...newFiles]);
+                      }
+                      e.target.value = '';
+                    }
+                  }}
+                  className="hidden"
+                />
                 {imagePreviews.length > 0 ? (
-                  <div className="w-full space-y-3">
-                    <div className="grid grid-cols-3 gap-2 justify-center max-w-[240px] mx-auto pointer-events-auto">
-                      {imagePreviews.slice(0, 6).map((preview, idx) => (
-                        <div key={idx} className="relative aspect-square rounded-lg border border-border overflow-hidden bg-black/40 group/item">
+                  <div className="w-full space-y-4 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                      <span className="text-xs font-bold text-primary-400">
+                        {images.length} Image{images.length > 1 ? 's' : ''} Selected
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => imageInputRef.current?.click()}
+                        className="text-xs bg-primary-500/20 hover:bg-primary-500/30 text-primary-400 font-semibold px-3 py-1 rounded-lg border border-primary-500/40 cursor-pointer transition-colors"
+                      >
+                        + Add More Images
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[260px] overflow-y-auto pr-1 scrollbar-thin">
+                      {imagePreviews.map((preview, idx) => (
+                        <div key={idx} className="relative aspect-square rounded-xl border border-border overflow-hidden bg-black/40 group/item shadow-sm">
                           <img src={preview} alt="Selected preview" className="w-full h-full object-cover" />
+                          <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-black/70 text-[10px] font-mono text-zinc-300 rounded">
+                            #{idx + 1}
+                          </span>
                           <button
                             type="button"
                             onClick={(e) => {
@@ -305,28 +369,25 @@ export const AddProduct = () => {
                               e.stopPropagation();
                               setImages(prev => prev.filter((_, i) => i !== idx));
                             }}
-                            className="absolute top-1 right-1 p-0.5 bg-black/70 hover:bg-red-500 text-white rounded-full transition-all duration-200 opacity-100 shadow-md"
+                            className="absolute top-1 right-1 p-1 bg-black/80 hover:bg-red-500 text-white rounded-full transition-all duration-200 shadow-md cursor-pointer"
+                            title="Remove image"
                           >
-                            <X size={10} />
+                            <X size={12} />
                           </button>
                         </div>
                       ))}
                     </div>
-                    <div>
-                      <p className="text-xs font-semibold text-primary-400">Click anywhere else to change images</p>
-                      <p className="text-[10px] text-zinc-500">{images.length} files selected</p>
-                    </div>
                   </div>
                 ) : (
-                  <>
+                  <div className="w-full h-full flex flex-col items-center justify-center pointer-events-none">
                     <div className="w-12 h-12 rounded-full bg-surfaceHover border border-border flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
                       <ImageIcon size={24} className="text-zinc-400 group-hover:text-primary-500 transition-colors" />
                     </div>
-                    <p className="text-sm font-semibold text-zinc-100 mb-1">Click to upload Images</p>
-                    <p className="text-xs text-zinc-500">PNG, JPG, WEBP (max 10MB)</p>
-                  </>
+                    <p className="text-sm font-semibold text-zinc-100 mb-1">Click or Drag & Drop Images Here</p>
+                    <p className="text-xs text-zinc-500">PNG, JPG, WEBP (Select multiple images)</p>
+                  </div>
                 )}
-              </label>
+              </div>
               <label className="relative border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-accent/50 hover:bg-accent/5 transition-all cursor-pointer group min-h-[180px]">
                 <input type="file" accept="video/mp4" onChange={(e) => setVideo(e.target.files[0])} className="hidden" />
                 {videoPreview ? (

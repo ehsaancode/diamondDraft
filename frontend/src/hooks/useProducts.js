@@ -24,7 +24,7 @@ export const useProducts = () => {
 
           const dbProducts = data.map((p, index) => {
             const sub = p.subcategory || DEFAULT_SUBCATEGORIES[p.category] || '';
-            const modelFileUrl = p.glbUrl || p.modelUrl || null;
+            const modelFileUrl = p.glbUrl || p.modelUrl || p.modelFile || p.glb || p.model || null;
             const has3D = !!modelFileUrl || p.category === '3D Models';
 
             return {

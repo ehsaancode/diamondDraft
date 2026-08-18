@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   ChevronLeft,
+  ChevronRight,
   Share2,
   Heart,
   Star,
@@ -38,7 +39,7 @@ const MobileProductDetails = ({ product }) => {
     return `${apiUrl}${cleanPath}`;
   };
 
-  const resolvedGlbUrl = getAssetUrl(product?.glbUrl || product?.modelUrl);
+  const resolvedGlbUrl = getAssetUrl(product?.glbUrl || product?.modelUrl || product?.modelFile || product?.glb || product?.model);
   const is3DProduct = product?.is3D || !!resolvedGlbUrl;
   const gallery =
     product?.images && product?.images.length > 0
@@ -54,10 +55,20 @@ const MobileProductDetails = ({ product }) => {
       : ['STL', '3DM', 'OBJ', 'STEP'];
 
   const [activeTab, setActiveTab] = useState('image'); // 'image' or '3d'
-  const [mainImage, setMainImage] = useState(gallery[0]);
+  const [mainImageIndex, setMainImageIndex] = useState(0);
   const [selectedFormat, setSelectedFormat] = useState(formats[0]);
   const [isWebAROpen, setIsWebAROpen] = useState(false);
   const [isFormatGuideOpen, setIsFormatGuideOpen] = useState(false);
+
+  const handlePrevImage = () => {
+    if (gallery.length <= 1) return;
+    setMainImageIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    if (gallery.length <= 1) return;
+    setMainImageIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1));
+  };
 
   const modelIdDisplay = product?.sku || product?.id || product?._id || 'MD-3001';
   const isFav = isFavorite(modelIdDisplay);
@@ -144,30 +155,59 @@ const MobileProductDetails = ({ product }) => {
         ) : (
           /* Media Gallery View */
           <div className="space-y-3">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="relative aspect-square rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden flex items-center justify-center p-6"
-            >
-              <img
-                src={mainImage || product?.image || '/images/jewellery_cad_ring.png'}
-                alt={product?.name}
-                className="max-h-full max-w-full object-contain"
-              />
-              <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-gray-200 text-[10px] font-mono text-gray-700 flex items-center gap-1">
-                <ImageIcon className="w-3.5 h-3.5" /> Media View
-              </div>
-            </motion.div>
+            <div className="relative aspect-square rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden flex items-center justify-center p-6 group">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={mainImageIndex}
+                  src={gallery[mainImageIndex] || product?.image || '/images/jewellery_cad_ring.png'}
+                  alt={product?.name}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.25 }}
+                  className="max-h-full max-w-full object-contain"
+                />
+              </AnimatePresence>
+
+              {/* Counter Badge */}
+              {gallery.length > 1 && (
+                <div className="absolute top-3 left-3 bg-black/75 backdrop-blur-md px-2.5 py-1 rounded-full border border-gray-700 text-[10px] font-mono text-white flex items-center gap-1">
+                  <ImageIcon className="w-3 h-3 text-cyan-400" /> {mainImageIndex + 1} / {gallery.length}
+                </div>
+              )}
+
+              {/* Previous Button */}
+              {gallery.length > 1 && (
+                <button
+                  onClick={handlePrevImage}
+                  aria-label="Previous Image"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow-md border border-gray-200 flex items-center justify-center text-gray-800 active:scale-90 transition-transform cursor-pointer z-10"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+              )}
+
+              {/* Next Button */}
+              {gallery.length > 1 && (
+                <button
+                  onClick={handleNextImage}
+                  aria-label="Next Image"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow-md border border-gray-200 flex items-center justify-center text-gray-800 active:scale-90 transition-transform cursor-pointer z-10"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              )}
+            </div>
 
             {/* Gallery Thumbnails */}
             {gallery.length > 1 && (
-              <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
                 {gallery.map((img, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setMainImage(img)}
+                    onClick={() => setMainImageIndex(idx)}
                     className={`w-14 h-14 rounded-xl border-2 overflow-hidden bg-white p-1 shrink-0 transition-all ${
-                      mainImage === img ? 'border-black scale-105 shadow-xs' : 'border-gray-200 opacity-60'
+                      mainImageIndex === idx ? 'border-black scale-105 shadow-xs' : 'border-gray-200 opacity-60'
                     }`}
                   >
                     <img src={img} alt="" className="w-full h-full object-cover rounded-lg" />
